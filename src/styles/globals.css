@@ -79,3 +79,7 @@
 @media(max-width:1050px){.blomSectorGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.blomSectorsHeading{align-items:start;flex-direction:column;gap:12px}}
 @media(max-width:650px){.blomSectorsContainer{width:calc(100% - 32px)}.blomSectorsSection{padding:56px 0 70px}.blomSectorGrid{grid-template-columns:1fr;gap:17px}.blomSectorVisual{aspect-ratio:16/9}.blomSectorsHeading{margin-bottom:25px}}
 @media(prefers-reduced-motion:reduce){.blomSectorTile,.blomSectorVisual img{transition:none}}
+
+/* Lift the complete opening composition together by approximately 1 cm (38 CSS px). */
+@media(min-width:1101px){.blomOpeningArtwork,.blomOpeningContent{transform:translateY(-38px)}}
+@media(min-width:651px) and (max-width:1100px){.blomOpeningArtwork,.blomOpeningContent{transform:translateY(-24px)}}
