@@ -1,0 +1,28 @@
+import Link from 'next/link';
+import type {Locale} from '@/lib/i18n/dictionary';
+import type {Entry} from '@/lib/data/site';
+import './contracting.css';
+
+const copy={
+ ar:{eyebrow:'BLOM UNITED / CONTRACTING',title:'المقاولات والتطوير العقاري',lead:'نحوّل التخطيط الدقيق إلى تنفيذ منضبط.',intro:'ندير المشروع كوحدة واحدة: نطاق واضح، جدول محكوم، وجودة تُقاس بالتفاصيل.',projects:'من أعمالنا',projectsIntro:'مشاريع حقيقية من ملف بلوم التعريفي. ستظهر صور التنفيذ الأصلية بعد اعتمادها ورفعها.',services:'مجالات العمل',servicesIntro:'خدمات القطاع كما تُنشر وتُعتمد في لوحة الإدارة.',approach:'منهجية العمل',approachIntro:'رحلة واضحة من فهم المتطلبات إلى التسليم.',steps:['فهم المتطلبات','التخطيط والتنسيق','التنفيذ والمتابعة','الفحص والتسليم'],view:'استكشف المشروع',service:'عرض الخدمة',empty:'تُضاف المشاريع والخدمات المعتمدة من لوحة الإدارة.',image:'مساحة الصورة الرسمية',imageNote:'تُستبدل بصورة المشروع الأصلية من Supabase',back:'العودة إلى قطاعات المجموعة',contact:'تواصل معنا',footer:'بلوم المتحدة — نبني الثقة بالتنفيذ'},
+ en:{eyebrow:'BLOM UNITED / CONTRACTING',title:'Contracting & Real Estate Development',lead:'Precise planning. Disciplined execution.',intro:'One scope, one schedule, one standard. We manage each project as one integrated undertaking.',projects:'Selected work',projectsIntro:'Actual projects from the BLOM UNITED company profile. Approved project photographs will be added here.',services:'Our capabilities',servicesIntro:'Approved sector services published from the content management system.',approach:'Our approach',approachIntro:'A clear path from project requirements to handover.',steps:['Understand requirements','Plan and coordinate','Execute and monitor','Inspect and hand over'],view:'Explore project',service:'Explore service',empty:'Approved projects and services will appear here when published.',image:'Official image placeholder',imageNote:'Replace with original project imagery from Supabase',back:'Back to group sectors',contact:'Contact us',footer:'BLOM UNITED — confidence through delivery'}
+} as const;
+const samples=[
+ {slug:'taiba-medical',ar:'مجمع طيبة الطبي',en:'Taiba Medical Complex',arType:'إحلال وتجديد مبنى',enType:'Building renovation'},
+ {slug:'al-maseera-club',ar:'نادي المسيرة الرياضي',en:'Al-Maseera Sports Club',arType:'أعمال طبقة التأسيس',enType:'Base-course works'}
+];
+export default function ContractingExperience({locale,services,projects}:{locale:Locale;services:Entry[];projects:Entry[]}){
+ const t=copy[locale];const ar=locale==='ar';
+ return <main className="contracting">
+  <section className="ctHero"><div className="ctWrap ctHeroGrid">
+   <div className="ctHeroText"><span className="ctKicker">{t.eyebrow}</span><h1>{t.title}</h1><p className="ctLead">{t.lead}</p><p className="ctIntro">{t.intro}</p><div className="ctActions"><a href="#ct-projects" className="ctPrimary">{t.projects}<span aria-hidden="true">↗</span></a><Link href={`/${locale}/contact`} className="ctSecondary">{t.contact}</Link></div></div>
+   <div className="ctHeroVisual ctImagePlaceholder" role="img" aria-label={t.image}><span className="ctVisualGrid" aria-hidden="true"/><span className="ctVisualOutline" aria-hidden="true"/><span className="ctPlaceholderText">{t.image}<small>{t.imageNote}</small></span><span className="ctVisualNumber">01 / 04</span></div>
+  </div></section>
+  <section className="ctSection ctWrap" id="ct-projects"><div className="ctSectionHead"><div><span className="ctKicker">01 — PROJECTS</span><h2>{t.projects}</h2></div><p>{t.projectsIntro}</p></div>
+   <div className="ctProjectGrid">{projects.length?projects.map((p,i)=><Link key={p.id} className="ctProject" href={`/${locale}/projects/${p.slug}`}><div className="ctProjectMedia">{p.cover?<img src={p.cover} alt={p.title} loading="lazy"/>:<div className="ctImagePlaceholder ctProjectPlaceholder"><span>{t.image}</span></div>}<span className="ctProjectIndex">{String(i+1).padStart(2,'0')}</span></div><div className="ctProjectInfo"><div><h3>{p.title}</h3>{p.summary&&<p>{p.summary}</p>}</div><span aria-label={t.view}>↗</span></div></Link>):samples.map((p,i)=><div className="ctProject ctSample" key={p.slug}><div className="ctProjectMedia ctImagePlaceholder ctProjectPlaceholder"><span>{t.image}<small>{t.imageNote}</small></span><span className="ctProjectIndex">{String(i+1).padStart(2,'0')}</span></div><div className="ctProjectInfo"><div><h3>{ar?p.ar:p.en}</h3><p>{ar?p.arType:p.enType}</p></div><span className="ctSampleLabel">{ar?'بانتظار الصور':'Awaiting imagery'}</span></div></div>)}</div>
+  </section>
+  <section className="ctBand" id="ct-services"><div className="ctWrap"><div className="ctSectionHead"><div><span className="ctKicker">02 — CAPABILITIES</span><h2>{t.services}</h2></div><p>{t.servicesIntro}</p></div>{services.length?<div className="ctServiceList">{services.map((s,i)=><Link key={s.id} href={`/${locale}/sectors/contracting/services/${s.slug}`} className="ctService"><span>{String(i+1).padStart(2,'0')}</span><div><h3>{s.title}</h3>{s.summary&&<p>{s.summary}</p>}</div><span aria-label={t.service}>↗</span></Link>)}</div>:<div className="ctEmpty">{t.empty}</div>}</div></section>
+  <section className="ctSection ctWrap" id="ct-approach"><div className="ctSectionHead"><div><span className="ctKicker">03 — PROCESS</span><h2>{t.approach}</h2></div><p>{t.approachIntro}</p></div><div className="ctSteps">{t.steps.map((s,i)=><div className="ctStep" key={s}><span>{String(i+1).padStart(2,'0')}</span><h3>{s}</h3></div>)}</div></section>
+  <section className="ctClosing"><div className="ctWrap ctClosingInner"><p>{t.footer}</p><Link href={`/${locale}/sectors`}>{t.back} <span aria-hidden="true">↗</span></Link></div></section>
+ </main>
+}
