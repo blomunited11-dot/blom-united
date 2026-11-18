@@ -24,7 +24,7 @@ export default async function Home({params}:{params:Promise<{locale:string}>}){
      <p>{d.intro}</p>
     </div>
     <div className="blomSectorGrid">{sectors.map((s,index)=>{const x=items.find(v=>v.slug===s.slug);return <Link className={`blomSectorTile blomSectorTile${index+1}`} key={s.slug} href={`/${locale}/sectors/${s.slug}`}>
-      <div className="blomSectorVisual">{x?.cover?<img src={x.cover} alt="" loading="lazy"/>:<span className="blomSectorWatermark" aria-hidden="true">{String(index+1).padStart(2,'0')}</span>}</div>
+      <div className="blomSectorVisual"><img src={`/brand/${String(index+1).padStart(2,'0')}.webp`} alt="" loading="lazy" /></div>
       <div className="blomSectorInfo"><span className="blomSectorIndex">0{index+1} / 04</span><h3>{x?.title||s[locale]}</h3>{x?.summary&&<p>{x.summary}</p>}<span className="blomSectorExplore">{d.explore}<span aria-hidden="true">{locale==='ar'?'↖':'↗'}</span></span></div>
      </Link>})}</div>
    </div>
