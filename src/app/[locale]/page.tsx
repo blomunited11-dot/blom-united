@@ -1,2 +1,59 @@
-import Link from 'next/link';import {dict,sectors,localeOf} from '@/lib/i18n/dictionary';import {published} from '@/lib/data/site';export const dynamic='force-dynamic';
-export default async function Home({params}:{params:Promise<{locale:string}>}){const l=localeOf((await params).locale),d=dict[l],items=await published('sectors',l);return <main><section className="container hero"><div><h1>{d.title}</h1><p className="muted">{d.subtitle}</p></div><div className="heroArt" aria-hidden="true">B</div></section><section className="section container"><h2>{d.intro}</h2><div className="cards">{sectors.map(s=>{const x=items.find(v=>v.slug===s.slug);return <Link className="card" key={s.slug} href={`/${l}/sectors/${s.slug}`}>{x?.cover?<img className="cardImage" src={x.cover} alt={x.title} style={{width:'100%',objectFit:'cover'}}/>:<div className="cardImage" aria-hidden="true"/>}<div className="cardBody"><h3>{x?.title||s[l]}</h3>{x?.summary&&<p>{x.summary}</p>}<span className="muted">{d.explore}</span></div></Link>})}</div></section></main>}
+import Link from 'next/link';
+import { dict, sectors, localeOf } from '@/lib/i18n/dictionary';
+import { published } from '@/lib/data/site';
+
+export const dynamic = 'force-dynamic';
+
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = localeOf((await params).locale);
+  const d = dict[locale];
+  const items = await published('sectors', locale);
+
+  return (
+    <main>
+      <section className="homeHero" aria-labelledby="home-heading">
+        <div className="container homeHeroInner">
+          <div className="homeHeroCopy">
+            <span className="homeEyebrow">{locale === 'ar' ? 'BLOM UNITED' : 'مجموعة بلوم المتحدة'}</span>
+            <h1 id="home-heading">{d.title}</h1>
+            <div className="homeHeroRule" aria-hidden="true" />
+            <p>{d.subtitle}</p>
+            <Link className="homeHeroLink" href={`/${locale}/sectors`}>
+              {d.sectors}<span aria-hidden="true">{locale === 'ar' ? '←' : '→'}</span>
+            </Link>
+          </div>
+          <div className="homeHeroVisual" aria-hidden="true">
+            <div className="homeHeroOrbit homeHeroOrbitOne" />
+            <div className="homeHeroOrbit homeHeroOrbitTwo" />
+            <div className="homeHeroMark"><span className="homeHeroMarkStem" /><span className="homeHeroMarkTop" /><span className="homeHeroMarkBottom" /></div>
+            <div className="homeHeroVisualLabel">BLOM <span>UNITED</span></div>
+          </div>
+        </div>
+        <div className="homeHeroBottom container">
+          <span>{locale === 'ar' ? 'مجموعة بلوم المتحدة' : 'BLOM UNITED'}</span>
+          <span>{locale === 'ar' ? 'اكتشف مجالات أعمالنا' : 'Discover our sectors'} ↓</span>
+        </div>
+      </section>
+      <section className="section container homeSectors" aria-labelledby="sectors-heading">
+        <div className="homeSectionHeading">
+          <span className="homeEyebrow">BLOM UNITED / 04</span>
+          <h2 id="sectors-heading">{d.intro}</h2>
+        </div>
+        <div className="cards">
+          {sectors.map((sector, index) => {
+            const content = items.find(item => item.slug === sector.slug);
+            return <Link className="card homeSectorCard" key={sector.slug} href={`/${locale}/sectors/${sector.slug}`}>
+              {content?.cover ? <img className="cardImage" src={content.cover} alt={content.title} /> : <div className="cardImage homeSectorPlaceholder" aria-hidden="true"><span>{String(index + 1).padStart(2, '0')}</span></div>}
+              <div className="cardBody">
+                <span className="homeSectorNumber">0{index + 1} / 04</span>
+                <h3>{content?.title || sector[locale]}</h3>
+                {content?.summary && <p>{content.summary}</p>}
+                <span className="homeSectorExplore">{d.explore} <span aria-hidden="true">{locale === 'ar' ? '↖' : '↗'}</span></span>
+              </div>
+            </Link>;
+          })}
+        </div>
+      </section>
+    </main>
+  );
+}
