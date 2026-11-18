@@ -8,7 +8,7 @@ export default async function Home({params}:{params:Promise<{locale:string}>}){
   <section className="blomOpening" aria-labelledby="blomOpeningTitle">
    <div className="container blomOpeningGrid">
     <div className="blomOpeningArtwork" role="img" aria-label={locale==='ar'?'رمز بلوم المتحدة مع مشهد مدينة سعودية':'BLOM UNITED symbol with Saudi cityscape'}>
-     <div className="blomOpeningB" aria-hidden="true"/>
+     <img className="blomOpeningImage" src="/brand/hero-city-b.webp" alt="" width={745} height={771} fetchPriority="high" />
     </div>
     <div className="blomOpeningContent">
      <h1 id="blomOpeningTitle">{locale==='ar'?<>مجموعة<br/>بلوم المتحدة</>:<>BLOM<br/>UNITED</>}</h1>
