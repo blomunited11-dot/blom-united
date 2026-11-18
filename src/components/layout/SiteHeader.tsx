@@ -6,8 +6,7 @@ export function SiteHeader({locale}:{locale:Locale}){
  const d=dict[locale],path=usePathname(),other=locale==='ar'?'en':'ar',otherPath=path.replace(/^\/(ar|en)(?=\/|$)/,`/${other}`);
  return <header className="header blomHeader"><div className="container headerInner">
   <Link className="brand blomBrand" href={`/${locale}`} aria-label={d.title}>
-   <span className="blomBrandNames"><strong>بلوم المتحدة</strong><span>BLOM UNITED</span></span>
-   <span className="blomBrandSymbol" aria-hidden="true"><span className="blomBrandBTop"/><span className="blomBrandBBottom"/></span>
+   <img className="blomBrandLogo" src="/brand/blom-header-logo.png" alt="بلوم المتحدة — BLOM UNITED" width={260} height={76} />
   </Link>
   <nav className="nav" aria-label={d.sectors}>
    <Link className={path===`/${locale}`?'navActive':''} href={`/${locale}`}>{d.home}</Link>
