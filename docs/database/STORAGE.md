@@ -1,0 +1,2 @@
+# Supabase Storage
+Bucket: `blom-media`. Public read for published imagery; only owner may upload in current implementation. No approved photos have been uploaded. Uploads are limited to 10 MB and JPEG/PNG/WebP/AVIF via the application. The bucket policy permits SVG but the UI does not upload SVG because of active-content risk. Review content safety, access policies and media linking before production. The media library currently uploads and lists assets but does not yet attach them to sectors, projects or products.
