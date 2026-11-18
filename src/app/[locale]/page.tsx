@@ -13,7 +13,6 @@ export default async function Home({params}:{params:Promise<{locale:string}>}){
     <div className="blomOpeningContent">
      <h1 id="blomOpeningTitle">{locale==='ar'?<>مجموعة<br/>بلوم المتحدة</>:<>BLOM<br/>UNITED</>}</h1>
      <p className="blomOpeningTagline">{d.subtitle}</p>
-     <div className="blomOpeningAccent" aria-hidden="true"><span/><span/></div>
      <p className="blomOpeningDescription">{locale==='ar'?'مجموعة سعودية رائدة تجمع بين الخبرة والتنمية المستدامة في المقاولات والتطوير العقاري، الصناعة، الضيافة، والخدمات الإدارية وتأسيس الأعمال.':'A leading Saudi group bringing together expertise and sustainable development across contracting and real estate, industry, hospitality, and business services.'}</p>
     </div>
    </div>
