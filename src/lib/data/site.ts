@@ -1,0 +1,10 @@
+import {serverDb} from '@/lib/supabase/server';
+import type {Locale} from '@/lib/i18n/dictionary';
+export type Entry={id:string;slug:string;title:string;summary:string|null;cover:string|null};
+type Kind='sectors'|'services'|'projects'|'news'|'pages'|'catalog_products';
+export async function published(kind:Kind,locale:Locale,sectorId?:string):Promise<Entry[]>{
+try{const db=await serverDb();let q=db.from(kind).select('id,slug,sector_id').eq('status','published');if(sectorId)q=q.eq('sector_id',sectorId);const {data,error}=await q.limit(100);if(error||!data?.length)return [];
+const ids=data.map(x=>x.id),entity=({sectors:'sector',services:'service',projects:'project',news:'news',pages:'page',catalog_products:'product'} as const)[kind];
+const {data:tr}=await db.from('content_translations').select('entity_id,title,summary').eq('entity_type',entity).eq('locale',locale).in('entity_id',ids);
+const {data:im}=await db.from('entity_media').select('entity_id,media_assets(public_url)').eq('entity_type',entity).in('entity_id',ids).order('sort_order');
+return data.map(x=>{const t=tr?.find(v=>v.entity_id===x.id),m=im?.find(v=>v.entity_id===x.id),asset=m?.media_assets as unknown as {public_url:string|null}|null;return{id:x.id,slug:x.slug,title:t?.title||x.slug,summary:t?.summary||null,cover:asset?.public_url||null}})}catch{return []}}
