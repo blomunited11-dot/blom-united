@@ -83,3 +83,8 @@
 /* Lift the complete opening composition together by approximately 1 cm (38 CSS px). */
 @media(min-width:1101px){.blomOpeningArtwork,.blomOpeningContent{transform:translateY(-38px)}}
 @media(min-width:651px) and (max-width:1100px){.blomOpeningArtwork,.blomOpeningContent{transform:translateY(-24px)}}
+
+/* Soften the four sector image frames and their outer cards. */
+.blomSectorTile{border-radius:22px}
+.blomSectorVisual{border-radius:21px 21px 0 0}
+@media(max-width:650px){.blomSectorTile{border-radius:18px}.blomSectorVisual{border-radius:17px 17px 0 0}}
