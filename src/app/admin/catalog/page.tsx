@@ -1,1 +1,1 @@
-export default function Page(){return <><h1>كتالوج الصناعة</h1><p>الفئات والمنتجات والمواصفات.</p></>}
+import {EntityManager} from '@/components/admin/EntityManager';export default function Page(){return <EntityManager table="catalog_products" title="كتالوج منتجات الصناعة"/>}

@@ -1,1 +1,1 @@
-export default function Page(){return <><h1>إدارة الصفحات</h1><p>جاهز للربط بقاعدة البيانات بعد تطبيق المخطط.</p></>}
+import {EntityManager} from '@/components/admin/EntityManager';export default function Page(){return <EntityManager table="pages" title="إدارة الصفحات"/>}

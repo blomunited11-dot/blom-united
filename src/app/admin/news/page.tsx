@@ -1,1 +1,1 @@
-export default function Page(){return <><h1>الأخبار</h1><p>المحتوى ثنائي اللغة.</p></>}
+import {EntityManager} from '@/components/admin/EntityManager';export default function Page(){return <EntityManager table="news" title="إدارة الأخبار"/>}

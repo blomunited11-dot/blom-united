@@ -1,1 +1,1 @@
-export default function Page(){return <><h1>إدارة القطاعات</h1><p>المحتوى والخدمات والصور لكل قطاع.</p></>}
+import {EntityManager} from '@/components/admin/EntityManager';export default function Page(){return <EntityManager table="sectors" title="إدارة القطاعات"/>}

@@ -1,1 +1,1 @@
-export default function Page(){return <><h1>إدارة المشاريع</h1><p>المشاريع والمعارض.</p></>}
+import {EntityManager} from '@/components/admin/EntityManager';export default function Page(){return <EntityManager table="projects" title="إدارة المشاريع"/>}
