@@ -52,3 +52,30 @@
 @media(min-width:1101px) and (max-height:850px){.blomOpeningGrid{min-height:0}.blomOpeningImage{max-height:calc(100svh - 112px)}}
 @media(max-width:1100px){.blomHeader .blomBrandLogo{height:56px;max-width:225px}.blomOpeningGrid{width:calc(100% - 48px);min-height:0;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px}.blomOpeningImage{max-height:none}.blomOpeningContent h1{font-size:clamp(35px,4.7vw,58px)}.blomOpeningTagline{font-size:clamp(20px,2.8vw,32px)}.blomOpeningDescription{font-size:clamp(16px,1.85vw,22px)}}
 @media(max-width:650px){.blomHeader .container,.blomOpeningGrid{width:calc(100% - 32px)}.blomHeader .headerInner{min-height:0}.blomHeader .blomBrandLogo{height:48px;max-width:190px}.blomOpeningGrid{grid-template-columns:1fr;gap:22px;padding-block:18px 38px}.blomOpeningArtwork{grid-column:1;grid-row:1;max-width:480px;justify-self:center}.blomOpeningImage{width:100%;max-height:none}.blomOpeningContent{grid-column:1;grid-row:2;max-width:none;justify-self:stretch;padding-top:0}.blomOpeningContent h1{font-size:clamp(38px,9vw,56px)}.blomOpeningTagline{font-size:clamp(21px,5vw,29px)}.blomOpeningDescription{font-size:clamp(17px,4vw,21px)}.blomOpeningAccent{margin:18px 0 21px}}
+
+/* Homepage — four business sectors, without placeholder photography or invented content. */
+.blomSectorsSection{background:#f6f9fc;padding:clamp(65px,7vw,112px) 0 110px;border-top:1px solid #e7edf4}
+.blomSectorsContainer{width:min(1460px,calc(100% - 80px))}
+.blomSectorsHeading{display:flex;align-items:end;justify-content:space-between;gap:32px;margin-bottom:38px}
+.blomSectorsEyebrow{display:block;color:#4c7da9;font:700 12px Arial,sans-serif;letter-spacing:.2em;direction:ltr;text-align:start}
+.blomSectorsHeading h2{color:#103f7d;font-size:clamp(32px,3.2vw,54px);line-height:1.3;margin:13px 0 0}
+.blomSectorsHeading p{max-width:460px;font-size:clamp(16px,1.35vw,22px);color:#63738b;margin:0}
+.blomSectorGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.blomSectorTile{display:flex;flex-direction:column;min-width:0;overflow:hidden;background:white;border:1px solid #dce7f1;border-radius:3px;transition:transform .25s ease,box-shadow .25s ease}
+.blomSectorTile:hover,.blomSectorTile:focus-visible{transform:translateY(-5px);box-shadow:0 18px 36px #163b6c17}
+.blomSectorVisual{position:relative;aspect-ratio:4/3;overflow:hidden;background:linear-gradient(145deg,#e5f1f9,#b7d4e8)}
+.blomSectorTile2 .blomSectorVisual{background:linear-gradient(145deg,#dcebf1,#9fbfc9)}
+.blomSectorTile3 .blomSectorVisual{background:linear-gradient(145deg,#e8eef6,#b6c9df)}
+.blomSectorTile4 .blomSectorVisual{background:linear-gradient(145deg,#e5f0f7,#b0cce1)}
+.blomSectorVisual img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+.blomSectorTile:hover .blomSectorVisual img{transform:scale(1.04)}
+.blomSectorWatermark{position:absolute;inset:0;display:grid;place-items:center;font:700 clamp(80px,10vw,170px)/1 Arial,sans-serif;letter-spacing:-.07em;color:#fff9;user-select:none}
+.blomSectorInfo{display:flex;flex-direction:column;flex:1;padding:25px 24px 22px}
+.blomSectorIndex{font:700 12px Arial,sans-serif;color:#7a9db8;letter-spacing:.12em;direction:ltr;align-self:flex-start}
+.blomSectorInfo h3{font-size:clamp(19px,1.6vw,26px);line-height:1.5;color:#123f78;margin:16px 0 14px}
+.blomSectorInfo p{font-size:15px;color:#6b7b8f;margin:0 0 18px}
+.blomSectorExplore{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-top:auto;padding-top:16px;border-top:1px solid #e6edf4;font-size:14px;font-weight:700;color:#2369a7}
+.blomSectorExplore>span{font-size:20px}
+@media(max-width:1050px){.blomSectorGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.blomSectorsHeading{align-items:start;flex-direction:column;gap:12px}}
+@media(max-width:650px){.blomSectorsContainer{width:calc(100% - 32px)}.blomSectorsSection{padding:56px 0 70px}.blomSectorGrid{grid-template-columns:1fr;gap:17px}.blomSectorVisual{aspect-ratio:16/9}.blomSectorsHeading{margin-bottom:25px}}
+@media(prefers-reduced-motion:reduce){.blomSectorTile,.blomSectorVisual img{transition:none}}
