@@ -1,4 +1,4 @@
--- BLOM UNITED baseline: safe to rerun for matching existing objects; does not overwrite existing tables or policies. 
+-- BLOM UNITED baseline: rerunnable baseline; replaces named RLS policies with the baseline definitions. 
 -- Existing table structures and policy definitions must still be verified before production.
 create extension if not exists pgcrypto;
 DO $enum_guard$
@@ -39,109 +39,48 @@ alter table public.catalog_products enable row level security;
 alter table public.entity_media enable row level security;
 alter table public.content_translations enable row level security;
 alter table public.audit_events enable row level security;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='sectors' AND policyname='sectors_read') THEN
-    EXECUTE $sql$CREATE POLICY sectors_read ON public.sectors for select using(status='published' or public.can_manage_sector(id))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='sectors' AND policyname='sectors_write') THEN
-    EXECUTE $sql$CREATE POLICY sectors_write ON public.sectors for all using(public.is_owner()) with check(public.is_owner())$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='admin_memberships' AND policyname='memberships_read') THEN
-    EXECUTE $sql$CREATE POLICY memberships_read ON public.admin_memberships for select using(user_id=auth.uid() or public.is_owner())$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='admin_memberships' AND policyname='memberships_write') THEN
-    EXECUTE $sql$CREATE POLICY memberships_write ON public.admin_memberships for all using(public.is_owner()) with check(public.is_owner())$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='sector_grants' AND policyname='grants_read') THEN
-    EXECUTE $sql$CREATE POLICY grants_read ON public.sector_grants for select using(user_id=auth.uid() or public.is_owner())$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='sector_grants' AND policyname='grants_write') THEN
-    EXECUTE $sql$CREATE POLICY grants_write ON public.sector_grants for all using(public.is_owner()) with check(public.is_owner())$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='pages' AND policyname='pages_read') THEN
-    EXECUTE $sql$CREATE POLICY pages_read ON public.pages for select using(status='published' or public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='pages' AND policyname='pages_write') THEN
-    EXECUTE $sql$CREATE POLICY pages_write ON public.pages for all using(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id))) with check(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='services' AND policyname='services_read') THEN
-    EXECUTE $sql$CREATE POLICY services_read ON public.services for select using(status='published' or public.can_manage_sector(sector_id))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='services' AND policyname='services_write') THEN
-    EXECUTE $sql$CREATE POLICY services_write ON public.services for all using(public.can_manage_sector(sector_id)) with check(public.can_manage_sector(sector_id))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='projects' AND policyname='projects_read') THEN
-    EXECUTE $sql$CREATE POLICY projects_read ON public.projects for select using(status='published' or public.can_manage_sector(sector_id))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='projects' AND policyname='projects_write') THEN
-    EXECUTE $sql$CREATE POLICY projects_write ON public.projects for all using(public.can_manage_sector(sector_id)) with check(public.can_manage_sector(sector_id))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='news' AND policyname='news_read') THEN
-    EXECUTE $sql$CREATE POLICY news_read ON public.news for select using(status='published' or public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='news' AND policyname='news_write') THEN
-    EXECUTE $sql$CREATE POLICY news_write ON public.news for all using(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id))) with check(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='catalog_categories' AND policyname='category_read') THEN
-    EXECUTE $sql$CREATE POLICY category_read ON public.catalog_categories for select using(status='published' or public.can_manage_sector(sector_id))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='catalog_categories' AND policyname='category_write') THEN
-    EXECUTE $sql$CREATE POLICY category_write ON public.catalog_categories for all using(public.can_manage_sector(sector_id)) with check(public.can_manage_sector(sector_id))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='catalog_products' AND policyname='product_read') THEN
-    EXECUTE $sql$CREATE POLICY product_read ON public.catalog_products for select using(status='published' or public.can_manage_sector(sector_id))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='catalog_products' AND policyname='product_write') THEN
-    EXECUTE $sql$CREATE POLICY product_write ON public.catalog_products for all using(public.can_manage_sector(sector_id)) with check(public.can_manage_sector(sector_id))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='media_assets' AND policyname='media_read') THEN
-    EXECUTE $sql$CREATE POLICY media_read ON public.media_assets for select using(public_url is not null or public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='media_assets' AND policyname='media_write') THEN
-    EXECUTE $sql$CREATE POLICY media_write ON public.media_assets for all using(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id))) with check(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)))$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='content_translations' AND policyname='translation_read') THEN
-    EXECUTE $sql$CREATE POLICY translation_read ON public.content_translations for select using(
+DROP POLICY IF EXISTS sectors_read ON public.sectors;
+CREATE POLICY sectors_read ON public.sectors for select using(status='published' or public.can_manage_sector(id));
+DROP POLICY IF EXISTS sectors_write ON public.sectors;
+CREATE POLICY sectors_write ON public.sectors for all using(public.is_owner()) with check(public.is_owner());
+DROP POLICY IF EXISTS memberships_read ON public.admin_memberships;
+CREATE POLICY memberships_read ON public.admin_memberships for select using(user_id=auth.uid() or public.is_owner());
+DROP POLICY IF EXISTS memberships_write ON public.admin_memberships;
+CREATE POLICY memberships_write ON public.admin_memberships for all using(public.is_owner()) with check(public.is_owner());
+DROP POLICY IF EXISTS grants_read ON public.sector_grants;
+CREATE POLICY grants_read ON public.sector_grants for select using(user_id=auth.uid() or public.is_owner());
+DROP POLICY IF EXISTS grants_write ON public.sector_grants;
+CREATE POLICY grants_write ON public.sector_grants for all using(public.is_owner()) with check(public.is_owner());
+DROP POLICY IF EXISTS pages_read ON public.pages;
+CREATE POLICY pages_read ON public.pages for select using(status='published' or public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)));
+DROP POLICY IF EXISTS pages_write ON public.pages;
+CREATE POLICY pages_write ON public.pages for all using(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id))) with check(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)));
+DROP POLICY IF EXISTS services_read ON public.services;
+CREATE POLICY services_read ON public.services for select using(status='published' or public.can_manage_sector(sector_id));
+DROP POLICY IF EXISTS services_write ON public.services;
+CREATE POLICY services_write ON public.services for all using(public.can_manage_sector(sector_id)) with check(public.can_manage_sector(sector_id));
+DROP POLICY IF EXISTS projects_read ON public.projects;
+CREATE POLICY projects_read ON public.projects for select using(status='published' or public.can_manage_sector(sector_id));
+DROP POLICY IF EXISTS projects_write ON public.projects;
+CREATE POLICY projects_write ON public.projects for all using(public.can_manage_sector(sector_id)) with check(public.can_manage_sector(sector_id));
+DROP POLICY IF EXISTS news_read ON public.news;
+CREATE POLICY news_read ON public.news for select using(status='published' or public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)));
+DROP POLICY IF EXISTS news_write ON public.news;
+CREATE POLICY news_write ON public.news for all using(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id))) with check(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)));
+DROP POLICY IF EXISTS category_read ON public.catalog_categories;
+CREATE POLICY category_read ON public.catalog_categories for select using(status='published' or public.can_manage_sector(sector_id));
+DROP POLICY IF EXISTS category_write ON public.catalog_categories;
+CREATE POLICY category_write ON public.catalog_categories for all using(public.can_manage_sector(sector_id)) with check(public.can_manage_sector(sector_id));
+DROP POLICY IF EXISTS product_read ON public.catalog_products;
+CREATE POLICY product_read ON public.catalog_products for select using(status='published' or public.can_manage_sector(sector_id));
+DROP POLICY IF EXISTS product_write ON public.catalog_products;
+CREATE POLICY product_write ON public.catalog_products for all using(public.can_manage_sector(sector_id)) with check(public.can_manage_sector(sector_id));
+DROP POLICY IF EXISTS media_read ON public.media_assets;
+CREATE POLICY media_read ON public.media_assets for select using(public_url is not null or public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)));
+DROP POLICY IF EXISTS media_write ON public.media_assets;
+CREATE POLICY media_write ON public.media_assets for all using(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id))) with check(public.is_owner() or (sector_id is not null and public.can_manage_sector(sector_id)));
+DROP POLICY IF EXISTS translation_read ON public.content_translations;
+CREATE POLICY translation_read ON public.content_translations for select using(
   (entity_type='sector' and exists(select 1 from public.sectors s where s.id=entity_id and s.status='published'))
   or (entity_type='page' and exists(select 1 from public.pages p where p.id=entity_id and p.status='published'))
   or (entity_type='service' and exists(select 1 from public.services s where s.id=entity_id and s.status='published'))
@@ -150,28 +89,14 @@ DO $policy$ BEGIN
   or (entity_type='category' and exists(select 1 from public.catalog_categories c where c.id=entity_id and c.status='published'))
   or (entity_type='product' and exists(select 1 from public.catalog_products p where p.id=entity_id and p.status='published'))
   or public.is_owner()
-)$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='content_translations' AND policyname='translation_write') THEN
-    EXECUTE $sql$CREATE POLICY translation_write ON public.content_translations for all using(public.is_owner()) with check(public.is_owner())$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='entity_media' AND policyname='entity_media_read') THEN
-    EXECUTE $sql$CREATE POLICY entity_media_read ON public.entity_media for select using(true)$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='entity_media' AND policyname='entity_media_write') THEN
-    EXECUTE $sql$CREATE POLICY entity_media_write ON public.entity_media for all using(public.is_owner()) with check(public.is_owner())$sql$;
-  END IF;
-END $policy$;
-DO $policy$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='audit_events' AND policyname='audit_read') THEN
-    EXECUTE $sql$CREATE POLICY audit_read ON public.audit_events for select using(public.is_owner())$sql$;
-  END IF;
-END $policy$;
+);
+DROP POLICY IF EXISTS translation_write ON public.content_translations;
+CREATE POLICY translation_write ON public.content_translations for all using(public.is_owner()) with check(public.is_owner());
+DROP POLICY IF EXISTS entity_media_read ON public.entity_media;
+CREATE POLICY entity_media_read ON public.entity_media for select using(true);
+DROP POLICY IF EXISTS entity_media_write ON public.entity_media;
+CREATE POLICY entity_media_write ON public.entity_media for all using(public.is_owner()) with check(public.is_owner());
+DROP POLICY IF EXISTS audit_read ON public.audit_events;
+CREATE POLICY audit_read ON public.audit_events for select using(public.is_owner());
 -- SECURITY NOTE: editor/publisher enforcement, publication transitions, and scoped translation/media writes
 -- require reviewed RPCs and stronger policies before enabling content-management writes in production.
