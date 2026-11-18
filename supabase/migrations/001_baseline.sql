@@ -1,4 +1,5 @@
--- BLOM UNITED baseline: safe to rerun for matching existing objects; does not overwrite existing tables or policies.\n-- Existing table structures and policy definitions must still be verified before production.
+-- BLOM UNITED baseline: safe to rerun for matching existing objects; does not overwrite existing tables or policies. 
+-- Existing table structures and policy definitions must still be verified before production.
 create extension if not exists pgcrypto;
 DO $
 BEGIN
