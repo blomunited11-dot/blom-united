@@ -1,13 +1,9 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { getSupabasePublicConfig } from './config';
 
 export async function serverDb() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    throw new Error('Supabase public configuration is missing');
-  }
+  const { url, key } = await getSupabasePublicConfig();
 
   const jar = await cookies();
   type CookieSetOptions = Parameters<typeof jar.set>[2];
