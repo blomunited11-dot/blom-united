@@ -1,7 +1,7 @@
 -- BLOM UNITED baseline: safe to rerun for matching existing objects; does not overwrite existing tables or policies. 
 -- Existing table structures and policy definitions must still be verified before production.
 create extension if not exists pgcrypto;
-DO $
+DO $enum_guard$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid=t.typnamespace WHERE n.nspname='public' AND t.typname='publish_state') THEN
     CREATE TYPE public.publish_state AS ENUM ('draft','review','published','archived');
@@ -10,7 +10,7 @@ BEGIN
     IS DISTINCT FROM ARRAY['draft','review','published','archived']::text[] THEN
     RAISE EXCEPTION 'Existing public.publish_state values differ from the required values; manual review needed';
   END IF;
-END $;
+END $enum_guard$;
 create table if not exists public.sectors(id uuid primary key default gen_random_uuid(),slug text unique not null,sort_order int not null default 0,status public.publish_state not null default 'draft',created_at timestamptz not null default now());
 create table if not exists public.admin_memberships(user_id uuid primary key references auth.users(id) on delete cascade,role text not null check(role in ('owner','editor','publisher','viewer')),active boolean not null default true);
 create table if not exists public.sector_grants(user_id uuid references public.admin_memberships(user_id) on delete cascade,sector_id uuid references public.sectors(id) on delete cascade,can_edit boolean not null default false,can_publish boolean not null default false,primary key(user_id,sector_id));
