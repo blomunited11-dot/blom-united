@@ -1,0 +1,1 @@
+import {dict,localeOf} from '@/lib/i18n/dictionary';export default async function Page({params}:{params:Promise<{locale:string}>}){const l=localeOf((await params).locale);return <main className="container page"><h1>{dict[l].about}</h1><p>{dict[l].noContent}</p></main>}

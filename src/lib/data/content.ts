@@ -1,0 +1,4 @@
+import {publicDb} from '@/lib/supabase/public';
+import type {Locale} from '@/lib/i18n/dictionary';
+export type PublishedItem={id:string;slug:string;title:string;summary:string|null;image_url:string|null};
+export async function getPublished(kind:'projects'|'news',locale:Locale,sectorId?:string):Promise<PublishedItem[]>{const db=publicDb();if(!db)return [];let q=db.from(kind).select('id,slug,sector_id,content_translations!inner(locale,title,summary),media_assets(public_url)').eq('status','published').eq('content_translations.locale',locale);if(sectorId)q=q.eq('sector_id',sectorId);const {data,error}=await q.limit(100);if(error){console.error('Content query failed',error.message);return []}return (data||[]).map((r:any)=>({id:r.id,slug:r.slug,title:r.content_translations?.[0]?.title||'',summary:r.content_translations?.[0]?.summary||null,image_url:r.media_assets?.public_url||null}))}

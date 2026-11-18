@@ -1,0 +1,2 @@
+import {notFound} from 'next/navigation';import {dict,sectors,localeOf} from '@/lib/i18n/dictionary';
+export default async function Sector({params}:{params:Promise<{locale:string;slug:string}>}){const {locale,slug}=await params;const l=localeOf(locale);const s=sectors.find(x=>x.slug===slug);if(!s)notFound();return <main className="container page"><h1>{s[l]}</h1><p className="muted">{dict[l].noContent}</p></main>}
