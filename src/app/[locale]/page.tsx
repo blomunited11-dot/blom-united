@@ -17,9 +17,17 @@ export default async function Home({params}:{params:Promise<{locale:string}>}){
     </div>
    </div>
   </section>
-  <section className="section container homeSectors" aria-labelledby="sectors-heading">
-   <h2 id="sectors-heading">{d.sectors}</h2>
-   <div className="cards">{sectors.map(s=>{const x=items.find(v=>v.slug===s.slug);return <Link className="card" key={s.slug} href={`/${locale}/sectors/${s.slug}`}>{x?.cover?<img className="cardImage" src={x.cover} alt={x.title}/>:<div className="cardImage" aria-hidden="true"/>}<div className="cardBody"><h3>{x?.title||s[locale]}</h3>{x?.summary&&<p>{x.summary}</p>}<span className="muted">{d.explore}</span></div></Link>})}</div>
+  <section className="blomSectorsSection" aria-labelledby="sectors-heading">
+   <div className="container blomSectorsContainer">
+    <div className="blomSectorsHeading">
+     <div><span className="blomSectorsEyebrow">BLOM UNITED / 04</span><h2 id="sectors-heading">{d.sectors}</h2></div>
+     <p>{d.intro}</p>
+    </div>
+    <div className="blomSectorGrid">{sectors.map((s,index)=>{const x=items.find(v=>v.slug===s.slug);return <Link className={`blomSectorTile blomSectorTile${index+1}`} key={s.slug} href={`/${locale}/sectors/${s.slug}`}>
+      <div className="blomSectorVisual">{x?.cover?<img src={x.cover} alt="" loading="lazy"/>:<span className="blomSectorWatermark" aria-hidden="true">{String(index+1).padStart(2,'0')}</span>}</div>
+      <div className="blomSectorInfo"><span className="blomSectorIndex">0{index+1} / 04</span><h3>{x?.title||s[locale]}</h3>{x?.summary&&<p>{x.summary}</p>}<span className="blomSectorExplore">{d.explore}<span aria-hidden="true">{locale==='ar'?'↖':'↗'}</span></span></div>
+     </Link>})}</div>
+   </div>
   </section>
  </main>;
 }
