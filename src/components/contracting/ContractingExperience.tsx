@@ -4,7 +4,7 @@ import type {Entry} from '@/lib/data/site';
 import type {ContractingCopy} from '@/lib/data/contracting';
 import './contracting.css';
 
-const content={
+export const contractingDefaultContent={
  ar:{
   title:'المقاولات والتطوير العقاري',label:'قطاع المقاولات / BLOM UNITED',
   lead:'نحوّل التخطيط الدقيق إلى تنفيذ منضبط.',
@@ -60,7 +60,7 @@ const content={
 } as const;
 
 export default function ContractingExperience({locale,services,projects,copy={}}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy}){
- const t={...content[locale],...copy};
+ const t={...contractingDefaultContent[locale],...copy};
  return <main className="contracting">
   <section className="ctHero"><div className="ctWrap ctHeroGrid">
    <div className="ctHeroText"><span className="ctKicker">{t.label}</span><h1>{t.title}</h1><p className="ctLead">{t.lead}</p><p className="ctIntro">{t.intro}</p><div className="ctActions"><a href="#ct-projects" className="ctPrimary">{t.seeProjects} <span aria-hidden="true">↗</span></a><Link href={`/${locale}/contact`} className="ctSecondary">{t.contact}</Link></div></div>
