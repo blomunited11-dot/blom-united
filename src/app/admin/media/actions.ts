@@ -14,10 +14,19 @@ export async function uploadMedia(form:FormData){
  const entityType=String(form.get('entity_type')||'project'),entityId=String(form.get('entity_id')||'');
  if(entityId&&(!['project','service','sector'].includes(entityType)||!/^[0-9a-f-]{36}$/i.test(entityId)))throw new Error('Invalid entity');
  if(entityId){
-  const table=entityType==='project'?'projects':entityType==='service'?'services':'sectors';
-  const{data:entity,error:entityError}=await db.from(table).select(entityType==='sector'?'id':'id,sector_id').eq('id',entityId).single();
-  if(entityError||!entity)throw new Error('Linked content not found');
-  if(sectorId&&(entityType==='sector'?entity.id!==sectorId:entity.sector_id!==sectorId))throw new Error('The image sector must match the linked content sector');
+  if(entityType==='sector'){
+   const{data:entity,error:entityError}=await db.from('sectors').select('id').eq('id',entityId).single();
+   if(entityError||!entity)throw new Error('Linked content not found');
+   if(sectorId&&entity.id!==sectorId)throw new Error('The image sector must match the linked content sector');
+  }else if(entityType==='project'){
+   const{data:entity,error:entityError}=await db.from('projects').select('sector_id').eq('id',entityId).single();
+   if(entityError||!entity)throw new Error('Linked content not found');
+   if(sectorId&&entity.sector_id!==sectorId)throw new Error('The image sector must match the linked content sector');
+  }else{
+   const{data:entity,error:entityError}=await db.from('services').select('sector_id').eq('id',entityId).single();
+   if(entityError||!entity)throw new Error('Linked content not found');
+   if(sectorId&&entity.sector_id!==sectorId)throw new Error('The image sector must match the linked content sector');
+  }
  }
  const ratio=String(form.get('display_ratio')||'16/9'),fit=String(form.get('display_fit')||'cover'),position=String(form.get('display_position')||'center');
  if(!['16/9','4/3','1/1','3/4','21/9'].includes(ratio)||!['cover','contain'].includes(fit)||!['center','top','bottom','left','right'].includes(position))throw new Error('Invalid presentation settings');
