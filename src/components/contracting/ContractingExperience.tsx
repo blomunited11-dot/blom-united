@@ -59,12 +59,12 @@ export const contractingDefaultContent={
  }
 } as const;
 
-export default function ContractingExperience({locale,services,projects,copy={}}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy}){
+export default function ContractingExperience({locale,services,projects,copy={},heroImage=null}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy;heroImage?:string|null}){
  const t={...contractingDefaultContent[locale],...copy};
  return <main className="contracting">
   <section className="ctHero"><div className="ctWrap ctHeroGrid">
    <div className="ctHeroText"><span className="ctKicker">{t.label}</span><h1>{t.title}</h1><p className="ctLead">{t.lead}</p><p className="ctIntro">{t.intro}</p><div className="ctActions"><a href="#ct-projects" className="ctPrimary">{t.seeProjects} <span aria-hidden="true">↗</span></a><Link href={`/${locale}/contact`} className="ctSecondary">{t.contact}</Link></div></div>
-   <div className="ctHeroVisual ctImagePlaceholder" role="img" aria-label={t.photo}><span className="ctVisualGrid" aria-hidden="true"/><span className="ctVisualOutline" aria-hidden="true"/><span className="ctPlaceholderText">{t.photo}<small>{t.pending}</small></span></div>
+   <div className="ctHeroVisual ctImagePlaceholder" role="img" aria-label={t.photo}>{heroImage?<img src={heroImage} alt={t.photo} style={{width:"100%",height:"100%",objectFit:"cover",position:"absolute",inset:0,zIndex:2}}/>:null}<span className="ctVisualGrid" aria-hidden="true"/><span className="ctVisualOutline" aria-hidden="true"/><span className="ctPlaceholderText">{t.photo}<small>{t.pending}</small></span></div>
   </div></section>
   <nav className="ctLocalNav ctWrap" aria-label={t.title}><a href="#ct-services">{t.capabilities}</a><a href="#ct-projects">{t.workTitle}</a><a href="#ct-process">{t.lifecycle}</a><a href="#ct-quality">{t.standards}</a></nav>
   <section className="ctSection ctWrap" id="ct-services"><div className="ctSectionHead"><div><span className="ctKicker">01 / CAPABILITIES</span><h2>{t.capabilities}</h2></div><p>{t.capIntro}</p></div><div className="ctCapabilities">{t.services.map((s,i)=><div className="ctCapability" key={s}><span>{String(i+1).padStart(2,'0')}</span><h3>{s}</h3></div>)}</div>{services.length>0&&<div className="ctLiveList"><h3>{t.publishedServices}</h3>{services.map(s=><Link key={s.id} href={`/${locale}/sectors/contracting/services/${s.slug}`}>{s.title}<span aria-hidden="true">↗</span></Link>)}</div>}</section>

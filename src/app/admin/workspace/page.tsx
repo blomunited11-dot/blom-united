@@ -1,26 +1,51 @@
 import Link from 'next/link';
 import {serverDb} from '@/lib/supabase/server';
+import {contractingArchitecture} from '@/config/contracting.architecture';
 export const dynamic='force-dynamic';
-const paths=[
- ['sectors','إعدادات القطاعات وحالة نشرها'],
- ['projects','المشاريع والعناوين والأوصاف'],
- ['services','الخدمات المنشورة'],
- ['catalog','منتجات قطاع الصناعة'],
- ['media','رفع الصور والوسائط'],
- ['visual','ربط الصور بالمشاريع والخدمات'],
- ['content','الصفحات الداخلية'],
- ['news','الأخبار']
-] as const;
-export default async function Workspace(){
+type Props={searchParams:Promise<{sector?:string}>};
+const names:Record<string,string>={contracting:'المقاولات والتطوير العقاري',industry:'الصناعة والأخشاب',hospitality:'الضيافة',administrative:'الخدمات الإدارية',services:'الخدمات الإدارية'};
+export default async function Workspace({searchParams}:Props){
+ const {sector:requested}=await searchParams;
  const db=await serverDb();
  const {data:sectors,error}=await db.from('sectors').select('id,slug,status,sort_order').order('sort_order').limit(100);
- return <div style={{maxWidth:1100}}>
-  <h1>إدارة قطاعات BLOM UNITED</h1>
-  <p className="muted">مركز الوصول إلى محتوى القطاعات والصفحات الداخلية. الصفحة الرئيسية للمجموعة خارج نطاق التحرير.</p>
-  {error&&<p role="alert">تعذر قراءة القطاعات: {error.message}</p>}
-  <div className="adminStats">{(sectors||[]).map(s=><article className="adminStat" key={s.id}><span>{s.slug}</span><strong>{s.status}</strong><p><Link href="/admin/sectors">تعديل بيانات القطاع</Link></p>{s.slug==='contracting'&&<p><Link href="/admin/contracting">تحرير أقسام المقاولات</Link></p>}<p><Link href={`/ar/sectors/${s.slug}`} target="_blank">معاينة الصفحة</Link></p></article>)}</div>
-  <h2>أدوات الإدارة المرتبطة</h2>
-  <div className="adminShortcuts">{paths.map(([href,title])=><Link key={href} href={`/admin/${href}`}>{title}</Link>)}</div>
-  <p className="muted">إدارة الصور والحقول المتقدمة في بعض القطاعات ما زالت تتطلب استكمال الربط مع المكونات المرئية. لا يتم الادعاء بأنها قابلة للتحرير حتى يرتبط عرضها بالبيانات فعليًا.</p>
+ const list=sectors||[];
+ const selected=list.find(s=>s.slug===requested)||null;
+ const actions=[
+  ['sectors','بيانات القطاع وحالة النشر'],
+  ['projects','المشاريع'],
+  ['services','الخدمات'],
+  ['catalog','المنتجات والتصنيفات'],
+  ['media','مكتبة الصور والوسائط'],
+  ['visual','ربط صور المشاريع والخدمات'],
+  ['content','الصفحات الداخلية'],
+  ['news','الأخبار']
+ ] as const;
+ return <div style={{maxWidth:1200}}>
+  <h1>لوحة إدارة القطاعات</h1>
+  <p className="muted">الخطوة الأولى: اختر القطاع. الصفحة الرئيسية للمجموعة مستثناة تمامًا من التحرير.</p>
+  {error&&<p role="alert">{error.message}</p>}
+  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:14,margin:'25px 0'}}>
+   {list.map(s=><Link key={s.id} href={`/admin/workspace?sector=${encodeURIComponent(s.slug)}`} style={{display:'grid',gap:10,border:selected?.id===s.id?'2px solid #285a78':'1px solid #d7dee7',background:selected?.id===s.id?'#eaf3f8':'white',borderRadius:14,padding:24}}>
+    <strong>{names[s.slug]||s.slug}</strong><small>{s.status==='published'?'منشور':s.status}</small>
+    <span>فتح معمارية القطاع ←</span>
+   </Link>)}
+  </div>
+  {selected?<section style={{border:'1px solid #d7dee7',borderRadius:14,padding:24,background:'white'}}>
+   <p><Link href="/admin/workspace">القطاعات</Link> / {names[selected.slug]||selected.slug}</p>
+   <h2>معمارية {names[selected.slug]||selected.slug}</h2>
+   {selected.slug==='contracting'?<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
+    {contractingArchitecture.map(s=><article key={s.id} style={{border:'1px solid #e0e6ed',borderRadius:10,padding:16}}>
+     <h3>{s.labelAr}</h3>
+     <p><Link href={`/admin/contracting?section=${s.id}&mode=texts`}>تحرير النصوص</Link></p>
+     <p><Link href={`/admin/contracting?section=${s.id}&mode=images`}>الصور والوسائط</Link></p>
+    </article>)}
+   </div>:<div>
+    <p>هذا القطاع يعرض حاليًا البيانات المنشورة من Supabase. الأقسام المرئية المستقلة التي لم تُوثق بعد لا تُعرض على أنها محررات جاهزة.</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
+     {actions.map(([path,title])=><Link key={path} href={`/admin/${path}`} style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>{title}</Link>)}
+    </div>
+   </div>}
+   <p style={{marginTop:24}}><Link href={`/ar/sectors/${selected.slug}`} target="_blank">معاينة القطاع في الموقع</Link></p>
+  </section>:<p>اختر أحد القطاعات أعلاه لعرض أدواته ومعماريته.</p>}
  </div>;
 }
