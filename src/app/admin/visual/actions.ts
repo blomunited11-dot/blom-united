@@ -9,7 +9,7 @@ export async function assignMediaSlot(input:{entityType:'project'|'service'|'sec
  if(member?.role!=='owner')throw new Error('هذه العملية تتطلب صلاحية المالك');
  if(!['project','service','sector'].includes(input.entityType)||!Number.isInteger(input.slot)||input.slot<0||input.slot>9||![input.entityId,input.mediaId].every(x=>/^[0-9a-f-]{36}$/i.test(x)))throw new Error('بيانات غير صالحة');
  const table=input.entityType==='project'?'projects':input.entityType==='service'?'services':'sectors';
- const [{data:entity},{data:media}]=await Promise.all([db.from(table).select('id,sector_id').eq('id',input.entityId).maybeSingle().then(x=>input.entityType==='sector'?db.from('sectors').select('id').eq('id',input.entityId).maybeSingle():x),db.from('media_assets').select('id,sector_id').eq('id',input.mediaId).maybeSingle()]);
+ const [{data:entity},{data:media}]=await Promise.all([db.from(table).select(input.entityType==='sector'?'id':'id,sector_id').eq('id',input.entityId).maybeSingle(),db.from('media_assets').select('id,sector_id').eq('id',input.mediaId).maybeSingle()]);
  if(!entity||!media)throw new Error('العنصر أو الصورة غير موجود');
  const sectorId=input.entityType==='sector'?input.entityId:(entity as {sector_id?:string}).sector_id;
  if(media.sector_id&&sectorId&&media.sector_id!==sectorId)throw new Error('الصورة مخصصة لقطاع آخر');
