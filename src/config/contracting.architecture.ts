@@ -20,7 +20,7 @@ export type ContractingSection = {
   source: 'component' | 'database' | 'mixed';
   fields: readonly ContractingField[];
 };
-const text = (key: string): ContractingField => ({key, kind: 'text', locale: 'localized', editable: false});
+const text = (key: string): ContractingField => ({key, kind: 'text', locale: 'localized', editable: true});
 const image = (key: string, note: string): ContractingField => ({key, kind: 'image', locale: 'shared', editable: false, note});
 export const contractingArchitecture: readonly ContractingSection[] = [
   {id:'hero',labelAr:'الواجهة التعريفية',source:'component',fields:[
@@ -53,3 +53,6 @@ export const contractingArchitecture: readonly ContractingSection[] = [
 export function getContractingArchitecture(): readonly ContractingSection[] {
   return contractingArchitecture;
 }
+
+/** Only scalar copy fields are editable in phase 2. Arrays, links and media remain locked. */
+export const contractingEditableTextKeys = [...new Set(contractingArchitecture.flatMap(section => section.fields.filter(field => field.kind === 'text' && field.editable).map(field => field.key)))];
