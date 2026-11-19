@@ -4,7 +4,7 @@ import {localeOf} from '@/lib/i18n/dictionary';
 import {published} from '@/lib/data/site';
 import {contractingDefaultContent} from '@/components/contracting/ContractingExperience';
 import {getContractingCopy} from '@/lib/data/contracting';
-import {contractingPages,contractingServicePages,contractingOtherPages} from '@/config/contracting.pages';
+import {contractingPages,contractingServicePages} from '@/config/contracting.pages';
 import '@/components/contracting/contracting.css';
 export const dynamic='force-dynamic';
 export function generateStaticParams(){return []}
