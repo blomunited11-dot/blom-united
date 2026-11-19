@@ -12,12 +12,12 @@ export async function uploadMedia(form:FormData){
  const sectorId=String(form.get('sector_id')||'');
  if(sectorId&&!/^[0-9a-f-]{36}$/i.test(sectorId))throw new Error('Invalid sector');
  const entityType=String(form.get('entity_type')||'project'),entityId=String(form.get('entity_id')||'');
- if(entityId&&(!['project','service'].includes(entityType)||!/^[0-9a-f-]{36}$/i.test(entityId)))throw new Error('Invalid entity');
+ if(entityId&&(!['project','service','sector'].includes(entityType)||!/^[0-9a-f-]{36}$/i.test(entityId)))throw new Error('Invalid entity');
  if(entityId){
-  const table=entityType==='project'?'projects':'services';
-  const{data:entity,error:entityError}=await db.from(table).select('id,sector_id').eq('id',entityId).single();
+  const table=entityType==='project'?'projects':entityType==='service'?'services':'sectors';
+  const{data:entity,error:entityError}=await db.from(table).select(entityType==='sector'?'id':'id,sector_id').eq('id',entityId).single();
   if(entityError||!entity)throw new Error('Linked content not found');
-  if(sectorId&&entity.sector_id!==sectorId)throw new Error('The image sector must match the linked content sector');
+  if(sectorId&&(entityType==='sector'?entity.id!==sectorId:entity.sector_id!==sectorId))throw new Error('The image sector must match the linked content sector');
  }
  const ratio=String(form.get('display_ratio')||'16/9'),fit=String(form.get('display_fit')||'cover'),position=String(form.get('display_position')||'center');
  if(!['16/9','4/3','1/1','3/4','21/9'].includes(ratio)||!['cover','contain'].includes(fit)||!['center','top','bottom','left','right'].includes(position))throw new Error('Invalid presentation settings');
@@ -32,9 +32,17 @@ export async function uploadMedia(form:FormData){
  const{data:asset,error:insertError}=await db.from('media_assets').insert({storage_path:path,public_url:url.publicUrl,alt_ar:altAr,alt_en:altEn,sector_id:sectorId||null,width_px:width,height_px:height,display_ratio:ratio,display_fit:fit,display_position:position}).select('id').single();
  if(insertError||!asset){await db.storage.from('blom-media').remove([path]);throw new Error(insertError?.message||'Media save failed')}
  if(entityId){
-  const{data:last}=await db.from('entity_media').select('sort_order').eq('entity_type',entityType).eq('entity_id',entityId).order('sort_order',{ascending:false}).limit(1).maybeSingle();
-  const{error:linkError}=await db.from('entity_media').insert({entity_type:entityType,entity_id:entityId,media_id:asset.id,sort_order:(last?.sort_order??-1)+1});
+  const requestedSlot=String(form.get('slot')??'');
+  const hasSlot=requestedSlot!=='';
+  const slot=Number(requestedSlot);
+  if(hasSlot&&(!Number.isInteger(slot)||slot<0||slot>9))throw new Error('Invalid slot');
+  const {data:last}=await db.from('entity_media').select('sort_order').eq('entity_type',entityType).eq('entity_id',entityId).order('sort_order',{ascending:false}).limit(1).maybeSingle();
+  const order=hasSlot?slot:(last?.sort_order??-1)+1;
+  const {data:old,error:oldError}=await db.from('entity_media').select('media_id').eq('entity_type',entityType).eq('entity_id',entityId).eq('sort_order',order).maybeSingle();
+  if(oldError)throw new Error(oldError.message);
+  const query=old?db.from('entity_media').update({media_id:asset.id}).eq('entity_type',entityType).eq('entity_id',entityId).eq('sort_order',order):db.from('entity_media').insert({entity_type:entityType,entity_id:entityId,media_id:asset.id,sort_order:order});
+  const {error:linkError}=await query;
   if(linkError){await db.from('media_assets').delete().eq('id',asset.id);await db.storage.from('blom-media').remove([path]);throw new Error(linkError.message)}
  }
- revalidatePath('/admin/media');revalidatePath('/admin/projects');revalidatePath('/ar');revalidatePath('/en');
+ revalidatePath('/admin/media');revalidatePath('/admin/visual');revalidatePath('/admin/projects');revalidatePath('/ar');revalidatePath('/en');
 }
