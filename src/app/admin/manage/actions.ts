@@ -77,6 +77,6 @@ export async function updateManagedEntry(form:FormData) {
  }
  revalidatePath('/admin');
  revalidatePath('/admin/'+table);
- revalidatePath('/ar',{type:'layout'});
- revalidatePath('/en',{type:'layout'});
+ revalidatePath('/ar','layout');
+ revalidatePath('/en','layout');
 }
