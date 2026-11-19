@@ -6,6 +6,7 @@ import { serverDb } from '@/lib/supabase/server';
 
 const links = [
   ['dashboard', 'الرئيسية'],
+  ['workspace', 'مركز إدارة القطاعات'],
   ['content', 'الصفحات'],
   ['sectors', 'القطاعات'],
   ['projects', 'المشاريع'],
