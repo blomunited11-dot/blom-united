@@ -185,7 +185,22 @@ export default function ContractingVisualEditor({
    }
    setImagePicker(true);return;
   }
-  const value=target.textContent?.trim();
+  // Text may be nested inside spans or emphasis tags. Inspect the nearest
+  // matching text node before giving up on direct editing.
+  const candidates:HTMLElement[]=[];
+  let node:HTMLElement|null=target;
+  for(let depth=0;node&&depth<4;depth++,node=node.parentElement){
+   if(node===event.currentTarget)break;
+   candidates.push(node);
+  }
+  const knownValues=[
+   ...editableStrings.map(([,value])=>value),
+   ...(['services','domains','steps','integratedItems'] as const).flatMap(key=>copy[key]),
+   ...copy.standardsItems.flatMap(item=>[item.name,item.text]),
+   ...copy.projects.flatMap(item=>[item.name,item.scope,item.category]),
+   ...(page==='root'?[]:[copy.pages[page].title,copy.pages[page].description])
+  ];
+  const value=candidates.map(item=>item.textContent?.trim()||'').find(text=>knownValues.includes(text));
   if(!value)return;
   if(page!=='root'){
    if(value===copy.pages[page].title){setActivePageField('title');return}
