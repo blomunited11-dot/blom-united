@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import {useState} from 'react';
+import {useState,type MouseEvent} from 'react';
+import {uploadContractingEditorImage} from './upload-action';
 import type {Entry} from '@/lib/data/site';
 import type {Locale} from '@/lib/i18n/dictionary';
 import {mergeContractingCopy,type ContractingContent} from '@/lib/data/contracting-copy';
@@ -54,6 +55,12 @@ export default function ContractingVisualEditor({
  const [copy,setCopy]=useState(initialCopy);
  const [activeText,setActiveText]=useState<string|null>(null);
  const [imagePicker,setImagePicker]=useState(false);
+ const [imageTarget,setImageTarget]=useState<string>('hero');
+ const [uploadedMedia,setUploadedMedia]=useState<MediaOption[]>([]);
+ const [uploadError,setUploadError]=useState('');
+ const [uploading,setUploading]=useState(false);
+ const [activeList,setActiveList]=useState<{key:string;index:number}|null>(null);
+ const [activePageField,setActivePageField]=useState<'title'|'description'|null>(null);
  const [selectedMediaId,setSelectedMediaId]=useState(mediaId||'');
  const [heroImage,setHeroImage]=useState(initialHeroImage);
  const [projectMediaSelections,setProjectMediaSelections]=useState<Record<string,string>>(()=>(
@@ -77,7 +84,7 @@ export default function ContractingVisualEditor({
   const media=mediaOptions.find(item=>item.id===selection);
   return media?{...project,cover:media.public_url}:project;
  });
- const visibleMediaOptions=[...mediaOptions];
+ const visibleMediaOptions=[...uploadedMedia,...mediaOptions];
  if(selectedMediaId&&!visibleMediaOptions.some(item=>item.id===selectedMediaId)){
   visibleMediaOptions.unshift({
    id:selectedMediaId,
@@ -138,19 +145,99 @@ export default function ContractingVisualEditor({
  }
 
  const editableStrings=Object.entries(copy).filter(([key,value])=>typeof value==='string'&&key!=='photo'&&key!=='pending') as [string,string][];
- function inspectPageClick(event:React.MouseEvent<HTMLElement>){
-  const target=event.target as HTMLElement;
-  if(target.closest('a,button,input,select,textarea'))return;
-  if(target.closest('img,.ctHeroVisual,.ctCaseMedia')){setImagePicker(true);return;}
-  const value=target.textContent?.trim();
-  const field=editableStrings.find(([,text])=>text===value);
-  if(field){event.preventDefault();setActiveText(field[0]);}
+ function selectImage(id:string,url:string|null){
+  if(imageTarget==='hero')chooseMedia(id,url);
+  else if(imageTarget.startsWith('portfolio:'))updatePortfolioMedia(imageTarget.slice(10),id);
+  else if(imageTarget.startsWith('project:')){
+   setProjectMediaSelections(current=>({...current,[imageTarget.slice(8)]:id}));
+   setIsDirty(true);
+  }
+  setImagePicker(false);
  }
+ async function uploadImage(form:FormData){
+  setUploading(true);setUploadError('');
+  try{
+   const result=await uploadContractingEditorImage(form);
+   const item:MediaOption={id:result.id,public_url:result.public_url,alt_ar:result.alt_ar,alt_en:result.alt_en};
+   setUploadedMedia(current=>[item,...current]);
+   selectImage(item.id,item.public_url);
+  }catch(error){setUploadError(error instanceof Error?error.message:'تعذر رفع الصورة')}
+  finally{setUploading(false)}
+ }
+ function inspectPageClick(event:MouseEvent<HTMLElement>){
+  const target=event.target as HTMLElement;
+  const anchor=target.closest('a[href]') as HTMLAnchorElement|null;
+  if(anchor){
+   const match=anchor.getAttribute('href')?.match(/^\/(?:ar|en)\/sectors\/contracting\/([^/?#]+)$/);
+   if(match){event.preventDefault();window.location.href='/admin/edit/contracting?locale='+locale+'&page='+encodeURIComponent(match[1]);}
+   return;
+  }
+  if(target.closest('button,input,select,textarea'))return;
+  const media=target.closest('.ctHeroVisual,.ctCaseMedia');
+  if(media){
+   if(media.classList.contains('ctHeroVisual'))setImageTarget('hero');
+   else{
+    const card=media.closest('.ctCase');
+    const cards=Array.from(card?.parentElement?.children||[]);
+    const index=card?cards.indexOf(card):-1;
+    const item=projects.length>0?projects[index]:copy.projects[index];
+    if(!item)return;
+    setImageTarget(projects.length>0?'project:'+item.id:'portfolio:'+item.key);
+   }
+   setImagePicker(true);return;
+  }
+  const value=target.textContent?.trim();
+  if(!value)return;
+  if(page!=='root'){
+   if(value===copy.pages[page].title){setActivePageField('title');return}
+   if(value===copy.pages[page].description){setActivePageField('description');return}
+  }
+  const field=editableStrings.find(([,text])=>text===value);
+  if(field){setActiveText(field[0]);return;}
+  const listKeys=['services','domains','steps','integratedItems'];
+  for(const key of listKeys){
+   const list=copy[key as keyof ContractingContent];
+   if(Array.isArray(list)){
+    const index=list.findIndex(item=>typeof item==='string'&&item===value);
+    if(index>=0){setActiveList({key,index});return}
+   }
+  }
+  const standardIndex=copy.standardsItems.findIndex(item=>item.name===value||item.text===value);
+  if(standardIndex>=0){setActiveList({key:value===copy.standardsItems[standardIndex].name?'standard-name':'standard-text',index:standardIndex});return}
+  const portfolioIndex=copy.projects.findIndex(item=>[item.name,item.scope,item.category].includes(value));
+  if(portfolioIndex>=0){setActiveList({key:'portfolio-'+(value===copy.projects[portfolioIndex].name?'name':value===copy.projects[portfolioIndex].scope?'scope':'category'),index:portfolioIndex})}
+ }
+ function currentListValue(){
+  if(!activeList)return '';
+  const {key,index}=activeList;
+  if(key.startsWith('standard-'))return copy.standardsItems[index]?.[key==='standard-name'?'name':'text']||'';
+  if(key.startsWith('portfolio-'))return String(copy.projects[index]?.[key.slice(10) as 'name'|'scope'|'category']||'');
+  const values=copy[key as keyof ContractingContent];
+  return Array.isArray(values)?String(values[index]||''):'';
+ }
+ function updateListValue(value:string){
+  if(!activeList)return;
+  const {key,index}=activeList;
+  if(key.startsWith('standard-')){
+   const items=copy.standardsItems.map((item,i)=>i===index?{...item,[key==='standard-name'?'name':'text']:value}:item);
+   updateField('standardsItems',items);
+   setJsonValues(current=>({...current,standardsItems:JSON.stringify(items,null,2)}));
+  }else if(key.startsWith('portfolio-')){
+   const items=copy.projects.map((item,i)=>i===index?{...item,[key.slice(10)]:value}:item);
+   updateField('projects',items);
+   setJsonValues(current=>({...current,projects:JSON.stringify(items,null,2)}));
+  }else{
+   const values=copy[key as keyof ContractingContent];
+   if(Array.isArray(values))updateField(key,values.map((item,i)=>i===index?value:item));
+  }
+ }
+
  return <div className={styles.page} dir={locale==='ar'?'rtl':'ltr'}>
   <div className={styles.columns}>
-   <div style={{position:"sticky",top:0,zIndex:100,background:"#fff",padding:12,display:"flex",gap:14,flexWrap:"wrap",borderBottom:"1px solid #ddd"}}><Link href="/admin">القطاعات</Link><strong>تحرير صفحة المقاولات مباشرة</strong><span>اضغط النص لتعديله أو الصورة لاختيار بديل</span><button type="button" onClick={()=>setImagePicker(true)}>اختيار صورة الواجهة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-save")?.click()}>حفظ مسودة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-publish")?.click()} disabled={isDirty||!draftFound}>نشر</button></div>
+   <div style={{position:"sticky",top:0,zIndex:100,background:"#fff",padding:12,display:"flex",gap:14,flexWrap:"wrap",borderBottom:"1px solid #ddd"}}><Link href="/admin">القطاعات</Link><Link href={`/admin/edit/contracting?locale=${locale==="ar"?"en":"ar"}&page=${page}`}>{locale==="ar"?"English":"العربية"}</Link><strong>تحرير صفحة المقاولات مباشرة</strong><span>اضغط النص لتعديله أو الصورة لاختيار بديل</span><button type="button" onClick={()=>{setImageTarget("hero");setImagePicker(true)}}>اختيار صورة الواجهة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-save")?.click()}>حفظ مسودة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-publish")?.click()} disabled={isDirty||!draftFound}>نشر</button></div>
    {activeText&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>{fieldLabels[activeText]||activeText}</strong><textarea dir={locale==="ar"?"rtl":"ltr"} rows={5} value={String(copy[activeText as keyof typeof copy]||"")} onChange={e=>updateField(activeText,e.target.value)} maxLength={3000}/><button type="button" onClick={()=>setActiveText(null)}>إغلاق والعودة للصفحة</button></div></div>}
-   {imagePicker&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,700px)",maxHeight:"80vh",overflow:"auto",display:"grid",gap:12}}><strong>صورة الواجهة — مكتبة الوسائط</strong><Link href="/admin/media" target="_blank">رفع صورة من الجهاز إلى المكتبة</Link><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}}>{mediaOptions.map(m=><button key={m.id} type="button" onClick={()=>{chooseMedia(m.id,m.public_url);setImagePicker(false)}}>{m.public_url&&<img src={m.public_url} alt={m.alt_ar||""} style={{width:"100%",height:90,objectFit:"cover"}}/>}</button>)}</div><button type="button" onClick={()=>setImagePicker(false)}>إغلاق</button></div></div>}
+   {(activeList||activePageField)&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>تحرير النص المحدد</strong><textarea rows={5} dir={locale==="ar"?"rtl":"ltr"} value={activePageField&&page!=='root'?copy.pages[page][activePageField]:currentListValue()} onChange={e=>activePageField&&page!=='root'?updatePageField(page,activePageField,e.target.value):updateListValue(e.target.value)}/><button type="button" onClick={()=>{setActiveList(null);setActivePageField(null)}}>إغلاق</button></div></div>}
+   {imagePicker&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,700px)",maxHeight:"80vh",overflow:"auto",display:"grid",gap:12}}><strong>صورة الواجهة — مكتبة الوسائط</strong><form action={uploadImage} style={{display:"grid",gap:8}}><label>صورة من جهازك بصيغة WebP (حتى 10 MB)<input type="file" name="file" accept="image/webp" required/></label><label>وصف الصورة بالعربية<input name="alt_ar" required maxLength={300}/></label><label>Image description in English<input name="alt_en" required maxLength={300}/></label><button type="submit" disabled={uploading}>{uploading?'جارٍ الرفع...':'رفع الصورة واختيارها'}</button>{uploadError&&<p role="alert">{uploadError}</p>}</form><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}}>{visibleMediaOptions.map(m=><button key={m.id} type="button" onClick={()=>selectImage(m.id,m.public_url)}>{m.public_url&&<img src={m.public_url} alt={m.alt_ar||""} style={{width:"100%",height:90,objectFit:"cover"}}/>}</button>)}</div><button type="button" onClick={()=>setImagePicker(false)}>إغلاق</button></div></div>}
    <section className={styles.editorPanel} aria-label="أدوات التحرير">
     <header className={styles.editorHeader}>
      <p className={styles.eyebrow}>BLOM UNITED / CONTENT STUDIO</p>
