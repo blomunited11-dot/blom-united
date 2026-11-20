@@ -1,0 +1,303 @@
+.page {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+  gap: 18px;
+  align-items: start;
+  direction: ltr;
+}
+
+.editorPanel,
+.previewPanel {
+  min-width: 0;
+  border: 1px solid #d6dee5;
+  border-radius: 14px;
+  background: #fff;
+  color: #15202b;
+}
+
+.editorPanel {
+  grid-column: 2;
+  padding: 22px;
+}
+
+.editorHeader {
+  border-bottom: 1px solid #e2e8ee;
+  padding-bottom: 16px;
+}
+
+.editorHeader h1,
+.previewHeader h2 {
+  margin: 6px 0 10px;
+}
+
+.editorHeader p:last-child,
+.helpText {
+  color: #52616e;
+  line-height: 1.7;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #63727e;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.pageNav,
+.utilityLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 16px 0;
+}
+
+.pageNav a,
+.utilityLinks a {
+  border: 1px solid #d5dee5;
+  border-radius: 8px;
+  padding: 8px 11px;
+  color: #173e4f;
+  text-decoration: none;
+}
+
+.pageNav a:hover,
+.utilityLinks a:hover {
+  background: #eef4f7;
+}
+
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  color: #253541;
+  font-weight: 600;
+}
+
+.field textarea,
+.field input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #aebbc5;
+  border-radius: 7px;
+  padding: 10px;
+  color: #15202b;
+  background: #fff;
+  font: inherit;
+}
+
+.field textarea {
+  resize: vertical;
+  font-weight: 400;
+}
+
+.field textarea:focus,
+.field input:focus {
+  outline: 2px solid #4f8397;
+  outline-offset: 1px;
+}
+
+.mediaFieldset,
+.pagesFieldset {
+  min-width: 0;
+  border: 1px solid #cbd5de;
+  border-radius: 9px;
+  padding: 14px;
+}
+
+.mediaFieldset legend,
+.pagesFieldset legend {
+  padding: 0 6px;
+  font-weight: 700;
+}
+
+.mediaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+  gap: 10px;
+  max-height: 320px;
+  overflow: auto;
+  margin: 12px 0;
+}
+
+.mediaChoice {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-width: 0;
+  border: 1px solid #d6dee5;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.mediaChoice:has(input:checked) {
+  border: 2px solid #176a8a;
+  background: #eff8fb;
+  padding: 7px;
+}
+
+.mediaChoice input {
+  justify-self: start;
+  margin: 0;
+}
+
+.mediaChoice img,
+.noImage {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  place-items: center;
+  border-radius: 5px;
+  object-fit: cover;
+  background: #eef2f4;
+  color: #52616e;
+}
+
+.mediaChoice > span:last-child {
+  overflow-wrap: anywhere;
+}
+
+.pageFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5eaee;
+}
+
+.pageFields:last-child {
+  border-bottom: 0;
+}
+
+.saveButton,
+.publishButton {
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  padding: 13px;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.saveButton {
+  background: #173e4f;
+}
+
+.publishButton {
+  background: #146c43;
+}
+
+.saveButton:disabled,
+.publishButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.publishForm {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  border-top: 1px solid #e2e8ee;
+  padding-top: 16px;
+}
+
+.publishForm p {
+  margin: 0;
+}
+
+.error {
+  color: #a32020;
+  font-size: 13px;
+}
+
+.previewPanel {
+  grid-column: 1;
+  position: sticky;
+  top: 12px;
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+}
+
+.previewHeader {
+  position: sticky;
+  z-index: 3;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #d6dee5;
+  padding: 13px 16px;
+  background: #fff;
+}
+
+.previewHeader h2 {
+  font-size: 18px;
+}
+
+.previewHeader > span {
+  color: #52616e;
+  font-size: 12px;
+}
+
+.previewViewport {
+  min-height: 500px;
+  overflow-x: auto;
+  background: #fff;
+}
+
+.previewViewport > main {
+  min-width: 360px;
+}
+
+@media (max-width: 1050px) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .previewPanel {
+    grid-column: 1;
+    grid-row: 1;
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .editorPanel {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 8px;
+  }
+
+  .editorPanel {
+    padding: 14px;
+  }
+
+  .pageFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .previewHeader {
+    align-items: start;
+    flex-direction: column;
+  }
+}
