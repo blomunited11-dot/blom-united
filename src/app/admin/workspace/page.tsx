@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {serverDb} from '@/lib/supabase/server';
-import {contractingArchitecture} from '@/config/contracting.architecture';
+import {contractingPages} from '@/config/contracting.pages';
 export const dynamic='force-dynamic';
 type Props={searchParams:Promise<{sector?:string}>};
 const names:Record<string,string>={contracting:'المقاولات والتطوير العقاري',industry:'الصناعة والأخشاب',hospitality:'الضيافة',administrative:'الخدمات الإدارية',services:'الخدمات الإدارية'};
@@ -33,12 +33,12 @@ export default async function Workspace({searchParams}:Props){
   {selected?<section style={{border:'1px solid #d7dee7',borderRadius:14,padding:24,background:'white'}}>
    <p><Link href="/admin/workspace">القطاعات</Link> / {names[selected.slug]||selected.slug}</p>
    <h2>معمارية {names[selected.slug]||selected.slug}</h2>
-   {selected.slug==='contracting'?<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
-    {contractingArchitecture.map(s=><article key={s.id} style={{border:'1px solid #e0e6ed',borderRadius:10,padding:16}}>
-     <h3>{s.labelAr}</h3>
-     <p><Link href={`/admin/contracting?section=${s.id}&mode=texts`}>تحرير النصوص</Link></p>
-     <p><Link href={`/admin/contracting?section=${s.id}&mode=images`}>الصور والوسائط</Link></p>
-    </article>)}
+   {selected.slug==='contracting'?<div>
+    <p><Link href="/admin/edit/contracting">فتح محرر صفحات المقاولات — مسودات ومعاينة ونشر</Link></p>
+    <p>يتضمن المحرر البوابة الرئيسية والصفحات الداخلية الإحدى عشرة. اختر الصفحة من المحرر لتعديل محتواها ومعاينة شكلها الفعلي.</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
+     {contractingPages.map((page,index)=><Link key={page.slug} href={`/admin/edit/contracting?page=${page.slug}`} style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>{String(index+2).padStart(2,'0')} — {page.ar}</Link>)}
+    </div>
    </div>:<div>
     <p>هذا القطاع يعرض حاليًا البيانات المنشورة من Supabase. الأقسام المرئية المستقلة التي لم تُوثق بعد لا تُعرض على أنها محررات جاهزة.</p>
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>

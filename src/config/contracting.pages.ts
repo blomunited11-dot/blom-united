@@ -15,6 +15,7 @@ export const contractingOtherPages=[
  {slug:'contact',ar:'طلب الخدمة والتواصل',en:'Contact & enquiries'}
 ] as const;
 export const contractingPages=[...contractingServicePages,...contractingOtherPages] as const;
+export type ContractingPageSlug=typeof contractingPages[number]['slug'];
 export function contractingPageTitle(slug:string,locale:'ar'|'en'){
  const item=contractingPages.find(p=>p.slug===slug);
  return item?.[locale]??null;

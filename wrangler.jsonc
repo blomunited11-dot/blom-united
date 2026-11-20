@@ -2,6 +2,7 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "blom-united",
   "main": ".open-next/worker.js",
+  "previews": {},
   "compatibility_date": "2026-11-18",
   "compatibility_flags": [
     "nodejs_compat"
