@@ -52,6 +52,8 @@ export default function ContractingVisualEditor({
  projectMediaDrafts,services,projects,draftFound,updatedAt,previewHref
 }:Props){
  const [copy,setCopy]=useState(initialCopy);
+ const [activeText,setActiveText]=useState<string|null>(null);
+ const [imagePicker,setImagePicker]=useState(false);
  const [selectedMediaId,setSelectedMediaId]=useState(mediaId||'');
  const [heroImage,setHeroImage]=useState(initialHeroImage);
  const [projectMediaSelections,setProjectMediaSelections]=useState<Record<string,string>>(()=>(
@@ -135,8 +137,20 @@ export default function ContractingVisualEditor({
   setIsDirty(true);
  }
 
+ const editableStrings=Object.entries(copy).filter(([key,value])=>typeof value==='string'&&key!=='photo'&&key!=='pending') as [string,string][];
+ function inspectPageClick(event:React.MouseEvent<HTMLElement>){
+  const target=event.target as HTMLElement;
+  if(target.closest('a,button,input,select,textarea'))return;
+  if(target.closest('img,.ctHeroVisual,.ctCaseMedia')){setImagePicker(true);return;}
+  const value=target.textContent?.trim();
+  const field=editableStrings.find(([,text])=>text===value);
+  if(field){event.preventDefault();setActiveText(field[0]);}
+ }
  return <div className={styles.page} dir={locale==='ar'?'rtl':'ltr'}>
   <div className={styles.columns}>
+   <div style={{position:"sticky",top:0,zIndex:100,background:"#fff",padding:12,display:"flex",gap:14,flexWrap:"wrap",borderBottom:"1px solid #ddd"}}><Link href="/admin">القطاعات</Link><strong>تحرير صفحة المقاولات مباشرة</strong><span>اضغط النص لتعديله أو الصورة لاختيار بديل</span><button type="button" onClick={()=>setImagePicker(true)}>اختيار صورة الواجهة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-save")?.click()}>حفظ مسودة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-publish")?.click()} disabled={isDirty||!draftFound}>نشر</button></div>
+   {activeText&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>{fieldLabels[activeText]||activeText}</strong><textarea dir={locale==="ar"?"rtl":"ltr"} rows={5} value={String(copy[activeText as keyof typeof copy]||"")} onChange={e=>updateField(activeText,e.target.value)} maxLength={3000}/><button type="button" onClick={()=>setActiveText(null)}>إغلاق والعودة للصفحة</button></div></div>}
+   {imagePicker&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,700px)",maxHeight:"80vh",overflow:"auto",display:"grid",gap:12}}><strong>صورة الواجهة — مكتبة الوسائط</strong><Link href="/admin/media" target="_blank">رفع صورة من الجهاز إلى المكتبة</Link><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}}>{mediaOptions.map(m=><button key={m.id} type="button" onClick={()=>{chooseMedia(m.id,m.public_url);setImagePicker(false)}}>{m.public_url&&<img src={m.public_url} alt={m.alt_ar||""} style={{width:"100%",height:90,objectFit:"cover"}}/>}</button>)}</div><button type="button" onClick={()=>setImagePicker(false)}>إغلاق</button></div></div>}
    <section className={styles.editorPanel} aria-label="أدوات التحرير">
     <header className={styles.editorHeader}>
      <p className={styles.eyebrow}>BLOM UNITED / CONTENT STUDIO</p>
@@ -268,12 +282,12 @@ export default function ContractingVisualEditor({
        <label className={styles.field}><span>{item.slug} — الوصف</span><textarea name={`page:${item.slug}:description`} value={copy.pages[item.slug].description} maxLength={3000} rows={2} required onChange={event=>updatePageField(item.slug,'description',event.target.value)}/></label>
       </div>)}
      </fieldset>
-     <button className={styles.saveButton} type="submit" disabled={Object.keys(jsonErrors).length>0}>حفظ التعديلات كمسودة</button>
+     <button id="contracting-draft-save" className={styles.saveButton} type="submit" disabled={Object.keys(jsonErrors).length>0}>حفظ التعديلات كمسودة</button>
     </form>
 
     {draftFound?<form action={publishContractingDraft} className={styles.publishForm}>
      <input type="hidden" name="locale" value={locale}/>
-    <button className={styles.publishButton} type="submit" disabled={isDirty||Object.keys(jsonErrors).length>0}>نشر مسودة المحتوى وصور بطاقات الأعمال</button>
+    <button id="contracting-draft-publish" className={styles.publishButton} type="submit" disabled={isDirty||Object.keys(jsonErrors).length>0}>نشر مسودة المحتوى وصور بطاقات الأعمال</button>
      {isDirty?<p className={styles.helpText}>احفظ التعديلات الحالية كمسودة قبل النشر.</p>:<p className={styles.helpText}>آخر حفظ للمسودة: {updatedAt}</p>}
     </form>:<p className={styles.helpText}>احفظ أول مسودة لتفعيل النشر والمعاينة الخاصة.</p>}
    </section>
@@ -283,7 +297,7 @@ export default function ContractingVisualEditor({
      <div><p className={styles.eyebrow}>LIVE PREVIEW</p><h2>معاينة الموقع</h2></div>
      <span>لا تظهر للزوار قبل النشر</span>
     </header>
-    <div className={styles.previewViewport} dir={locale==='ar'?'rtl':'ltr'}>
+    <div className={styles.previewViewport} onClick={inspectPageClick} dir={locale==='ar'?'rtl':'ltr'}>
      {page==='root'
       ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage} projectImages={portfolioImages}/>
       :<ContractingInnerExperience locale={locale} page={page} copy={previewCopy} services={services} projects={projects}/>}
