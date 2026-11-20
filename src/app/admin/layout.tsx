@@ -4,22 +4,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { serverDb } from '@/lib/supabase/server';
 
-const links = [
-  ['dashboard', 'الرئيسية'],
-  ['workspace', 'مركز إدارة القطاعات'],
-  ['content', 'الصفحات'],
-  ['sectors', 'القطاعات'],
-  ['projects', 'المشاريع'],
-  ['catalog', 'المنتجات'],
-  ['media', 'الوسائط'],
-  ['visual', 'محرر الصور'],
-  ['contracting', 'نصوص المقاولات'],
-  ['edit/contracting', 'محرر المقاولات (مسودات)'],
-  ['news', 'الأخبار'],
-  ['users', 'المستخدمون'],
-  ['settings', 'الإعدادات'],
-];
-
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   let db;
   try {
@@ -48,8 +32,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return <div className="adminShell" dir="rtl">
     <aside className="adminAside">
       <div className="adminAsideBrand"><small>BLOM UNITED</small><h2>إدارة المحتوى</h2><p>مساحة عمل المجموعة</p></div>
-      <div className="adminAsideLabel">الأقسام</div>
-      {links.map(([slug, title]) => <Link href={`/admin/${slug}`} key={slug}>{title}</Link>)}
+      <div className="adminAsideLabel">مساحة العمل</div>
+      <Link href="/admin/dashboard">لوحة الإدارة</Link>
+      <Link href="/admin/workspace">مركز القطاعات</Link>
+      <Link href="/admin/sectors">بيانات القطاعات</Link>
+      <Link href="/admin/edit/contracting?page=root">محرر المقاولات</Link>
+      <div className="adminAsideLabel">المشاريع والوسائط</div>
+      <Link href="/admin/projects">إدارة المشاريع</Link>
+      <Link href="/admin/visual">ربط صور القطاعات والمشاريع والخدمات</Link>
+      <Link href="/admin/media">مكتبة الوسائط</Link>
       <div className="adminAsideFooter">لوحة إدارة المحتوى · الإصدار التجريبي</div>
     </aside>
     <main className="adminMain">{children}</main>

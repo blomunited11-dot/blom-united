@@ -20,6 +20,25 @@ function formText(form:FormData,name:string):string{
  return value;
 }
 
+function buildProjectMediaSelections(form:FormData){
+ const selections:{project_id:string;action:'set'|'discard';media_id:string|null}[]=[];
+ for(const [name,value] of form.entries()){
+  if(!name.startsWith('project_media:'))continue;
+  if(typeof value!=='string')throw new Error('Invalid project media selection');
+  const projectId=name.slice('project_media:'.length);
+  if(!/^[0-9a-f-]{36}$/i.test(projectId))throw new Error('Invalid project media selection');
+  if(!value)continue;
+  if(value==='__published__'){
+   selections.push({project_id:projectId,action:'discard',media_id:null});
+  }else if(/^[0-9a-f-]{36}$/i.test(value)){
+   selections.push({project_id:projectId,action:'set',media_id:value});
+  }else{
+   throw new Error('Invalid project media selection');
+  }
+ }
+ return selections;
+}
+
 function buildDraftContent(form:FormData,locale:'ar'|'en'){
  const defaults=contractingDefaultContent[locale] as Record<string,unknown>;
  const content:Record<string,unknown>={};
@@ -50,8 +69,14 @@ export async function saveContractingDraft(form:FormData){
  const content=buildDraftContent(form,locale);
  const mediaId=String(form.get('hero_media_id')||'');
  if(mediaId&&!/^[0-9a-f-]{36}$/i.test(mediaId))throw new Error('Invalid media');
+ const projectMedia=buildProjectMediaSelections(form);
  const db=await ownerDb();
- const {error}=await db.rpc('save_contracting_draft',{p_locale:locale,p_content:content,p_media_id:mediaId||null});
+ const {error}=await db.rpc('save_contracting_editor_draft',{
+  p_locale:locale,
+  p_content:content,
+  p_media_id:mediaId||null,
+  p_project_media:projectMedia
+ });
  if(error)throw new Error(error.message);
  revalidatePath('/admin/edit/contracting');
  revalidatePath('/admin/contracting');
@@ -61,7 +86,7 @@ export async function publishContractingDraft(form:FormData){
  const locale=String(form.get('locale')||'');
  if(locale!=='ar'&&locale!=='en')throw new Error('Invalid locale');
  const db=await ownerDb();
- const {error}=await db.rpc('publish_contracting_draft',{p_locale:locale});
+ const {error}=await db.rpc('publish_contracting_editor_draft',{p_locale:locale});
  if(error)throw new Error(error.message);
  revalidatePath('/admin/edit/contracting');
  revalidatePath('/admin/contracting');

@@ -13,6 +13,8 @@ import { publishContractingDraft, saveContractingDraft } from '@/app/admin/contr
 
 const userId = '11111111-1111-4111-8111-111111111111';
 const mediaId = '22222222-2222-4222-8222-222222222222';
+const projectId = '33333333-3333-4333-8333-333333333333';
+const secondProjectId = '44444444-4444-4444-8444-444444444444';
 
 function validDraftForm(locale: 'ar'|'en'='ar') {
   const form = new FormData();
@@ -62,16 +64,23 @@ describe('contracting draft workflow', () => {
     vi.clearAllMocks();
   });
 
-  it('saves validated localized content and staged media without revalidating public pages', async () => {
+  it('saves validated content and staged project media without revalidating public pages', async () => {
     const db = createDb();
     mocks.serverDb.mockResolvedValue(db);
+    const form=validDraftForm();
+    form.set(`project_media:${projectId}`,mediaId);
+    form.set(`project_media:${secondProjectId}`,'__published__');
 
-    await saveContractingDraft(validDraftForm());
+    await saveContractingDraft(form);
 
     expect(db.rpc).toHaveBeenCalledTimes(1);
-    expect(db.rpc).toHaveBeenCalledWith('save_contracting_draft', expect.objectContaining({
+    expect(db.rpc).toHaveBeenCalledWith('save_contracting_editor_draft', expect.objectContaining({
       p_locale: 'ar',
       p_media_id: mediaId,
+      p_project_media: [
+        {project_id:projectId,action:'set',media_id:mediaId},
+        {project_id:secondProjectId,action:'discard',media_id:null},
+      ],
       p_content: expect.objectContaining({
         title: contractingDefaultContent.ar.title,
         pages: expect.objectContaining({
@@ -104,7 +113,7 @@ describe('contracting draft workflow', () => {
 
     await publishContractingDraft(form);
 
-    expect(db.rpc).toHaveBeenCalledWith('publish_contracting_draft', { p_locale: 'en' });
+    expect(db.rpc).toHaveBeenCalledWith('publish_contracting_editor_draft', { p_locale: 'en' });
     expect(mocks.revalidatePath).toHaveBeenCalledWith('/ar/sectors/contracting');
     expect(mocks.revalidatePath).toHaveBeenCalledWith('/en/sectors/contracting/quality-safety');
   });
@@ -128,5 +137,16 @@ describe('contracting draft workflow', () => {
     await expect(saveContractingDraft(validDraftForm())).rejects.toThrow('Database update failed');
 
     expect(mocks.revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it('rejects malformed project media selections before contacting the database', async () => {
+    const db = createDb();
+    mocks.serverDb.mockResolvedValue(db);
+    const form=validDraftForm();
+    form.set('project_media:not-a-uuid',mediaId);
+
+    await expect(saveContractingDraft(form)).rejects.toThrow('Invalid project media selection');
+
+    expect(db.rpc).not.toHaveBeenCalled();
   });
 });

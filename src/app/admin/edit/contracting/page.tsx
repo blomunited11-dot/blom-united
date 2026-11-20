@@ -19,7 +19,12 @@ export default async function ContractingVisualEditorPage({searchParams}:Props){
  const locale:Locale=requestedLocale==='en'?'en':'ar';
  const selectedPage=contractingPages.find(item=>item.slug===requestedPage);
  const page:ContractingPageSlug|'root'=requestedPage==='root'?'root':selectedPage?.slug||'root';
- const draft=await getContractingDraft(locale);
+ let draft;
+ try{
+  draft=await getContractingDraft(locale);
+ }catch(error){
+  return <p role="alert">تعذر تحميل المسودة أو صور المشاريع: {error instanceof Error?error.message:'خطأ غير معروف'}</p>;
+ }
  if(!draft.authorized)redirect('/admin/workspace');
 
  const db=await serverDb();
@@ -38,6 +43,17 @@ export default async function ContractingVisualEditorPage({searchParams}:Props){
  const mediaId=draft.found?draft.heroMediaId:liveCopy.heroMediaId||null;
  const heroImage=draft.found?draft.heroImage:await getContractingHeroImage(locale);
  const mediaOptions=(media||[]).filter(item=>item.public_url&&(!item.sector_id||item.sector_id===sector.id));
+ for(const projectDraft of Object.values(draft.projectMediaDrafts)){
+  if(!mediaOptions.some(item=>item.id===projectDraft.mediaId)){
+   mediaOptions.unshift({
+    id:projectDraft.mediaId,
+    public_url:projectDraft.publicUrl,
+    alt_ar:'صورة محفوظة كمسودة',
+    alt_en:'Draft image',
+    sector_id:sector.id
+   });
+  }
+ }
  const sectorPublished=(await published('sectors',locale)).find(item=>item.slug==='contracting');
  const [services,projects]=await Promise.all([
   sectorPublished?published('services',locale,sectorPublished.id):Promise.resolve([]),
@@ -57,6 +73,7 @@ export default async function ContractingVisualEditorPage({searchParams}:Props){
   heroImage={heroImage}
   mediaOptions={mediaOptions}
   mediaError={mediaError?.message||null}
+  projectMediaDrafts={draft.projectMediaDrafts}
   services={services}
   projects={projects}
   draftFound={draft.found}

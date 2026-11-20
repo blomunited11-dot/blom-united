@@ -13,5 +13,7 @@ export default async function Page(){
  ]);
  const failure=[sectors,projects,services,media,links].find(x=>x.error);
  if(failure?.error)return <p role="alert">تعذر تحميل محرر الصور: {failure.error.message}</p>;
- return <VisualMediaEditor sectors={sectors.data||[]} projects={projects.data||[]} services={services.data||[]} media={media.data||[]} links={links.data||[]}/>;
+ const contractingSectorId=sectors.data?.find(item=>item.slug==='contracting')?.id;
+ const projectsForImmediateEditor=(projects.data||[]).filter(item=>item.sector_id!==contractingSectorId);
+ return <VisualMediaEditor sectors={sectors.data||[]} projects={projectsForImmediateEditor} services={services.data||[]} media={media.data||[]} links={links.data||[]}/>;
 }
