@@ -374,15 +374,16 @@
   }
 }
 
-/* Direct editing mode: full-size original site, no parallel form/preview columns. */
-.columns{display:flex;flex-direction:column;gap:0;direction:inherit}
-.editorPanel{order:0;width:100%;padding:10px 16px;border-radius:0;grid-column:auto}
-.editorHeader{display:none}
-.editorPanel .form,.editorPanel .publishForm{position:absolute!important;left:-10000px!important;top:auto!important;width:1px!important;height:1px!important;overflow:hidden!important}
-.previewPanel{order:1;width:100%;border:0;border-radius:0;overflow:visible}
-.previewHeader{display:none}
-.previewViewport{overflow:visible;max-height:none;height:auto;cursor:pointer}
-.page{max-width:none;padding:0}
-
-.editorPanel{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;opacity:0!important;pointer-events:none!important}
-.previewViewport :global(.contracting) {min-height:70vh}
+/* Keep the real save/publish forms visible and focusable.
+   Hiding required controls offscreen prevents browser validation and makes the editor appear inert. */
+.columns{direction:ltr}
+.editorPanel{direction:rtl;grid-column:2;position:sticky;top:80px;max-height:calc(100vh - 95px);overflow-y:auto;scrollbar-gutter:stable}
+.previewPanel{grid-column:1;position:sticky;top:80px;max-height:calc(100vh - 95px)}
+.pageNav a:focus-visible,.utilityLinks a:focus-visible{outline:3px solid #176a8a;outline-offset:3px}
+.previewViewport{cursor:default}
+.previewViewport :global(.ctHeroVisual),.previewViewport :global(.ctCaseMedia){cursor:pointer}
+@media(max-width:1050px){
+ .columns{display:flex;flex-direction:column;direction:rtl}
+ .editorPanel{order:2;position:static;max-height:none;width:100%;overflow:visible}
+ .previewPanel{order:1;position:static;max-height:none;width:100%;overflow:visible}
+}
