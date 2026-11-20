@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import {serverDb} from '@/lib/supabase/server';
 import {contractingArchitecture} from '@/config/contracting.architecture';
+import {contractingPages} from '@/config/contracting.pages';
 import {contractingDefaultContent} from '@/components/contracting/ContractingExperience';
 import {readContractingCopy} from '@/lib/data/contracting';
 import {saveContractingCopy,saveContractingHeroImage} from './actions';
@@ -28,7 +29,8 @@ export default async function ContractingAdmin({searchParams}:Params){
  const path=(id:string,m:string)=>`/admin/contracting?section=${id}&mode=${m}`;
  return <div dir="rtl" style={{maxWidth:1200}}>
   <p><Link href="/admin/workspace">القطاعات</Link> / المقاولات والتطوير العقاري</p>
-  <h1>معمارية قطاع المقاولات</h1>
+  <h1>معمارية قطاع المقاولات — 12 صفحة</h1>
+  <section style={{border:'1px solid #d7dee7',borderRadius:12,padding:16,margin:'20px 0'}}><h2>صفحات القطاع المعتمدة (12)</h2><p>البوابة الرئيسية + 11 صفحة داخلية. الصفحات الداخلية تستخدم محتوى القطاع المنشور، وتحتاج صور الخدمات إلى اعتماد وربط مستقل.</p><div style={{display:'flex',gap:12,flexWrap:'wrap'}}><Link href='/ar/sectors/contracting' target='_blank'>01 — بوابة المقاولات</Link>{contractingPages.map((p,i)=><Link key={p.slug} href={`/ar/sectors/contracting/${p.slug}`} target='_blank'>{String(i+2).padStart(2,'0')} — {p.ar}</Link>)}</div></section>
   <p className="muted">اختر القسم الحقيقي من الصفحة ثم النصوص أو الصور. يحفظ كل قسم وحده دون استبدال بيانات الأقسام الأخرى.</p>
   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12,margin:'24px 0'}}>
    {contractingArchitecture.map(s=><Link key={s.id} href={path(s.id,mode)} style={{display:'block',border:s.id===section.id?'2px solid #285a78':'1px solid #ccd5df',borderRadius:12,padding:16,background:s.id===section.id?'#e9f2f8':'white'}}><strong>{s.labelAr}</strong><small style={{display:'block',marginTop:6}}>{s.fields.length} عناصر معرفة</small></Link>)}
