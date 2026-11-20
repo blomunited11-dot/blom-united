@@ -33,6 +33,7 @@ export default async function Workspace({searchParams}:Props){
   {selected?<section style={{border:'1px solid #d7dee7',borderRadius:14,padding:24,background:'white'}}>
    <p><Link href="/admin/workspace">القطاعات</Link> / {names[selected.slug]||selected.slug}</p>
    <h2>معمارية {names[selected.slug]||selected.slug}</h2>
+   {selected.slug==='contracting'&&<p><Link href="/admin/edit/contracting">فتح تجربة التحرير على الصفحة الأصلية (تجريبي)</Link></p>}
    {selected.slug==='contracting'?<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
     {contractingArchitecture.map(s=><article key={s.id} style={{border:'1px solid #e0e6ed',borderRadius:10,padding:16}}>
      <h3>{s.labelAr}</h3>
