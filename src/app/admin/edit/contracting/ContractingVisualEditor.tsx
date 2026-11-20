@@ -9,6 +9,7 @@ import {contractingPages,type ContractingPageSlug} from '@/config/contracting.pa
 import {publishContractingDraft,saveContractingDraft} from '@/app/admin/contracting/actions';
 import ContractingExperience from '@/components/contracting/ContractingExperience';
 import ContractingInnerExperience from '@/components/contracting/ContractingInnerExperience';
+import type {ContractingProjectMediaDrafts} from '@/lib/data/contracting-project-media';
 import styles from './ContractingVisualEditor.module.css';
 
 type MediaOption={id:string;public_url:string;alt_ar:string|null;alt_en:string|null};
@@ -22,6 +23,7 @@ type Props={
  heroImage:string|null;
  mediaOptions:MediaOption[];
  mediaError:string|null;
+ projectMediaDrafts:ContractingProjectMediaDrafts;
  services:Entry[];
  projects:Entry[];
  draftFound:boolean;
@@ -47,11 +49,14 @@ function isStringList(value:unknown):value is string[]{
 
 export default function ContractingVisualEditor({
  locale,page,copy:initialCopy,mediaId,heroImage:initialHeroImage,mediaOptions,mediaError,
- services,projects,draftFound,updatedAt,previewHref
+ projectMediaDrafts,services,projects,draftFound,updatedAt,previewHref
 }:Props){
  const [copy,setCopy]=useState(initialCopy);
  const [selectedMediaId,setSelectedMediaId]=useState(mediaId||'');
  const [heroImage,setHeroImage]=useState(initialHeroImage);
+ const [projectMediaSelections,setProjectMediaSelections]=useState<Record<string,string>>(()=>(
+  Object.fromEntries(Object.entries(projectMediaDrafts).map(([id,draft])=>[id,draft.mediaId]))
+ ));
  const [isDirty,setIsDirty]=useState(false);
  const [jsonValues,setJsonValues]=useState<Record<string,string>>(()=>{
   return Object.fromEntries(Object.entries(initialCopy).filter(([,value])=>
@@ -62,8 +67,14 @@ export default function ContractingVisualEditor({
  const entries=Object.entries(copy) as [string,unknown][];
  const textFields=entries.filter(([,value])=>typeof value==='string');
  const listFields=entries.filter(([,value])=>isStringList(value));
- const jsonFields=entries.filter(([,value])=>Array.isArray(value)&&value.some(item=>typeof item!=='string'));
+ const jsonFields=entries.filter(([key,value])=>Array.isArray(value)&&value.some(item=>typeof item!=='string')&&!(key==='projects'&&projects.length>0));
  const pageTitle=page==='root'?(locale==='ar'?'بوابة المقاولات':'Contracting portal'):copy.pages[page].title;
+ const previewProjects=projects.map(project=>{
+  const selection=projectMediaSelections[project.id];
+  if(!selection||selection==='__published__')return project;
+  const media=mediaOptions.find(item=>item.id===selection);
+  return media?{...project,cover:media.public_url}:project;
+ });
  const visibleMediaOptions=[...mediaOptions];
  if(selectedMediaId&&!visibleMediaOptions.some(item=>item.id===selectedMediaId)){
   visibleMediaOptions.unshift({
@@ -131,6 +142,7 @@ export default function ContractingVisualEditor({
 
     <form action={saveContractingDraft} className={styles.form}>
      <input type="hidden" name="locale" value={locale}/>
+     {projects.length>0&&<input type="hidden" name="json:projects" value={jsonValues.projects||JSON.stringify(copy.projects)}/>}
      {mediaError&&<input type="hidden" name="hero_media_id" value={selectedMediaId}/>}
      <fieldset className={styles.mediaFieldset}>
       <legend>صورة واجهة المقاولات</legend>
@@ -152,6 +164,47 @@ export default function ContractingVisualEditor({
       </>}
       <Link href="/admin/media">فتح مكتبة الوسائط</Link>
      </fieldset>
+
+      {page==='root'&&<fieldset className={styles.projectMediaFieldset} id="project-media">
+       <legend>صور بطاقات المشاريع</legend>
+       <p className={styles.helpText}>عناوين المشاريع وأوصافها من إدارة المشاريع. اختيار الصور هنا يُحفظ كمسودة ويظهر في المعاينة فقط، وتُنشر صور المشاريع مع نشر مسودة المقاولات.</p>
+       {projects.length===0?<p className={styles.helpText}>لا توجد مشاريع منشورة في قطاع المقاولات لربط صورها.</p>:<>
+        {mediaOptions.length===0&&<p className={styles.helpText}>لا توجد صور متاحة. أضف الصور أولًا من <Link href="/admin/media">مكتبة الوسائط</Link>.</p>}
+        <div className={styles.projectMediaGrid}>
+         {projects.map(project=>{
+          const selection=projectMediaSelections[project.id]||'';
+          const previewUrl=selection&&selection!=='__published__'
+           ?mediaOptions.find(item=>item.id===selection)?.public_url||null
+           :project.cover;
+          return <div className={styles.projectMediaRow} key={project.id}>
+           <div className={styles.projectMediaDetails}>
+            <strong>{project.title}</strong>
+            {project.summary&&<span>{project.summary}</span>}
+            <label className={styles.projectMediaSelect}>
+             <span>الصورة المرتبطة</span>
+             <select
+              name={`project_media:${project.id}`}
+              value={selection}
+              disabled={!!mediaError||mediaOptions.length===0}
+              onChange={event=>{
+               setProjectMediaSelections(current=>({...current,[project.id]:event.target.value}));
+               setIsDirty(true);
+              }}
+             >
+              <option value="">عدم تغيير الصورة المحفوظة</option>
+              <option value="__published__">العودة إلى الصورة المنشورة</option>
+              {mediaOptions.map((item,index)=><option key={item.id} value={item.id}>
+               {(locale==='ar'?item.alt_ar:item.alt_en)||`صورة من المكتبة ${index+1}`}
+              </option>)}
+             </select>
+            </label>
+           </div>
+           {previewUrl?<img className={styles.projectMediaPreview} src={previewUrl} alt={`معاينة صورة ${project.title}`}/>:<div className={styles.projectMediaNoImage}>لا توجد صورة منشورة</div>}
+          </div>;
+         })}
+        </div>
+       </>}
+      </fieldset>}
 
      {textFields.map(([key,value])=><label className={styles.field} key={key}>
       <span>{fieldLabels[key]||key}</span>
@@ -178,7 +231,7 @@ export default function ContractingVisualEditor({
 
     {draftFound?<form action={publishContractingDraft} className={styles.publishForm}>
      <input type="hidden" name="locale" value={locale}/>
-     <button className={styles.publishButton} type="submit" disabled={isDirty||Object.keys(jsonErrors).length>0}>نشر المسودة المحفوظة لهذه اللغة</button>
+     <button className={styles.publishButton} type="submit" disabled={isDirty||Object.keys(jsonErrors).length>0}>نشر مسودة المحتوى وصور المشاريع المعلقة</button>
      {isDirty?<p className={styles.helpText}>احفظ التعديلات الحالية كمسودة قبل النشر.</p>:<p className={styles.helpText}>آخر حفظ للمسودة: {updatedAt}</p>}
     </form>:<p className={styles.helpText}>احفظ أول مسودة لتفعيل النشر والمعاينة الخاصة.</p>}
    </section>
@@ -190,7 +243,7 @@ export default function ContractingVisualEditor({
     </header>
     <div className={styles.previewViewport} dir={locale==='ar'?'rtl':'ltr'}>
      {page==='root'
-      ?<ContractingExperience locale={locale} services={services} projects={projects} copy={previewCopy} heroImage={heroImage}/>
+      ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage}/>
       :<ContractingInnerExperience locale={locale} page={page} copy={previewCopy} services={services} projects={projects}/>}
     </div>
    </aside>

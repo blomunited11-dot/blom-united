@@ -10,16 +10,6 @@ export default async function Workspace({searchParams}:Props){
  const {data:sectors,error}=await db.from('sectors').select('id,slug,status,sort_order').order('sort_order').limit(100);
  const list=sectors||[];
  const selected=list.find(s=>s.slug===requested)||null;
- const actions=[
-  ['sectors','بيانات القطاع وحالة النشر'],
-  ['projects','المشاريع'],
-  ['services','الخدمات'],
-  ['catalog','المنتجات والتصنيفات'],
-  ['media','مكتبة الصور والوسائط'],
-  ['visual','ربط صور المشاريع والخدمات'],
-  ['content','الصفحات الداخلية'],
-  ['news','الأخبار']
- ] as const;
  return <div style={{maxWidth:1200}}>
   <h1>لوحة إدارة القطاعات</h1>
   <p className="muted">الخطوة الأولى: اختر القطاع. الصفحة الرئيسية للمجموعة مستثناة تمامًا من التحرير.</p>
@@ -39,11 +29,14 @@ export default async function Workspace({searchParams}:Props){
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
      {contractingPages.map((page,index)=><Link key={page.slug} href={`/admin/edit/contracting?page=${page.slug}`} style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>{String(index+2).padStart(2,'0')} — {page.ar}</Link>)}
     </div>
-   </div>:<div>
-    <p>هذا القطاع يعرض حاليًا البيانات المنشورة من Supabase. الأقسام المرئية المستقلة التي لم تُوثق بعد لا تُعرض على أنها محررات جاهزة.</p>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
-     {actions.map(([path,title])=><Link key={path} href={`/admin/${path}`} style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>{title}</Link>)}
+    <h3>المشاريع والصور</h3>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12}}>
+     <Link href="/admin/projects" style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>إدارة المشاريع وحالات النشر</Link>
+     <Link href="/admin/edit/contracting?page=root#project-media" style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>مسودات صور بطاقات المشاريع</Link>
+     <Link href="/admin/media" style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>مكتبة الوسائط</Link>
     </div>
+   </div>:<div>
+    <p>هذا القطاع يعرض حاليًا البيانات المنشورة فقط. محرره لم يُبنَ بعد؛ ستظهر أدواته هنا بعد تجهيز صفحاته بدل عرض أزرار عامة لا تخص هذا القطاع.</p>
    </div>}
    <p style={{marginTop:24}}><Link href={`/ar/sectors/${selected.slug}`} target="_blank">معاينة القطاع في الموقع</Link></p>
   </section>:<p>اختر أحد القطاعات أعلاه لعرض أدواته ومعماريته.</p>}

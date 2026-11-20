@@ -22,6 +22,9 @@ export async function uploadMedia(form:FormData){
    const{data:entity,error:entityError}=await db.from('projects').select('sector_id').eq('id',entityId).single();
    if(entityError||!entity)throw new Error('Linked content not found');
    if(sectorId&&entity.sector_id!==sectorId)throw new Error('The image sector must match the linked content sector');
+   const{data:sector,error:sectorError}=await db.from('sectors').select('slug').eq('id',entity.sector_id).maybeSingle();
+   if(sectorError)throw new Error(sectorError.message);
+   if(sector?.slug==='contracting')throw new Error('Contracting project images must be saved as drafts in the contracting editor.');
   }else{
    const{data:entity,error:entityError}=await db.from('services').select('sector_id').eq('id',entityId).single();
    if(entityError||!entity)throw new Error('Linked content not found');

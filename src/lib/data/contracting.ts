@@ -3,6 +3,7 @@ import {serverDb} from '@/lib/supabase/server';
 import {contractingDefaultContent} from '@/config/contracting.content';
 import {mergeContractingCopy} from '@/lib/data/contracting-copy';
 import type {ContractingContent,ContractingCopy} from '@/lib/data/contracting-copy';
+import type {ContractingProjectMediaDrafts} from '@/lib/data/contracting-project-media';
 
 export {mergeContractingCopy};
 export type {ContractingContent,ContractingCopy};
@@ -13,6 +14,7 @@ export type ContractingDraftRead={
  copy:ContractingCopy;
  heroMediaId:string|null;
  heroImage:string|null;
+ projectMediaDrafts:ContractingProjectMediaDrafts;
  updatedAt:string|null;
 };
 
@@ -106,19 +108,31 @@ export async function getContractingDraft(locale:Locale):Promise<ContractingDraf
  const db=await serverDb();
  const {data:{user},error:authError}=await db.auth.getUser();
  if(authError)throw new Error(authError.message);
- if(!user)return {authorized:false,found:false,copy:{},heroMediaId:null,heroImage:null,updatedAt:null};
+ if(!user)return {authorized:false,found:false,copy:{},heroMediaId:null,heroImage:null,projectMediaDrafts:{},updatedAt:null};
  const {data:membership,error:membershipError}=await db.from('admin_memberships').select('role').eq('user_id',user.id).eq('active',true).maybeSingle();
  if(membershipError)throw new Error(membershipError.message);
- if(membership?.role!=='owner')return {authorized:false,found:false,copy:{},heroMediaId:null,heroImage:null,updatedAt:null};
- const {data:draft,error:draftError}=await db.from('contracting_content_drafts').select('content,hero_media_id,updated_at').eq('locale',locale).maybeSingle();
+ if(membership?.role!=='owner')return {authorized:false,found:false,copy:{},heroMediaId:null,heroImage:null,projectMediaDrafts:{},updatedAt:null};
+ const [{data:draft,error:draftError},{data:projectMedia,error:projectMediaError}]=await Promise.all([
+  db.from('contracting_content_drafts').select('content,hero_media_id,updated_at').eq('locale',locale).maybeSingle(),
+  db.from('contracting_project_media_drafts').select('project_id,media_id,media_assets(public_url)').limit(100)
+ ]);
  if(draftError)throw new Error(draftError.message);
- if(!draft)return {authorized:true,found:false,copy:{},heroMediaId:null,heroImage:null,updatedAt:null};
+ if(projectMediaError)throw new Error(projectMediaError.message);
+ const projectMediaDrafts:ContractingProjectMediaDrafts={};
+ for(const item of projectMedia||[]){
+  const relation=item.media_assets as {public_url:string|null}|{public_url:string|null}[]|null;
+  const asset=Array.isArray(relation)?relation[0]:relation;
+  if(asset?.public_url)projectMediaDrafts[item.project_id]={mediaId:item.media_id,publicUrl:asset.public_url};
+ }
+ if(!draft)return {authorized:true,found:false,copy:{},heroMediaId:null,heroImage:null,projectMediaDrafts,updatedAt:null};
+ const heroImage=await getContractingMediaUrl(db,draft.hero_media_id);
  return {
   authorized:true,
   found:true,
   copy:sanitizeLike(draft.content,contractingDefaultContent.ar) as ContractingCopy||{},
   heroMediaId:draft.hero_media_id,
-  heroImage:await getContractingMediaUrl(db,draft.hero_media_id),
+  heroImage,
+  projectMediaDrafts,
   updatedAt:draft.updated_at
  };
 }

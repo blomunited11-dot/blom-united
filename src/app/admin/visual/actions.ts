@@ -12,6 +12,11 @@ export async function assignMediaSlot(input:{entityType:'project'|'service'|'sec
  const [{data:entity},{data:media}]=await Promise.all([db.from(table).select(input.entityType==='sector'?'id':'id,sector_id').eq('id',input.entityId).maybeSingle(),db.from('media_assets').select('id,sector_id').eq('id',input.mediaId).maybeSingle()]);
  if(!entity||!media)throw new Error('العنصر أو الصورة غير موجود');
  const sectorId=input.entityType==='sector'?input.entityId:(entity as {sector_id?:string}).sector_id;
+ if(input.entityType==='project'&&sectorId){
+  const {data:sector,error:sectorError}=await db.from('sectors').select('slug').eq('id',sectorId).maybeSingle();
+  if(sectorError)throw new Error(sectorError.message);
+  if(sector?.slug==='contracting')throw new Error('صور مشاريع المقاولات تُحفظ كمسودات من محرر المقاولات.');
+ }
  if(media.sector_id&&sectorId&&media.sector_id!==sectorId)throw new Error('الصورة مخصصة لقطاع آخر');
  const {data:existing,error:readError}=await db.from('entity_media').select('media_id').eq('entity_type',input.entityType).eq('entity_id',input.entityId).eq('sort_order',input.slot).maybeSingle();
  if(readError)throw new Error(readError.message);

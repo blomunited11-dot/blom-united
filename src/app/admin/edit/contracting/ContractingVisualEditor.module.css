@@ -108,7 +108,8 @@
 }
 
 .mediaFieldset,
-.pagesFieldset {
+.pagesFieldset,
+.projectMediaFieldset {
   min-width: 0;
   border: 1px solid #cbd5de;
   border-radius: 9px;
@@ -116,7 +117,8 @@
 }
 
 .mediaFieldset legend,
-.pagesFieldset legend {
+.pagesFieldset legend,
+.projectMediaFieldset legend {
   padding: 0 6px;
   font-weight: 700;
 }
@@ -167,6 +169,65 @@
 
 .mediaChoice > span:last-child {
   overflow-wrap: anywhere;
+}
+
+.projectMediaGrid {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.projectMediaRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #d6dee5;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.projectMediaDetails {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.projectMediaDetails > span {
+  color: #52616e;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.projectMediaSelect {
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+}
+
+.projectMediaSelect select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #aebbc5;
+  border-radius: 7px;
+  padding: 8px;
+  color: #15202b;
+  background: #fff;
+  font: inherit;
+}
+
+.projectMediaPreview,
+.projectMediaNoImage {
+  display: grid;
+  width: 120px;
+  height: 80px;
+  place-items: center;
+  border-radius: 6px;
+  object-fit: cover;
+  background: #eef2f4;
+  color: #52616e;
+  font-size: 11px;
+  text-align: center;
 }
 
 .pageFields {
@@ -294,6 +355,17 @@
 
   .pageFields {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .projectMediaRow {
+    grid-template-columns: minmax(0, 1fr) 80px;
+    gap: 8px;
+  }
+
+  .projectMediaPreview,
+  .projectMediaNoImage {
+    width: 80px;
+    height: 64px;
   }
 
   .previewHeader {

@@ -9,6 +9,25 @@ import {contractingPages,contractingServicePages} from '@/config/contracting.pag
 
 export default function ContractingExperience({locale,services,projects,copy={},heroImage=null,editorControls=null}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy;heroImage?:string|null;editorControls?:ReactNode}){
  const t=mergeContractingCopy(locale,copy);
+ const portfolio=projects.length>0
+  ?projects.map(project=>({
+   key:project.id,
+   name:project.title,
+   category:'',
+   scope:project.summary||'',
+   stages:[] as string[],
+   cover:project.cover,
+   href:`/${locale}/projects/${project.slug}`
+  }))
+  :t.projects.map(project=>({
+   key:project.name,
+   name:project.name,
+   category:project.category,
+   scope:project.scope,
+   stages:project.stages,
+   cover:null,
+   href:null
+  }));
  return <main className="contracting">
   {editorControls}
   <section className="ctHero"><div className="ctWrap ctHeroGrid">
@@ -18,7 +37,7 @@ export default function ContractingExperience({locale,services,projects,copy={},
   <nav className="ctLocalNav ctWrap" aria-label={t.title}>{contractingPages.map(p=><Link key={p.slug} href={`/${locale}/sectors/contracting/${p.slug}`}>{t.pages[p.slug].title}</Link>)}</nav>
   <section className="ctSection ctWrap" id="ct-services"><div className="ctSectionHead"><div><span className="ctKicker">01 / CAPABILITIES</span><h2>{t.capabilities}</h2></div><p>{t.capIntro}</p></div><div className="ctCapabilities">{t.services.map((s,i)=><Link className="ctCapability" key={s} href={`/${locale}/sectors/contracting/${contractingServicePages[i].slug}`}><span>{String(i+1).padStart(2,'0')}</span><h3>{s}</h3><span aria-hidden="true">↗</span></Link>)}</div>{services.length>0&&<div className="ctLiveList"><h3>{t.publishedServices}</h3>{services.map(s=><Link key={s.id} href={`/${locale}/sectors/contracting/services/${s.slug}`}>{s.title}<span aria-hidden="true">↗</span></Link>)}</div>}</section>
   <section className="ctBand"><div className="ctWrap"><div className="ctSectionHead"><div><span className="ctKicker">02 / SECTORS</span><h2>{t.domainsTitle}</h2></div></div><div className="ctDomains">{t.domains.map((d,i)=><div key={d}><span>{String(i+1).padStart(2,'0')}</span><h3>{d}</h3></div>)}</div></div></section>
-  <section className="ctSection ctWrap" id="ct-projects"><div className="ctSectionHead"><div><span className="ctKicker">03 / PORTFOLIO</span><h2>{t.workTitle}</h2></div><p>{t.workIntro}</p></div><div className="ctCaseGrid">{t.projects.map((p,i)=><article className={i===0?'ctCase ctCaseFeatured':'ctCase'} key={p.name}><div className="ctCaseMedia ctImagePlaceholder"><span className="ctCaseNumber">{String(i+1).padStart(2,'0')}</span><div className="ctCasePlaceholder">{t.photo}<small>{t.pending}</small></div></div><div className="ctCaseBody"><span className="ctKicker">{p.category}</span><h3>{p.name}</h3><p>{p.scope}</p><div className="ctStageTags">{p.stages.map(s=><span key={s}>{s}</span>)}</div></div></article>)}</div>{projects.length>0&&<div className="ctLiveList"><h3>{t.published}</h3>{projects.map(p=><Link key={p.id} href={`/${locale}/projects/${p.slug}`}>{p.title}<span aria-hidden="true">↗</span></Link>)}</div>}</section>
+  <section className="ctSection ctWrap" id="ct-projects"><div className="ctSectionHead"><div><span className="ctKicker">{projects.length>0?t.published:'03 / PORTFOLIO'}</span><h2>{t.workTitle}</h2></div><p>{t.workIntro}</p></div><div className="ctCaseGrid">{portfolio.map((p,i)=><article className={i===0?'ctCase ctCaseFeatured':'ctCase'} key={p.key}><div className="ctCaseMedia ctImagePlaceholder">{p.cover?<img src={p.cover} alt={p.name} loading="lazy"/>:<div className="ctCasePlaceholder">{t.photo}<small>{t.pending}</small></div>}<span className="ctCaseNumber">{String(i+1).padStart(2,'0')}</span></div><div className="ctCaseBody">{p.category&&<span className="ctKicker">{p.category}</span>}<h3>{p.href?<Link href={p.href}>{p.name}</Link>:p.name}</h3>{p.scope&&<p>{p.scope}</p>}{p.stages.length>0&&<div className="ctStageTags">{p.stages.map(s=><span key={s}>{s}</span>)}</div>}</div></article>)}</div></section>
   <section className="ctBand" id="ct-process"><div className="ctWrap"><div className="ctSectionHead"><div><span className="ctKicker">04 / LIFECYCLE</span><h2>{t.lifecycle}</h2></div><p>{t.lifecycleIntro}</p></div><div className="ctLifecycle">{t.steps.map((s,i)=><div key={s}><span>{String(i+1).padStart(2,'0')}</span><h3>{s}</h3></div>)}</div></div></section>
   <section className="ctSection ctWrap"><div className="ctSectionHead"><div><span className="ctKicker">05 / DELIVERY</span><h2>{t.integrated}</h2></div><p>{t.integratedIntro}</p></div><div className="ctDelivery">{t.integratedItems.map((item,i)=><div key={item}><span>{String(i+1).padStart(2,'0')}</span><p>{item}</p></div>)}</div></section>
   <section className="ctBand" id="ct-quality"><div className="ctWrap"><div className="ctSectionHead"><div><span className="ctKicker">06 / STANDARDS</span><h2>{t.standards}</h2></div></div><div className="ctStandards">{t.standardsItems.map((s,i)=><article key={s.name}><span>{String(i+1).padStart(2,'0')}</span><h3>{s.name}</h3><p>{s.text}</p></article>)}</div></div></section>
