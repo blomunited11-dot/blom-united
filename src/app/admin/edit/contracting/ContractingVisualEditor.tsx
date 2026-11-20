@@ -80,7 +80,7 @@ export default function ContractingVisualEditor({
  const pageTitle=page==='root'?(locale==='ar'?'بوابة المقاولات':'Contracting portal'):copy.pages[page].title;
  const previewProjects=projects.map(project=>{
   const selection=projectMediaSelections[project.id];
-  if(!selection||selection==='__published__')return project;
+  if(!selection||!selection)return project;
   const media=[...uploadedMedia,...mediaOptions].find(item=>item.id===selection);
   return media?{...project,cover:media.public_url}:project;
  });
@@ -315,7 +315,7 @@ export default function ContractingVisualEditor({
         <div className={styles.projectMediaGrid}>
          {projects.map(project=>{
           const selection=projectMediaSelections[project.id]||'';
-          const previewUrl=selection&&selection!=='__published__'
+          const previewUrl=selection&&Boolean(selection)
            ?mediaOptions.find(item=>item.id===selection)?.public_url||null
            :project.cover;
           return <div className={styles.projectMediaRow} key={project.id}>
@@ -334,7 +334,7 @@ export default function ContractingVisualEditor({
               }}
              >
               <option value="">عدم تغيير الصورة المحفوظة</option>
-              <option value="__published__">العودة إلى الصورة المنشورة</option>
+              
               {mediaOptions.map((item,index)=><option key={item.id} value={item.id}>
                {(locale==='ar'?item.alt_ar:item.alt_en)||`صورة من المكتبة ${index+1}`}
               </option>)}
