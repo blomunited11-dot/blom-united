@@ -28,9 +28,7 @@ function buildProjectMediaSelections(form:FormData){
   const projectId=name.slice('project_media:'.length);
   if(!/^[0-9a-f-]{36}$/i.test(projectId))throw new Error('Invalid project media selection');
   if(!value)continue;
-  if(value==='__published__'){
-   selections.push({project_id:projectId,action:'discard',media_id:null});
-  }else if(/^[0-9a-f-]{36}$/i.test(value)){
+  if(/^[0-9a-f-]{36}$/i.test(value)){
    selections.push({project_id:projectId,action:'set',media_id:value});
   }else{
    throw new Error('Invalid project media selection');
