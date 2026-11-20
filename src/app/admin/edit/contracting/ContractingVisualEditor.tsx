@@ -81,7 +81,7 @@ export default function ContractingVisualEditor({
  const previewProjects=projects.map(project=>{
   const selection=projectMediaSelections[project.id];
   if(!selection||selection==='__published__')return project;
-  const media=mediaOptions.find(item=>item.id===selection);
+  const media=[...uploadedMedia,...mediaOptions].find(item=>item.id===selection);
   return media?{...project,cover:media.public_url}:project;
  });
  const visibleMediaOptions=[...uploadedMedia,...mediaOptions];
@@ -130,7 +130,7 @@ export default function ContractingVisualEditor({
 
  const previewCopy=mergeContractingCopy(locale,copy);
  const portfolioImages=Object.fromEntries(previewCopy.projects.flatMap(project=>{
-  const image=mediaOptions.find(item=>item.id===project.mediaId)?.public_url;
+  const image=[...uploadedMedia,...mediaOptions].find(item=>item.id===project.mediaId)?.public_url;
   return image?[[project.key,image]]:[];
  }));
 
