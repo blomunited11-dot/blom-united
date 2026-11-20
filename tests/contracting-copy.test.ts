@@ -27,6 +27,29 @@ describe('contracting copy',()=>{
   expect(copy.services[0]).toBe('Service 1');
  });
 
+ it('restores stable portfolio keys and nullable media for legacy content',()=>{
+  const legacyProjects=contractingDefaultContent.ar.projects.map(({key,mediaId,...project})=>({
+   ...project,
+   stages:[...project.stages]
+  }));
+  const merged=mergeContractingCopy('ar',{projects:legacyProjects});
+
+  expect(merged.projects.map(project=>project.key)).toEqual(contractingDefaultContent.ar.projects.map(project=>project.key));
+  expect(merged.projects.every(project=>project.mediaId===null)).toBe(true);
+ });
+
+ it('retains a valid published media id on its static portfolio card',()=>{
+  const mediaId='22222222-2222-4222-8222-222222222222';
+  const projects=contractingDefaultContent.ar.projects.map((project,index)=>({
+   ...project,
+   mediaId:index===0?mediaId:null
+  }));
+  const copy=readContractingCopy({contracting:{projects}});
+
+  expect(copy.projects?.[0]?.mediaId).toBe(mediaId);
+  expect(validateContractingDraftCopy({...contractingDefaultContent.ar,projects}).projects[0].mediaId).toBe(mediaId);
+ });
+
  it('rejects malformed or incomplete draft content',()=>{
   const content=structuredClone(contractingDefaultContent.ar);
   expect(()=>validateContractingDraftCopy({...content,services:['only one']})).toThrow('Exactly six service links are required');

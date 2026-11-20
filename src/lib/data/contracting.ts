@@ -23,6 +23,7 @@ function isRecord(value:unknown):value is Record<string,unknown>{
 }
 
 function sanitizeLike(value:unknown,shape:unknown):unknown{
+ if(shape===null)return value===null||(typeof value==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value))?value:undefined;
  if(typeof shape==='string')return typeof value==='string'&&value.length<=3000?value:undefined;
  if(Array.isArray(shape)){
   if(!Array.isArray(value)||value.length>30)return undefined;
@@ -52,6 +53,11 @@ export function readContractingCopy(body:unknown):ContractingCopy{
 
 export function validateContractingDraftCopy(value:unknown):ContractingContent{
  function validate(current:unknown,shape:unknown,path:string):unknown{
+  if(shape===null){
+   if(current===null)return null;
+   if(typeof current==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(current))return current;
+   throw new Error(`Invalid nullable field: ${path}`);
+  }
   if(typeof shape==='string'){
    if(typeof current!=='string'||!current.trim()||current.length>3000){
     throw new Error(`Invalid or empty text: ${path}`);
@@ -90,6 +96,29 @@ export async function getContractingCopy(locale:Locale):Promise<ContractingCopy>
  const {data:translation,error:translationError}=await db.from('content_translations').select('body').eq('entity_type','sector').eq('entity_id',sector.id).eq('locale',locale).maybeSingle();
  if(translationError)throw new Error(translationError.message);
  return readContractingCopy(translation?.body);
+}
+
+export async function getContractingPortfolioImages(
+ projects:readonly {key:string;mediaId?:string|null}[]
+):Promise<Record<string,string>>{
+ const mediaByKey=projects.filter(project=>project.mediaId);
+ const mediaIds=[...new Set(mediaByKey.map(project=>project.mediaId!))];
+ if(!mediaIds.length)return {};
+ const db=await serverDb();
+ const [{data:sector,error:sectorError},{data:media,error:mediaError}]=await Promise.all([
+  db.from('sectors').select('id').eq('slug','contracting').maybeSingle(),
+  db.from('media_assets').select('id,public_url,sector_id').in('id',mediaIds)
+ ]);
+ if(sectorError)throw new Error(sectorError.message);
+ if(mediaError)throw new Error(mediaError.message);
+ if(!sector)return {};
+ const mediaById=new Map((media||[])
+  .filter(item=>item.public_url&&(!item.sector_id||item.sector_id===sector.id))
+  .map(item=>[item.id,item.public_url as string]));
+ return Object.fromEntries(mediaByKey.flatMap(project=>{
+  const url=mediaById.get(project.mediaId!);
+  return url?[[project.key,url]]:[];
+ }));
 }
 
 async function getContractingMediaUrl(db:Awaited<ReturnType<typeof serverDb>>,mediaId:string|null):Promise<string|null>{

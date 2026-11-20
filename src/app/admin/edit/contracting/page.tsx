@@ -5,6 +5,7 @@ import {contractingPages,type ContractingPageSlug} from '@/config/contracting.pa
 import {
  getContractingDraft,
  getContractingHeroImage,
+ getContractingPortfolioImages,
  mergeContractingCopy,
  readContractingCopy
 } from '@/lib/data/contracting';
@@ -43,6 +44,19 @@ export default async function ContractingVisualEditorPage({searchParams}:Props){
  const mediaId=draft.found?draft.heroMediaId:liveCopy.heroMediaId||null;
  const heroImage=draft.found?draft.heroImage:await getContractingHeroImage(locale);
  const mediaOptions=(media||[]).filter(item=>item.public_url&&(!item.sector_id||item.sector_id===sector.id));
+ const portfolioImages=await getContractingPortfolioImages(copy.projects);
+ for(const project of copy.projects){
+  const publicUrl=portfolioImages[project.key];
+  if(project.mediaId&&publicUrl&&!mediaOptions.some(item=>item.id===project.mediaId)){
+   mediaOptions.unshift({
+    id:project.mediaId,
+    public_url:publicUrl,
+    alt_ar:'صورة بطاقة أعمال',
+    alt_en:'Portfolio card image',
+    sector_id:sector.id
+   });
+  }
+ }
  for(const projectDraft of Object.values(draft.projectMediaDrafts)){
   if(!mediaOptions.some(item=>item.id===projectDraft.mediaId)){
    mediaOptions.unshift({

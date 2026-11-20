@@ -22,13 +22,13 @@ export const contractingDefaultContent={
   domainsTitle:'القطاعات التي نخدمها',domains:['القطاع الحكومي والمرافق','الرعاية الصحية والعيادات','التعليم والإسكان الجامعي','الضيافة والفنادق','التجاري والمكاتب الإدارية','السكني والتطوير العقاري'],
   workTitle:'أعمال تحكي التجربة',workIntro:'نماذج من الأعمال الواردة في الملف التعريفي. تظهر هنا مواضع الصور إلى حين اعتماد المواد الأصلية ونشرها.',
   projects:[
-   {name:'مجمع طيبة الطبي',category:'الرعاية الصحية',scope:'إحلال وتجديد المبنى، مع أعمال الواجهات والتشطيبات والتجهيز للتشغيل.',stages:['أثناء التنفيذ','بعد الإنجاز']},
-   {name:'نادي المسيرة الرياضي',category:'المنشآت الرياضية',scope:'أعمال طبقة التأسيس وتجهيز الموقع، موثقة بمراحل التنفيذ.',stages:['قبل التنفيذ','أثناء التنفيذ','بعد التنفيذ']},
-   {name:'المختبرات المركزية بالجوف',category:'الأعمال التخصصية',scope:'أعمال الأرضيات الفينيل ومعالجة الوصلات والتشطيبات.',stages:['أثناء التنفيذ','بعد الإنجاز']},
-   {name:'مستشفى الأمير متعب',category:'المنشآت الصحية',scope:'أعمال دهانات الواجهات وتجهيزها وتسليمها.',stages:['أثناء التنفيذ','بعد الإنجاز']},
-   {name:'مقر بلوم المتحدة',category:'الأعمال الإدارية',scope:'رفع كفاءة المقر، بما يشمل التشطيبات الداخلية والواجهات ومساحات العمل.',stages:['أثناء التنفيذ','بعد الإنجاز']},
-   {name:'مقر إمارة منطقة الجوف',category:'المرافق الحكومية',scope:'أعمال الواجهات والقواطع والممرات والمواقف والتشطيبات.',stages:['قبل التنفيذ','أثناء التنفيذ','بعد الإنجاز']},
-   {name:'مشاريع الفلل والدوبلكسات',category:'المشاريع السكنية',scope:'أعمال الموقع والأساسات والهياكل والعزل والتشطيبات.',stages:['أعمال الأساسات','الهيكل والتشطيب','الواجهات']}
+   {key:'taiba-medical-complex',mediaId:null,name:'مجمع طيبة الطبي',category:'الرعاية الصحية',scope:'إحلال وتجديد المبنى، مع أعمال الواجهات والتشطيبات والتجهيز للتشغيل.',stages:['أثناء التنفيذ','بعد الإنجاز']},
+   {key:'al-maseera-sports-club',mediaId:null,name:'نادي المسيرة الرياضي',category:'المنشآت الرياضية',scope:'أعمال طبقة التأسيس وتجهيز الموقع، موثقة بمراحل التنفيذ.',stages:['قبل التنفيذ','أثناء التنفيذ','بعد التنفيذ']},
+   {key:'central-laboratories-al-jouf',mediaId:null,name:'المختبرات المركزية بالجوف',category:'الأعمال التخصصية',scope:'أعمال الأرضيات الفينيل ومعالجة الوصلات والتشطيبات.',stages:['أثناء التنفيذ','بعد الإنجاز']},
+   {key:'prince-mutaib-hospital',mediaId:null,name:'مستشفى الأمير متعب',category:'المنشآت الصحية',scope:'أعمال دهانات الواجهات وتجهيزها وتسليمها.',stages:['أثناء التنفيذ','بعد الإنجاز']},
+   {key:'blom-united-headquarters',mediaId:null,name:'مقر بلوم المتحدة',category:'الأعمال الإدارية',scope:'رفع كفاءة المقر، بما يشمل التشطيبات الداخلية والواجهات ومساحات العمل.',stages:['أثناء التنفيذ','بعد الإنجاز']},
+   {key:'al-jouf-emirate-headquarters',mediaId:null,name:'مقر إمارة منطقة الجوف',category:'المرافق الحكومية',scope:'أعمال الواجهات والقواطع والممرات والمواقف والتشطيبات.',stages:['قبل التنفيذ','أثناء التنفيذ','بعد الإنجاز']},
+   {key:'residential-duplex-projects',mediaId:null,name:'مشاريع الفلل والدوبلكسات',category:'المشاريع السكنية',scope:'أعمال الموقع والأساسات والهياكل والعزل والتشطيبات.',stages:['أعمال الأساسات','الهيكل والتشطيب','الواجهات']}
   ],
   lifecycle:'من الفكرة إلى التسليم',lifecycleIntro:'ثماني مراحل مترابطة كما يعرضها الملف التعريفي، لكل مرحلة مسؤولية ومخرجات واضحة.',
   steps:['الفكرة ودراسة الجدوى','التصميم والتراخيص','أعمال الموقع والحفر','الأساسات والخرسانة','المباني والأعمال المعمارية','الكهروميكانيك والتمديدات','التشطيبات النهائية','التشغيل والتسليم والضمان'],
@@ -61,13 +61,13 @@ export const contractingDefaultContent={
   domainsTitle:'Sectors we serve',domains:['Government and public facilities','Healthcare and clinics','Education and student housing','Hospitality and hotels','Retail and corporate offices','Residential and real estate'],
   workTitle:'Work that speaks for itself',workIntro:'Examples documented in the company profile. Image spaces remain until original project photography is approved.',
   projects:[
-   {name:'Taiba Medical Complex',category:'Healthcare',scope:'Building renovation, facade and finishing works, and preparation for operation.',stages:['During execution','After completion']},
-   {name:'Al-Maseera Sports Club',category:'Sports facilities',scope:'Base-course works and site preparation documented through execution.',stages:['Before','During','After']},
-   {name:'Central Laboratories, Al-Jouf',category:'Specialist works',scope:'Vinyl flooring, welded joints and finishing works.',stages:['During execution','After completion']},
-   {name:'Prince Mutaib Hospital',category:'Healthcare',scope:'Facade painting and finishing works.',stages:['During execution','After completion']},
-   {name:'BLOM UNITED Headquarters',category:'Corporate',scope:'Office refurbishment, interior finishes, facades and workspaces.',stages:['During execution','After completion']},
-   {name:'Al-Jouf Emirate Headquarters',category:'Government',scope:'Facades, partitions, hardscape, parking and finishes.',stages:['Before','During','After']},
-   {name:'Residential Duplex Projects',category:'Residential',scope:'Site works, foundations, concrete structure, waterproofing and finishes.',stages:['Foundations','Structure and finishes','Facades']}
+   {key:'taiba-medical-complex',mediaId:null,name:'Taiba Medical Complex',category:'Healthcare',scope:'Building renovation, facade and finishing works, and preparation for operation.',stages:['During execution','After completion']},
+   {key:'al-maseera-sports-club',mediaId:null,name:'Al-Maseera Sports Club',category:'Sports facilities',scope:'Base-course works and site preparation documented through execution.',stages:['Before','During','After']},
+   {key:'central-laboratories-al-jouf',mediaId:null,name:'Central Laboratories, Al-Jouf',category:'Specialist works',scope:'Vinyl flooring, welded joints and finishing works.',stages:['During execution','After completion']},
+   {key:'prince-mutaib-hospital',mediaId:null,name:'Prince Mutaib Hospital',category:'Healthcare',scope:'Facade painting and finishing works.',stages:['During execution','After completion']},
+   {key:'blom-united-headquarters',mediaId:null,name:'BLOM UNITED Headquarters',category:'Corporate',scope:'Office refurbishment, interior finishes, facades and workspaces.',stages:['During execution','After completion']},
+   {key:'al-jouf-emirate-headquarters',mediaId:null,name:'Al-Jouf Emirate Headquarters',category:'Government',scope:'Facades, partitions, hardscape, parking and finishes.',stages:['Before','During','After']},
+   {key:'residential-duplex-projects',mediaId:null,name:'Residential Duplex Projects',category:'Residential',scope:'Site works, foundations, concrete structure, waterproofing and finishes.',stages:['Foundations','Structure and finishes','Facades']}
   ],
   lifecycle:'From brief to handover',lifecycleIntro:'Eight connected stages from the company profile, with clear ownership and deliverables.',
   steps:['Brief and feasibility','Design and permits','Site setup and excavation','Foundations and concrete','Blockwork and architecture','MEP installation and testing','Final finishes','Commissioning, handover and warranty'],
