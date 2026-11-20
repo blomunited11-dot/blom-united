@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type {ReactNode} from 'react';
 import type {Locale} from '@/lib/i18n/dictionary';
 import type {Entry} from '@/lib/data/site';
 import type {ContractingCopy} from '@/lib/data/contracting';
@@ -60,9 +61,10 @@ export const contractingDefaultContent={
  }
 } as const;
 
-export default function ContractingExperience({locale,services,projects,copy={},heroImage=null}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy;heroImage?:string|null}){
+export default function ContractingExperience({locale,services,projects,copy={},heroImage=null,editorControls=null}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy;heroImage?:string|null;editorControls?:ReactNode}){
  const t={...contractingDefaultContent[locale],...copy};
  return <main className="contracting">
+  {editorControls}
   <section className="ctHero"><div className="ctWrap ctHeroGrid">
    <div className="ctHeroText"><span className="ctKicker">{t.label}</span><h1>{t.title}</h1><p className="ctLead">{t.lead}</p><p className="ctIntro">{t.intro}</p><div className="ctActions"><a href="#ct-projects" className="ctPrimary">{t.seeProjects} <span aria-hidden="true">↗</span></a><Link href={`/${locale}/contact`} className="ctSecondary">{t.contact}</Link></div></div>
    <div className="ctHeroVisual ctImagePlaceholder" role="img" aria-label={t.photo}>{heroImage?<img src={heroImage} alt={t.photo} style={{width:"100%",height:"100%",objectFit:"cover",position:"absolute",inset:0,zIndex:2}}/>:null}<span className="ctVisualGrid" aria-hidden="true"/><span className="ctVisualOutline" aria-hidden="true"/><span className="ctPlaceholderText">{t.photo}<small>{t.pending}</small></span></div>
