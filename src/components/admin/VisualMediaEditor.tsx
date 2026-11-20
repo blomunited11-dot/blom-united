@@ -16,7 +16,7 @@ export function VisualMediaEditor({sectors,projects,services,media,links}:{secto
  const sectorId=kind==='sector'?selected:current?.sector_id||'';
  const existing=(n:number)=>links.find(x=>x.entity_type===kind&&x.entity_id===selected&&x.sort_order===n);
  const asset=(n:number)=>media.find(x=>x.id===existing(n)?.media_id);
- const eligible=media.filter(x=>!x.sector_id||!sectorId||x.sector_id===sectorId);
+ const eligible=media.filter(x=>Boolean(sectorId)&&x.sector_id===sectorId);
  async function assign(mediaId:string){
   if(!selected||slot===null)return;
   setBusy(true);setError('');setNotice('');
