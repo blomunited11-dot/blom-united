@@ -7,6 +7,7 @@ vi.mock('next/link',()=>({
 }));
 
 import ContractingExperience from '@/components/contracting/ContractingExperience';
+import {contractingDefaultContent} from '@/config/contracting.content';
 
 describe('contracting portfolio cards',()=>{
  it('renders published project covers and links in the card grid',()=>{
@@ -25,5 +26,19 @@ describe('contracting portfolio cards',()=>{
   expect(markup).toContain('src="https://example.com/project.webp"');
   expect(markup).toContain('href="/ar/projects/project-one"');
   expect(markup).toContain('alt="مشروع واحد"');
+ });
+
+ it('renders media on static portfolio cards when no database projects exist',()=>{
+  const project=contractingDefaultContent.ar.projects[0];
+  const markup=renderToStaticMarkup(createElement(ContractingExperience,{
+   locale:'ar',
+   services:[],
+   projects:[],
+   copy:{projects:contractingDefaultContent.ar.projects.map(project=>({...project,stages:[...project.stages]}))},
+   projectImages:{[project.key]:'https://example.com/portfolio.webp'}
+  }));
+
+  expect(markup).toContain('src="https://example.com/portfolio.webp"');
+  expect(markup).toContain(`<h3>${project.name}</h3>`);
  });
 });

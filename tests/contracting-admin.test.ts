@@ -68,6 +68,11 @@ describe('contracting draft workflow', () => {
     const db = createDb();
     mocks.serverDb.mockResolvedValue(db);
     const form=validDraftForm();
+    const projects=contractingDefaultContent.ar.projects.map((project,index)=>({
+      ...project,
+      mediaId:index===0?mediaId:null,
+    }));
+    form.set('json:projects',JSON.stringify(projects));
     form.set(`project_media:${projectId}`,mediaId);
     form.set(`project_media:${secondProjectId}`,'__published__');
 
@@ -83,6 +88,12 @@ describe('contracting draft workflow', () => {
       ],
       p_content: expect.objectContaining({
         title: contractingDefaultContent.ar.title,
+        projects: expect.arrayContaining([
+          expect.objectContaining({
+            key: contractingDefaultContent.ar.projects[0].key,
+            mediaId,
+          }),
+        ]),
         pages: expect.objectContaining({
           'general-contracting': expect.objectContaining({
             title: contractingDefaultContent.ar.pages['general-contracting'].title,

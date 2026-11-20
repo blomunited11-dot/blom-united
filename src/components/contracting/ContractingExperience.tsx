@@ -7,7 +7,7 @@ import {contractingDefaultContent} from '@/config/contracting.content';
 import './contracting.css';
 import {contractingPages,contractingServicePages} from '@/config/contracting.pages';
 
-export default function ContractingExperience({locale,services,projects,copy={},heroImage=null,editorControls=null}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy;heroImage?:string|null;editorControls?:ReactNode}){
+export default function ContractingExperience({locale,services,projects,copy={},heroImage=null,projectImages={},editorControls=null}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy;heroImage?:string|null;projectImages?:Record<string,string>;editorControls?:ReactNode}){
  const t=mergeContractingCopy(locale,copy);
  const portfolio=projects.length>0
   ?projects.map(project=>({
@@ -20,12 +20,12 @@ export default function ContractingExperience({locale,services,projects,copy={},
    href:`/${locale}/projects/${project.slug}`
   }))
   :t.projects.map(project=>({
-   key:project.name,
+   key:project.key,
    name:project.name,
    category:project.category,
    scope:project.scope,
    stages:project.stages,
-   cover:null,
+   cover:projectImages[project.key]||null,
    href:null
   }));
  return <main className="contracting">
