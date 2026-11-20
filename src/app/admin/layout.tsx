@@ -14,7 +14,7 @@ const links = [
   ['media', 'الوسائط'],
   ['visual', 'محرر الصور'],
   ['contracting', 'نصوص المقاولات'],
-  ['edit/contracting', 'المحرر البصري التجريبي'],
+  ['edit/contracting', 'محرر المقاولات (مسودات)'],
   ['news', 'الأخبار'],
   ['users', 'المستخدمون'],
   ['settings', 'الإعدادات'],

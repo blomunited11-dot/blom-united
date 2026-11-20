@@ -8,14 +8,31 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/lib/supabase/server', () => ({ serverDb: mocks.serverDb }));
 vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidatePath }));
 
-import { saveContractingCopy, saveContractingHeroImage } from '@/app/admin/contracting/actions';
+import { contractingDefaultContent } from '@/config/contracting.content';
+import { publishContractingDraft, saveContractingDraft } from '@/app/admin/contracting/actions';
 
 const userId = '11111111-1111-4111-8111-111111111111';
 const mediaId = '22222222-2222-4222-8222-222222222222';
 
-function makeForm(entries: Record<string, string>) {
+function validDraftForm(locale: 'ar'|'en'='ar') {
   const form = new FormData();
-  for (const [key, value] of Object.entries(entries)) form.set(key, value);
+  const content = contractingDefaultContent[locale] as Record<string, unknown>;
+  form.set('locale', locale);
+  form.set('hero_media_id', mediaId);
+  for (const [key, value] of Object.entries(content)) {
+    if (typeof value === 'string') {
+      form.set(`text:${key}`, value);
+    } else if (Array.isArray(value) && value.every(item => typeof item === 'string')) {
+      form.set(`list:${key}`, value.join('\n'));
+    } else if (Array.isArray(value)) {
+      form.set(`json:${key}`, JSON.stringify(value));
+    } else if (key === 'pages') {
+      for (const [slug, page] of Object.entries(value as Record<string, {title:string;description:string}>)) {
+        form.set(`page:${slug}:title`, page.title);
+        form.set(`page:${slug}:description`, page.description);
+      }
+    }
+  }
   return form;
 }
 
@@ -40,69 +57,76 @@ function createDb(role: string | null = 'owner', rpcError: { message: string } |
   };
 }
 
-describe('contracting admin actions', () => {
+describe('contracting draft workflow', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('saves the hero image through one atomic RPC and refreshes public views', async () => {
+  it('saves validated localized content and staged media without revalidating public pages', async () => {
     const db = createDb();
     mocks.serverDb.mockResolvedValue(db);
 
-    await saveContractingHeroImage(makeForm({ media_id: mediaId }));
+    await saveContractingDraft(validDraftForm());
 
     expect(db.rpc).toHaveBeenCalledTimes(1);
-    expect(db.rpc).toHaveBeenCalledWith('save_contracting_hero_media', { p_media_id: mediaId });
-    expect(mocks.revalidatePath).toHaveBeenCalledWith('/ar/sectors/contracting');
-    expect(mocks.revalidatePath).toHaveBeenCalledWith('/en/sectors');
+    expect(db.rpc).toHaveBeenCalledWith('save_contracting_draft', expect.objectContaining({
+      p_locale: 'ar',
+      p_media_id: mediaId,
+      p_content: expect.objectContaining({
+        title: contractingDefaultContent.ar.title,
+        pages: expect.objectContaining({
+          'general-contracting': expect.objectContaining({
+            title: contractingDefaultContent.ar.pages['general-contracting'].title,
+          }),
+        }),
+      }),
+    }));
+    expect(mocks.revalidatePath).toHaveBeenCalledWith('/admin/edit/contracting');
+    expect(mocks.revalidatePath).not.toHaveBeenCalledWith('/ar/sectors/contracting');
   });
 
-  it('merges one locale copy through the database RPC', async () => {
+  it('refuses incomplete content before calling the database', async () => {
     const db = createDb();
     mocks.serverDb.mockResolvedValue(db);
-    const form = makeForm({
-      locale: 'ar',
-      section: 'hero',
-      label: '  تعريف  ',
-      title: 'عنوان',
-      lead: 'مقدمة',
-      intro: 'تفصيل',
-      seeProjects: 'المشاريع',
-      contact: 'اتصل بنا',
-    });
+    const form = validDraftForm();
+    form.delete('text:title');
 
-    await saveContractingCopy(form);
+    await expect(saveContractingDraft(form)).rejects.toThrow('Missing field: text:title');
 
-    expect(db.rpc).toHaveBeenCalledWith('save_contracting_copy', {
-      p_locale: 'ar',
-      p_values: {
-        label: 'تعريف',
-        title: 'عنوان',
-        lead: 'مقدمة',
-        intro: 'تفصيل',
-        seeProjects: 'المشاريع',
-        contact: 'اتصل بنا',
-      },
-    });
+    expect(db.rpc).not.toHaveBeenCalled();
   });
 
-  it('does not revalidate after the atomic image save fails', async () => {
-    const db = createDb('owner', { message: 'Database update failed' });
+  it('publishes only a saved locale draft and refreshes all contracting pages', async () => {
+    const db = createDb();
     mocks.serverDb.mockResolvedValue(db);
+    const form = new FormData();
+    form.set('locale', 'en');
 
-    await expect(saveContractingHeroImage(makeForm({ media_id: mediaId })))
-      .rejects.toThrow('Database update failed');
+    await publishContractingDraft(form);
 
-    expect(mocks.revalidatePath).not.toHaveBeenCalled();
+    expect(db.rpc).toHaveBeenCalledWith('publish_contracting_draft', { p_locale: 'en' });
+    expect(mocks.revalidatePath).toHaveBeenCalledWith('/ar/sectors/contracting');
+    expect(mocks.revalidatePath).toHaveBeenCalledWith('/en/sectors/contracting/quality-safety');
   });
 
-  it('blocks non-owners before calling the database RPC', async () => {
+  it('blocks non-owners from saving or publishing drafts', async () => {
     const db = createDb('editor');
     mocks.serverDb.mockResolvedValue(db);
 
-    await expect(saveContractingHeroImage(makeForm({ media_id: mediaId })))
-      .rejects.toThrow('Owner permission required');
+    await expect(saveContractingDraft(validDraftForm())).rejects.toThrow('Owner permission required');
+    const form = new FormData();
+    form.set('locale', 'ar');
+    await expect(publishContractingDraft(form)).rejects.toThrow('Owner permission required');
 
     expect(db.rpc).not.toHaveBeenCalled();
+  });
+
+  it('does not revalidate after a database operation fails', async () => {
+    const db = createDb('owner', { message: 'Database update failed' });
+    mocks.serverDb.mockResolvedValue(db);
+
+    await expect(saveContractingDraft(validDraftForm())).rejects.toThrow('Database update failed');
+
+    expect(mocks.revalidatePath).not.toHaveBeenCalled();
   });
 });

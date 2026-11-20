@@ -1,51 +1,72 @@
 'use server';
 import {revalidatePath} from 'next/cache';
 import {serverDb} from '@/lib/supabase/server';
-import {contractingArchitecture,contractingEditableTextKeys} from '@/config/contracting.architecture';
+import {contractingDefaultContent} from '@/config/contracting.content';
+import {contractingPages} from '@/config/contracting.pages';
+import {validateContractingDraftCopy} from '@/lib/data/contracting';
 
-export async function saveContractingCopy(form:FormData) {
- const locale=String(form.get('locale')||'');
- if(locale!=='ar'&&locale!=='en')throw new Error('Invalid locale');
+async function ownerDb(){
  const db=await serverDb();
  const {data:{user},error:authError}=await db.auth.getUser();
  if(authError||!user)throw new Error('Authentication required');
  const {data:member,error:membershipError}=await db.from('admin_memberships').select('role').eq('user_id',user.id).eq('active',true).maybeSingle();
  if(membershipError||member?.role!=='owner')throw new Error('Owner permission required');
- const section=String(form.get('section')||'');
- const selected=contractingArchitecture.find(x=>x.id===section);
- if(!selected)throw new Error('Invalid section');
- const keys=selected.fields.filter(x=>x.kind==='text'&&x.editable).map(x=>x.key);
- if(keys.some(key=>!contractingEditableTextKeys.includes(key)))throw new Error('Invalid fields');
- const values:Record<string,string>={};
- for(const key of keys){
-  const value=form.get(key);
-  if(typeof value!=='string')throw new Error('Missing field: '+key);
-  const clean=value.trim();
-  if(clean.length>3000)throw new Error('Text exceeds 3000 characters: '+key);
-  values[key]=clean;
- }
- const {error}=await db.rpc('save_contracting_copy',{p_locale:locale,p_values:values});
- if(error)throw new Error(error.message);
- revalidatePath('/admin/contracting');
- revalidatePath('/ar/sectors/contracting');
- revalidatePath('/en/sectors/contracting');
+ return db;
 }
 
-/** Select an existing media library image for the contracting hero; no arbitrary URLs. */
-export async function saveContractingHeroImage(form:FormData){
- const db=await serverDb();
- const {data:{user},error:authError}=await db.auth.getUser();
- if(authError||!user)throw new Error('Authentication required');
- const {data:member,error:memberError}=await db.from('admin_memberships').select('role').eq('user_id',user.id).eq('active',true).maybeSingle();
- if(memberError||member?.role!=='owner')throw new Error('Owner permission required');
- const mediaId=String(form.get('media_id')||'');
+function formText(form:FormData,name:string):string{
+ const value=form.get(name);
+ if(typeof value!=='string')throw new Error(`Missing field: ${name}`);
+ return value;
+}
+
+function buildDraftContent(form:FormData,locale:'ar'|'en'){
+ const defaults=contractingDefaultContent[locale] as Record<string,unknown>;
+ const content:Record<string,unknown>={};
+ for(const [key,value] of Object.entries(defaults)){
+  if(typeof value==='string'){
+   content[key]=formText(form,`text:${key}`).trim();
+  }else if(Array.isArray(value)&&value.every(item=>typeof item==='string')){
+   content[key]=formText(form,`list:${key}`).split(/\r?\n/).map(item=>item.trim()).filter(Boolean);
+  }else if(Array.isArray(value)){
+   let parsed:unknown;
+   try{parsed=JSON.parse(formText(form,`json:${key}`));}
+   catch{throw new Error(`Invalid JSON list: ${key}`);}
+   content[key]=parsed;
+  }else if(key==='pages'){
+   const pageDefaults=value as Record<string,{title:string;description:string}>;
+   content.pages=Object.fromEntries(Object.keys(pageDefaults).map(slug=>[slug,{
+    title:formText(form,`page:${slug}:title`).trim(),
+    description:formText(form,`page:${slug}:description`).trim()
+   }]));
+  }
+ }
+ return validateContractingDraftCopy(content);
+}
+
+export async function saveContractingDraft(form:FormData){
+ const locale=String(form.get('locale')||'');
+ if(locale!=='ar'&&locale!=='en')throw new Error('Invalid locale');
+ const content=buildDraftContent(form,locale);
+ const mediaId=String(form.get('hero_media_id')||'');
  if(mediaId&&!/^[0-9a-f-]{36}$/i.test(mediaId))throw new Error('Invalid media');
- const {error}=await db.rpc('save_contracting_hero_media',{p_media_id:mediaId||null});
+ const db=await ownerDb();
+ const {error}=await db.rpc('save_contracting_draft',{p_locale:locale,p_content:content,p_media_id:mediaId||null});
  if(error)throw new Error(error.message);
+ revalidatePath('/admin/edit/contracting');
  revalidatePath('/admin/contracting');
- revalidatePath('/admin/visual');
- revalidatePath('/ar/sectors/contracting');
- revalidatePath('/en/sectors/contracting');
- revalidatePath('/ar/sectors');
- revalidatePath('/en/sectors');
+}
+
+export async function publishContractingDraft(form:FormData){
+ const locale=String(form.get('locale')||'');
+ if(locale!=='ar'&&locale!=='en')throw new Error('Invalid locale');
+ const db=await ownerDb();
+ const {error}=await db.rpc('publish_contracting_draft',{p_locale:locale});
+ if(error)throw new Error(error.message);
+ revalidatePath('/admin/edit/contracting');
+ revalidatePath('/admin/contracting');
+ for(const pathLocale of ['ar','en']){
+  revalidatePath(`/${pathLocale}/sectors/contracting`);
+  for(const page of contractingPages)revalidatePath(`/${pathLocale}/sectors/contracting/${page.slug}`);
+ }
 }
