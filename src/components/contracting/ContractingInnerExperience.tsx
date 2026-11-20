@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type {Locale} from '@/lib/i18n/dictionary';
 import type {Entry} from '@/lib/data/site';
-import {mergeContractingCopy,type ContractingCopy} from '@/lib/data/contracting';
+import {mergeContractingCopy,type ContractingCopy} from '@/lib/data/contracting-copy';
 import {contractingPages,contractingServicePages,type ContractingPageSlug} from '@/config/contracting.pages';
 import './contracting.css';
 
