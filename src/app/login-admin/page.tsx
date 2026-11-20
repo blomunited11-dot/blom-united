@@ -44,7 +44,7 @@ export default function Login() {
         throw new Error('بيانات الدخول صحيحة، لكن هذا الحساب غير مفعّل في لوحة الإدارة.');
       }
 
-      window.location.href = '/admin/dashboard';
+      window.location.href = '/admin';
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'تعذر الاتصال بخدمة تسجيل الدخول.');
     } finally {
