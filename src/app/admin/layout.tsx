@@ -1,3 +1,4 @@
+import './admin-workspace.css';
 export const dynamic='force-dynamic';
 import {redirect} from 'next/navigation';
 import {serverDb} from '@/lib/supabase/server';
