@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import {useState} from 'react';
+import {useFormStatus} from 'react-dom';
 import type {Entry} from '@/lib/data/site';
 import type {Locale} from '@/lib/i18n/dictionary';
 import {mergeContractingCopy,type ContractingContent} from '@/lib/data/contracting-copy';
@@ -47,6 +48,16 @@ function isStringList(value:unknown):value is string[]{
  return Array.isArray(value)&&value.every(item=>typeof item==='string');
 }
 
+function SaveButton({disabled}:{disabled:boolean}){
+ const {pending}=useFormStatus();
+ return <button className={styles.saveButton} type="submit" disabled={disabled||pending}>{pending?'جاري الحفظ…':'حفظ التعديلات كمسودة'}</button>;
+}
+
+function PublishButton({disabled}:{disabled:boolean}){
+ const {pending}=useFormStatus();
+ return <button className={styles.publishButton} type="submit" disabled={disabled||pending}>{pending?'جاري النشر…':'نشر مسودة المحتوى وصور بطاقات الأعمال'}</button>;
+}
+
 export default function ContractingVisualEditor({
  locale,page,copy:initialCopy,mediaId,heroImage:initialHeroImage,mediaOptions,mediaError,
  projectMediaDrafts,services,projects,draftFound,updatedAt,previewHref
@@ -69,12 +80,12 @@ export default function ContractingVisualEditor({
  const listFields=entries.filter(([,value])=>isStringList(value));
  const jsonFields=entries.filter(([,value])=>Array.isArray(value)&&value.some(item=>typeof item!=='string'));
  const pageTitle=page==='root'?(locale==='ar'?'بوابة المقاولات':'Contracting portal'):copy.pages[page].title;
- const previewProjects=projects.map(project=>{
-  const selection=projectMediaSelections[project.id];
-  if(!selection||selection==='__published__')return project;
-  const media=mediaOptions.find(item=>item.id===selection);
-  return media?{...project,cover:media.public_url}:project;
- });
+  const previewProjects=projects.map(project=>{
+   const selection=projectMediaSelections[project.id];
+   if(!selection)return project;
+   const media=mediaOptions.find(item=>item.id===selection);
+   return media?{...project,cover:media.public_url}:project;
+  });
  const visibleMediaOptions=[...mediaOptions];
  if(selectedMediaId&&!visibleMediaOptions.some(item=>item.id===selectedMediaId)){
   visibleMediaOptions.unshift({
@@ -214,10 +225,10 @@ export default function ContractingVisualEditor({
         {mediaOptions.length===0&&<p className={styles.helpText}>لا توجد صور متاحة. أضف الصور أولًا من <Link href="/admin/media">مكتبة الوسائط</Link>.</p>}
         <div className={styles.projectMediaGrid}>
          {projects.map(project=>{
-          const selection=projectMediaSelections[project.id]||'';
-          const previewUrl=selection&&selection!=='__published__'
-           ?mediaOptions.find(item=>item.id===selection)?.public_url||null
-           :project.cover;
+           const selection=projectMediaSelections[project.id]||'';
+           const previewUrl=selection
+            ?mediaOptions.find(item=>item.id===selection)?.public_url||null
+            :project.cover;
           return <div className={styles.projectMediaRow} key={project.id}>
            <div className={styles.projectMediaDetails}>
             <strong>{project.title}</strong>
@@ -233,9 +244,8 @@ export default function ContractingVisualEditor({
                setIsDirty(true);
               }}
              >
-              <option value="">عدم تغيير الصورة المحفوظة</option>
-              <option value="__published__">العودة إلى الصورة المنشورة</option>
-              {mediaOptions.map((item,index)=><option key={item.id} value={item.id}>
+               <option value="">عدم تغيير الصورة المحفوظة</option>
+               {mediaOptions.map((item,index)=><option key={item.id} value={item.id}>
                {(locale==='ar'?item.alt_ar:item.alt_en)||`صورة من المكتبة ${index+1}`}
               </option>)}
              </select>
@@ -268,12 +278,12 @@ export default function ContractingVisualEditor({
        <label className={styles.field}><span>{item.slug} — الوصف</span><textarea name={`page:${item.slug}:description`} value={copy.pages[item.slug].description} maxLength={3000} rows={2} required onChange={event=>updatePageField(item.slug,'description',event.target.value)}/></label>
       </div>)}
      </fieldset>
-     <button className={styles.saveButton} type="submit" disabled={Object.keys(jsonErrors).length>0}>حفظ التعديلات كمسودة</button>
+     <SaveButton disabled={Object.keys(jsonErrors).length>0}/>
     </form>
 
     {draftFound?<form action={publishContractingDraft} className={styles.publishForm}>
      <input type="hidden" name="locale" value={locale}/>
-    <button className={styles.publishButton} type="submit" disabled={isDirty||Object.keys(jsonErrors).length>0}>نشر مسودة المحتوى وصور بطاقات الأعمال</button>
+     <PublishButton disabled={isDirty||Object.keys(jsonErrors).length>0}/>
      {isDirty?<p className={styles.helpText}>احفظ التعديلات الحالية كمسودة قبل النشر.</p>:<p className={styles.helpText}>آخر حفظ للمسودة: {updatedAt}</p>}
     </form>:<p className={styles.helpText}>احفظ أول مسودة لتفعيل النشر والمعاينة الخاصة.</p>}
    </section>

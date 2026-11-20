@@ -74,7 +74,6 @@ describe('contracting draft workflow', () => {
     }));
     form.set('json:projects',JSON.stringify(projects));
     form.set(`project_media:${projectId}`,mediaId);
-    form.set(`project_media:${secondProjectId}`,'__published__');
 
     await saveContractingDraft(form);
 
@@ -84,7 +83,6 @@ describe('contracting draft workflow', () => {
       p_media_id: mediaId,
       p_project_media: [
         {project_id:projectId,action:'set',media_id:mediaId},
-        {project_id:secondProjectId,action:'discard',media_id:null},
       ],
       p_content: expect.objectContaining({
         title: contractingDefaultContent.ar.title,
