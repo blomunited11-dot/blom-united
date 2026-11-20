@@ -12,7 +12,8 @@ type Params={searchParams:Promise<{section?:string;mode?:string}>};
 export default async function ContractingAdmin({searchParams}:Params){
  const {section:requested,mode:requestedMode}=await searchParams;
  const section=contractingArchitecture.find(x=>x.id===requested)||contractingArchitecture[0];
- const mode=requestedMode==='images'?'images':'texts';
+ const requestedImages=requestedMode==='images';
+ const mode=requestedImages&&section.id==='hero'?'images':'texts';
  const db=await serverDb();
  const {data:sector,error:sectorError}=await db.from('sectors').select('id').eq('slug','contracting').maybeSingle();
  if(sectorError||!sector)return <p role="alert">سجل قطاع المقاولات غير موجود؛ لم تتغير البيانات.</p>;
@@ -37,9 +38,10 @@ export default async function ContractingAdmin({searchParams}:Params){
   </div>
   <section style={{background:'white',border:'1px solid #d7dee7',borderRadius:14,padding:24}}>
    <h2>{section.labelAr}</h2>
+   {requestedImages&&section.id!=='hero'&&<p role="status">تحرير الصور متاح حاليًا لقسم الواجهة فقط.</p>}
    <nav style={{display:'flex',gap:12,margin:'15px 0 25px'}}>
     <Link href={path(section.id,'texts')} style={{padding:12,borderBottom:mode==='texts'?'3px solid #285a78':'1px solid #ddd'}}>النصوص</Link>
-    <Link href={path(section.id,'images')} style={{padding:12,borderBottom:mode==='images'?'3px solid #285a78':'1px solid #ddd'}}>الصور</Link>
+    {section.id==='hero'?<Link href={path(section.id,'images')} style={{padding:12,borderBottom:mode==='images'?'3px solid #285a78':'1px solid #ddd'}}>الصور</Link>:<span aria-disabled="true" style={{padding:12,color:'#64748b'}}>الصور غير متاحة</span>}
     <Link href="/ar/sectors/contracting" target="_blank" style={{padding:12}}>معاينة القطاع</Link>
    </nav>
    {mode==='texts'?fields.length===0?<p>لا توجد نصوص منفردة قابلة للتحرير في هذا القسم حاليًا.</p>:
