@@ -180,9 +180,8 @@ export default function ContractingVisualEditor({
     const card=media.closest('.ctCase');
     const cards=Array.from(card?.parentElement?.children||[]);
     const index=card?cards.indexOf(card):-1;
-    const item=projects.length>0?projects[index]:copy.projects[index];
-    if(!item)return;
-    setImageTarget(projects.length>0?'project:'+item.id:'portfolio:'+item.key);
+    if(projects.length>0){const item=projects[index];if(!item)return;setImageTarget('project:'+item.id)}
+    else{const item=copy.projects[index];if(!item)return;setImageTarget('portfolio:'+item.key)}
    }
    setImagePicker(true);return;
   }
