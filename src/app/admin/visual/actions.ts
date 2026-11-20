@@ -17,7 +17,7 @@ export async function assignMediaSlot(input:{entityType:'project'|'service'|'sec
   if(sectorError)throw new Error(sectorError.message);
   if(sector?.slug==='contracting')throw new Error('صور مشاريع المقاولات تُحفظ كمسودات من محرر المقاولات.');
  }
- if(media.sector_id&&sectorId&&media.sector_id!==sectorId)throw new Error('الصورة مخصصة لقطاع آخر');
+ if(!sectorId||media.sector_id!==sectorId)throw new Error('يجب أن تكون الصورة مخصصة للقطاع نفسه');
  const {data:existing,error:readError}=await db.from('entity_media').select('media_id').eq('entity_type',input.entityType).eq('entity_id',input.entityId).eq('sort_order',input.slot).maybeSingle();
  if(readError)throw new Error(readError.message);
  if(existing){
