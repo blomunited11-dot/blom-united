@@ -18,8 +18,9 @@ type Props={searchParams:Promise<{locale?:string;page?:string}>};
 export default async function ContractingVisualEditorPage({searchParams}:Props){
  const {locale:requestedLocale,page:requestedPage}=await searchParams;
  const locale:Locale=requestedLocale==='en'?'en':'ar';
- const selectedPage=contractingPages.find(item=>item.slug===requestedPage);
- const page:ContractingPageSlug|'root'=requestedPage==='root'?'root':selectedPage?.slug||'root';
+  const selectedPage=contractingPages.find(item=>item.slug===requestedPage);
+  const page:ContractingPageSlug|'root'=requestedPage==='root'?'root':selectedPage?.slug||'root';
+  if(page==='root')redirect('/admin/workspace?sector=contracting');
  let draft;
  try{
   draft=await getContractingDraft(locale);
@@ -73,9 +74,7 @@ export default async function ContractingVisualEditorPage({searchParams}:Props){
   sectorPublished?published('services',locale,sectorPublished.id):Promise.resolve([]),
   sectorPublished?published('projects',locale,sectorPublished.id):Promise.resolve([])
  ]);
- const previewHref=page==='root'
-  ?`/${locale}/sectors/contracting?previewDraft=1`
-  :`/${locale}/sectors/contracting/${page}?previewDraft=1`;
+  const previewHref=`/${locale}/sectors/contracting/${page}?previewDraft=1`;
  const editorKey=`${locale}:${page}:${draft.updatedAt||'unsaved'}:${mediaId||'no-image'}`;
 
  return <ContractingVisualEditor
