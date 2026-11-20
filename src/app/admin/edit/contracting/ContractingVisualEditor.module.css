@@ -373,3 +373,13 @@
     flex-direction: column;
   }
 }
+
+/* Direct editing mode: full-size original site, no parallel form/preview columns. */
+.columns{display:flex;flex-direction:column;gap:0;direction:inherit}
+.editorPanel{order:0;width:100%;padding:10px 16px;border-radius:0;grid-column:auto}
+.editorHeader{display:none}
+.editorPanel .form,.editorPanel .publishForm{position:absolute!important;left:-10000px!important;top:auto!important;width:1px!important;height:1px!important;overflow:hidden!important}
+.previewPanel{order:1;width:100%;border:0;border-radius:0;overflow:visible}
+.previewHeader{display:none}
+.previewViewport{overflow:visible;max-height:none;height:auto;cursor:pointer}
+.page{max-width:none;padding:0}
