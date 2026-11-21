@@ -42,14 +42,21 @@ export function mergeContractingCopy(locale:Locale,...copies:ContractingCopy[]):
  // Preserve published custom sector labels while migrating the previous first label.
  // Existing drafts and translations can otherwise override the updated default.
  const resolvedDomains=merged.domains?.map((domain,index)=>index===0&&domain==='القطاع الحكومي والمرافق'?'المباني والمرافق':domain);
+ // Keep the three-photo groups together when reading older published content.
  const legacyPortfolioKeys=new Set(['taiba-medical-complex','al-maseera-sports-club','central-laboratories-al-jouf']);
- const hasLegacyPortfolio=Array.isArray(merged.projects)&&merged.projects.some(project=>legacyPortfolioKeys.has(project.key||''));
- const portfolioSource=hasLegacyPortfolio
-  ?[...base.projects.slice(0,3).map((project,index)=>({
-    ...project,
-    ...(index===0?{mediaId:merged.projects?.find(item=>item.key==='taiba-medical-complex')?.mediaId??null}:{})
-   })),...(merged.projects||[]).filter(project=>!legacyPortfolioKeys.has(project.key||''))]
-  :merged.projects;
+ const galleryKeys=new Set(base.projects.slice(0,9).map(project=>project.key));
+ const savedProjects=merged.projects||[];
+ const savedByKey=new Map(savedProjects.map(project=>[project.key,project]));
+ const legacyTaiba=savedByKey.get('taiba-medical-complex');
+ const gallery=base.projects.slice(0,9).map(project=>{
+  const saved=savedByKey.get(project.key);
+  const oldMedia=project.key==='taiba-medical-complex-before'?legacyTaiba?.mediaId:undefined;
+  return {...project,...(saved||{}),mediaId:saved?.mediaId??oldMedia??project.mediaId};
+ });
+ const remaining=savedProjects.filter(project=>!galleryKeys.has(project.key||'')&&!legacyPortfolioKeys.has(project.key||''));
+ const portfolioSource=savedProjects.length
+  ?[...gallery,...remaining]
+  :undefined;
  const projects=portfolioSource?.map((project,index)=>{
   const defaultProject=base.projects.find(item=>item.key===project.key)||base.projects[index];
   return {
