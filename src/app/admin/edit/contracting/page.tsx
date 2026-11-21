@@ -73,7 +73,7 @@ export default async function ContractingVisualEditorPage({searchParams}:Props){
   sectorPublished?published('services',locale,sectorPublished.id):Promise.resolve([]),
   sectorPublished?published('projects',locale,sectorPublished.id):Promise.resolve([])
  ]);
-  const previewHref=`/${locale}/sectors/contracting/${page}?previewDraft=1`;
+  const previewHref=`/${locale}/sectors/contracting${page==='root'?'':`/${page}`}?previewDraft=1`;
  const editorKey=`${locale}:${page}:${draft.updatedAt||'unsaved'}:${mediaId||'no-image'}`;
 
  return <ContractingVisualEditor
