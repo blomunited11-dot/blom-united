@@ -110,3 +110,14 @@
 .ctIntegratedImage img{display:block;width:100%;height:100%;object-fit:contain}
 .ctIntegratedEmpty{color:#e7edf0;text-align:center;padding:30px;line-height:1.8}
 @media(max-width:700px){.ctIntegratedImage{aspect-ratio:1728/864}}
+
+/* Mobile quality/safety: visually bind each caption to its own image. */
+@media(max-width:560px){
+ .ctStandards{gap:0}
+ .ctStandards .ctQualityCard{gap:0;padding:0 0 18px;margin:0 0 26px;border-bottom:1px solid var(--ct-line)}
+ .ctStandards .ctQualityCard:last-child{margin-bottom:0;border-bottom:0;padding-bottom:0}
+ .ctQualityMedia{margin-bottom:8px;aspect-ratio:4/3}
+ .ctStandards .ctQualityCard>span{margin:0 0 3px;line-height:1.4}
+ .ctStandards .ctQualityCard h3{margin:0 0 4px;font-size:21px;line-height:1.45}
+ .ctStandards .ctQualityCard p{margin:0;font-size:14px;line-height:1.65}
+}
