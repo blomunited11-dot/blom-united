@@ -50,6 +50,10 @@ function buildDraftContent(form:FormData,locale:'ar'|'en'){
    try{parsed=JSON.parse(formText(form,`json:${key}`));}
    catch{throw new Error(`Invalid JSON list: ${key}`);}
    content[key]=parsed;
+  }else if(key==='lifecycleMediaId'){
+   const id=formText(form,'lifecycle_media_id');
+   if(id&&!/^[0-9a-f-]{36}$/i.test(id))throw new Error('Invalid lifecycle media');
+   content.lifecycleMediaId=id||null;
   }else if(key==='pages'){
    const pageDefaults=value as Record<string,{title:string;description:string}>;
    content.pages=Object.fromEntries(Object.keys(pageDefaults).map(slug=>[slug,{
