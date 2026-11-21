@@ -22,7 +22,7 @@ export default async function Sector({params,searchParams}:{params:Promise<{loca
   const previewProjects=preview?withContractingProjectMediaDrafts(projects,preview.projectMediaDrafts):projects;
   const mergedCopy=mergeContractingCopy(l,copy);
   const images=await getContractingPortfolioImages([...mergedCopy.projects,...mergedCopy.serviceMediaIds.map((mediaId,index)=>({key:`service-${index}`,mediaId}))]);
-  const serviceImages=Object.fromEntries(mergedCopy.serviceMediaIds.map((_,index)=>[String(index),images[`service-${index}`]]).filter((entry):entry is [string,string]=>typeof entry[1]==='string'));
+  const serviceImages=Object.fromEntries(mergedCopy.serviceMediaIds.flatMap((_,index)=>images[`service-${index}`]?[[String(index),images[`service-${index}`]]]:[]));
   const projectImages=images;
   return <ContractingExperience locale={l} services={services} projects={previewProjects} copy={mergedCopy} heroImage={heroImage} projectImages={projectImages} serviceImages={serviceImages}/>;
  }
