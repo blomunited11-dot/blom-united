@@ -62,6 +62,7 @@ function buildDraftContent(form:FormData,locale:'ar'|'en'){
 }
 
 export async function saveContractingDraft(form:FormData){
+ try{
  const locale=String(form.get('locale')||'');
  if(locale!=='ar'&&locale!=='en')throw new Error('Invalid locale');
  const content=buildDraftContent(form,locale);
@@ -78,9 +79,12 @@ export async function saveContractingDraft(form:FormData){
  if(error)throw new Error(error.message);
  revalidatePath('/admin/edit/contracting');
  revalidatePath('/admin/contracting');
+ return {ok:true as const};
+ }catch(error){console.error('contracting-draft-save-failed',error);return {ok:false as const,error:'تعذر حفظ المسودة. '+(error instanceof Error?error.message:'خطأ غير معروف')};}
 }
 
 export async function publishContractingDraft(form:FormData){
+ try{
  const locale=String(form.get('locale')||'');
  if(locale!=='ar'&&locale!=='en')throw new Error('Invalid locale');
  const db=await ownerDb();
@@ -92,4 +96,6 @@ export async function publishContractingDraft(form:FormData){
   revalidatePath(`/${pathLocale}/sectors/contracting`);
   for(const page of contractingPages)revalidatePath(`/${pathLocale}/sectors/contracting/${page.slug}`);
  }
+ return {ok:true as const};
+ }catch(error){console.error('contracting-draft-publish-failed',error);return {ok:false as const,error:'تعذر نشر المسودة. '+(error instanceof Error?error.message:'خطأ غير معروف')};}
 }
