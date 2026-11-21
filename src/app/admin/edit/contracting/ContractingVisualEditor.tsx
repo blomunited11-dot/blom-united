@@ -67,6 +67,9 @@ export default function ContractingVisualEditor({
   Object.fromEntries(Object.entries(projectMediaDrafts).map(([id,draft])=>[id,draft.mediaId]))
  ));
  const [isDirty,setIsDirty]=useState(false);
+ const [savedDraft,setSavedDraft]=useState(draftFound);
+ const [operationBusy,setOperationBusy]=useState(false);
+ const [operationMessage,setOperationMessage]=useState('');
  const [jsonValues,setJsonValues]=useState<Record<string,string>>(()=>{
   return Object.fromEntries(Object.entries(initialCopy).filter(([,value])=>
    Array.isArray(value)&&value.some(item=>typeof item!=='string')
@@ -122,6 +125,20 @@ export default function ContractingVisualEditor({
   }
  }
 
+ async function saveDraft(form:FormData){
+  setOperationBusy(true);setOperationMessage('جارٍ حفظ المسودة...');
+  try{const result=await saveContractingDraft(form);if(!result.ok){setOperationMessage(result.error);return;}
+   setSavedDraft(true);setIsDirty(false);setOperationMessage('تم حفظ المسودة بنجاح. يمكنك الآن نشرها.');
+  }catch(error){setOperationMessage(error instanceof Error?error.message:'فشل حفظ المسودة');}
+  finally{setOperationBusy(false);}
+ }
+ async function publishDraft(form:FormData){
+  if(isDirty||!savedDraft)return;
+  setOperationBusy(true);setOperationMessage('جارٍ نشر الصفحة...');
+  try{const result=await publishContractingDraft(form);setOperationMessage(result.ok?'تم نشر المسودة بنجاح.':result.error);}
+  catch(error){setOperationMessage(error instanceof Error?error.message:'فشل النشر');}
+  finally{setOperationBusy(false);}
+ }
  function chooseMedia(id:string,url:string|null){
   setSelectedMediaId(id);
   setHeroImage(url);
@@ -263,7 +280,7 @@ export default function ContractingVisualEditor({
 
  return <div className={styles.page} dir={locale==='ar'?'rtl':'ltr'}>
   <div className={styles.columns}>
-   <div style={{position:"sticky",top:0,zIndex:100,background:"#fff",padding:12,display:"flex",gap:14,flexWrap:"wrap",borderBottom:"1px solid #ddd"}}><Link href="/admin">القطاعات</Link><Link href={`/admin/edit/contracting?locale=${locale==="ar"?"en":"ar"}&page=${page}`}>{locale==="ar"?"English":"العربية"}</Link><strong>تحرير صفحة المقاولات مباشرة</strong><span>اضغط النص لتعديله أو الصورة لاختيار بديل</span><button type="button" onClick={()=>{setImageTarget("hero");setImagePicker(true)}}>اختيار صورة الواجهة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-save")?.click()}>حفظ مسودة</button><button type="button" onClick={()=>{if(window.confirm("هل تؤكد نشر مسودة المقاولات وصورها على الموقع العام؟"))document.getElementById("contracting-draft-publish")?.click()}} disabled={isDirty||!draftFound}>نشر</button></div>
+   <div style={{position:"sticky",top:0,zIndex:100,background:"#fff",padding:12,display:"flex",gap:14,flexWrap:"wrap",borderBottom:"1px solid #ddd"}}><Link href="/admin">القطاعات</Link><Link href={`/admin/edit/contracting?locale=${locale==="ar"?"en":"ar"}&page=${page}`}>{locale==="ar"?"English":"العربية"}</Link><strong>تحرير صفحة المقاولات مباشرة</strong><span>اضغط النص لتعديله أو إطار الصورة لرفع بديل</span>{operationMessage&&<span role="status" style={{color:operationMessage.includes("تم ")?"#17663b":"#a33",fontWeight:600}}>{operationMessage}</span>}<button type="button" onClick={()=>{setImageTarget("hero");setImagePicker(true)}}>اختيار صورة الواجهة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-save")?.click()}>حفظ مسودة</button><button type="button" onClick={()=>{if(window.confirm("هل تؤكد نشر مسودة المقاولات وصورها على الموقع العام؟"))document.getElementById("contracting-draft-publish")?.click()}} disabled={isDirty||!savedDraft||operationBusy}>نشر</button></div>
    {activeText&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>{fieldLabels[activeText]||activeText}</strong><textarea dir={locale==="ar"?"rtl":"ltr"} rows={5} value={String(copy[activeText as keyof typeof copy]||"")} onChange={e=>updateField(activeText,e.target.value)} maxLength={3000}/><button type="button" onClick={()=>setActiveText(null)}>إغلاق والعودة للصفحة</button></div></div>}
    {(activeList||activePageField)&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>تحرير النص المحدد</strong><textarea rows={5} dir={locale==="ar"?"rtl":"ltr"} value={activePageField&&page!=='root'?copy.pages[page][activePageField]:currentListValue()} onChange={e=>activePageField&&page!=='root'?updatePageField(page,activePageField,e.target.value):updateListValue(e.target.value)}/><button type="button" onClick={()=>{setActiveList(null);setActivePageField(null)}}>إغلاق</button></div></div>}
    {imagePicker&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,700px)",maxHeight:"80vh",overflow:"auto",display:"grid",gap:12}}><strong>استبدال الصورة في الصفحة</strong><form action={uploadImage} style={{display:"grid",gap:8}}><label>اختر صورة من جهازك (JPG أو PNG أو WebP)<input type="file" name="file" accept="image/jpeg,image/png,image/webp,image/avif" required/></label><p>يُستخدم النص الموجود بجانب الصورة في الصفحة؛ لا حاجة لإدخال وصف بديل عند الرفع.</p><button type="submit" disabled={uploading}>{uploading?'جارٍ الرفع...':'تحويل الصورة واختيارها'}</button>{uploadError&&<p role="alert">{uploadError}</p>}</form><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}}>{visibleMediaOptions.map(m=><button key={m.id} type="button" onClick={()=>selectImage(m.id,m.public_url)}>{m.public_url&&<img src={m.public_url} alt={m.alt_ar||""} style={{width:"100%",height:90,objectFit:"cover"}}/>}</button>)}</div><button type="button" onClick={()=>setImagePicker(false)}>إغلاق</button></div></div>}
@@ -283,18 +300,18 @@ export default function ContractingVisualEditor({
      {draftFound&&<Link href={previewHref} target="_blank" rel="noreferrer">فتح آخر مسودة محفوظة</Link>}
     </div>
 
-    <form action={saveContractingDraft} className={styles.form}>
+    <form action={saveDraft} className={styles.form}>
      <input type="hidden" name="locale" value={locale}/>
      {mediaError&&<input type="hidden" name="hero_media_id" value={selectedMediaId}/>}
      <fieldset className={styles.mediaFieldset}>
       <legend>صورة واجهة المقاولات</legend>
-      <p className={styles.helpText}>اختر صورة من مكتبة الوسائط. ستظهر فورًا في المعاينة، وتُحفظ ضمن المسودة.</p>
+      <p className={styles.helpText}>اضغط إطار رفع الصورة لاختيار صورة من جهازك أو من الصور المحفوظة؛ ثم احفظ المسودة وانشرها.</p>
       {mediaError?<p className={styles.error} role="alert">تعذر تحميل مكتبة الوسائط: {mediaError}</p>:<>
        <div className={styles.mediaGrid}>
         <label className={styles.mediaChoice}>
-         <input type="radio" name="hero_media_id" value="" checked={!selectedMediaId} onChange={()=>chooseMedia('',null)}/>
-         <span className={styles.noImage}>بدون صورة</span>
-         <span>إزالة الصورة</span>
+         <input type="radio" name="hero_media_id" value="" checked={!selectedMediaId} onChange={()=>{setImageTarget("hero");setImagePicker(true)}}/>
+         <span className={styles.noImage} role="button" tabIndex={0} onClick={event=>{event.preventDefault();setImageTarget("hero");setImagePicker(true)}} onKeyDown={event=>{if(event.key==="Enter"){event.preventDefault();setImageTarget("hero");setImagePicker(true)}}}>اضغط هنا لرفع صورة</span>
+         <span>اختيار صورة للواجهة</span>
         </label>
         {visibleMediaOptions.map(item=><label className={styles.mediaChoice} key={item.id}>
          <input type="radio" name="hero_media_id" value={item.id} checked={selectedMediaId===item.id} onChange={()=>chooseMedia(item.id,item.public_url||null)}/>
@@ -397,12 +414,12 @@ export default function ContractingVisualEditor({
        <label className={styles.field}><span>{item.slug} — الوصف</span><textarea name={`page:${item.slug}:description`} value={copy.pages[item.slug].description} maxLength={3000} rows={2} required onChange={event=>updatePageField(item.slug,'description',event.target.value)}/></label>
       </div>)}
      </fieldset>
-     <button id="contracting-draft-save" className={styles.saveButton} type="submit" disabled={Object.keys(jsonErrors).length>0}>حفظ التعديلات كمسودة</button>
+     <button id="contracting-draft-save" className={styles.saveButton} type="submit" disabled={operationBusy||Object.keys(jsonErrors).length>0}>حفظ التعديلات كمسودة</button>
     </form>
 
-    {draftFound?<form action={publishContractingDraft} className={styles.publishForm}>
+    {savedDraft?<form action={publishDraft} className={styles.publishForm}>
      <input type="hidden" name="locale" value={locale}/>
-    <button id="contracting-draft-publish" className={styles.publishButton} type="submit" disabled={isDirty||Object.keys(jsonErrors).length>0}>نشر مسودة المحتوى وصور بطاقات الأعمال</button>
+    <button id="contracting-draft-publish" className={styles.publishButton} type="submit" disabled={isDirty||operationBusy||Object.keys(jsonErrors).length>0}>نشر مسودة المحتوى وصور بطاقات الأعمال</button>
      {isDirty?<p className={styles.helpText}>احفظ التعديلات الحالية كمسودة قبل النشر.</p>:<p className={styles.helpText}>آخر حفظ للمسودة: {updatedAt}</p>}
     </form>:<p className={styles.helpText}>احفظ أول مسودة لتفعيل النشر والمعاينة الخاصة.</p>}
    </section>
