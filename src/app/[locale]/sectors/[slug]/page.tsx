@@ -21,8 +21,10 @@ export default async function Sector({params,searchParams}:{params:Promise<{loca
   ]);
   const previewProjects=preview?withContractingProjectMediaDrafts(projects,preview.projectMediaDrafts):projects;
   const mergedCopy=mergeContractingCopy(l,copy);
-  const projectImages=await getContractingPortfolioImages(mergedCopy.projects);
-  return <ContractingExperience locale={l} services={services} projects={previewProjects} copy={mergedCopy} heroImage={heroImage} projectImages={projectImages}/>;
+  const images=await getContractingPortfolioImages([...mergedCopy.projects,...mergedCopy.serviceMediaIds.map((mediaId,index)=>({key:`service-${index}`,mediaId}))]);
+  const serviceImages=Object.fromEntries(mergedCopy.serviceMediaIds.map((_,index)=>[String(index),images[`service-${index}`]]).filter((entry):entry is [string,string]=>typeof entry[1]==='string'));
+  const projectImages=images;
+  return <ContractingExperience locale={l} services={services} projects={previewProjects} copy={mergedCopy} heroImage={heroImage} projectImages={projectImages} serviceImages={serviceImages}/>;
  }
  return <main className="container page"><h1>{sector?.title||s[l]}</h1><p>{sector?.summary||dict[l].noContent}</p><h2>{l==='ar'?'الخدمات':'Services'}</h2><div className="cards">{services.map(x=><Link className="card cardBody" key={x.id} href={`/${l}/sectors/${slug}/services/${x.slug}`}>{x.title}</Link>)}</div><h2>{dict[l].projects}</h2><div className="cards">{projects.map(x=><Link className="card cardBody" key={x.id} href={`/${l}/projects/${x.slug}`}>{x.title}</Link>)}</div></main>;
 }
