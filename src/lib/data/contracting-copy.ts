@@ -42,7 +42,15 @@ export function mergeContractingCopy(locale:Locale,...copies:ContractingCopy[]):
  // Preserve published custom sector labels while migrating the previous first label.
  // Existing drafts and translations can otherwise override the updated default.
  const resolvedDomains=merged.domains?.map((domain,index)=>index===0&&domain==='القطاع الحكومي والمرافق'?'المباني والمرافق':domain);
- const projects=merged.projects?.map((project,index)=>{
+ const legacyPortfolioKeys=new Set(['taiba-medical-complex','al-maseera-sports-club','central-laboratories-al-jouf']);
+ const hasLegacyPortfolio=Array.isArray(merged.projects)&&merged.projects.some(project=>legacyPortfolioKeys.has(project.key||''));
+ const portfolioSource=hasLegacyPortfolio
+  ?[...base.projects.slice(0,3).map((project,index)=>({
+    ...project,
+    ...(index===0?{mediaId:merged.projects?.find(item=>item.key==='taiba-medical-complex')?.mediaId??null}:{})
+   })),...(merged.projects||[]).filter(project=>!legacyPortfolioKeys.has(project.key||''))]
+  :merged.projects;
+ const projects=portfolioSource?.map((project,index)=>{
   const defaultProject=base.projects.find(item=>item.key===project.key)||base.projects[index];
   return {
    ...defaultProject,
