@@ -349,6 +349,7 @@ export default function ContractingVisualEditor({
      {draftFound&&<Link href={previewHref} target="_blank" rel="noreferrer">فتح آخر مسودة محفوظة</Link>}
     </div>
 
+    {page==='root'&&<div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'12px 0',alignItems:'center'}}><a href="#lifecycle-media" style={{display:'inline-block',padding:'12px 18px',background:'#183d4a',color:'#fff',borderRadius:8,fontWeight:700}}>صورة «من الفكرة إلى التسليم» — اختيار أو رفع</a><button type="button" onClick={()=>{setImageTarget('lifecycle');setImageSource('device');setImagePicker(true)}} style={{padding:'12px 18px',border:'1px solid #183d4a',borderRadius:8}}>رفع الصورة مباشرة</button></div>}
     <form action={saveDraft} className={styles.form}>
      <input type="hidden" name="locale" value={locale}/><input type="hidden" name="lifecycle_media_id" value={copy.lifecycleMediaId||""}/>
      {mediaError&&<input type="hidden" name="hero_media_id" value={selectedMediaId}/>}
