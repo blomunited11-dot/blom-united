@@ -58,3 +58,13 @@
 .ctDomains .ctDomainCard>span{font-size:12px;color:#374151}
 .ctDomains .ctDomainCard h3{margin:9px 0 0;font-size:clamp(18px,1.7vw,22px)}
 @media(prefers-reduced-motion:reduce){.ctDomainMedia img{transition:none}}
+
+/* Three editorial portfolio showcases: large lead photograph beside the description. */
+.ctCaseGrid{row-gap:22px}
+.ctCaseShowcase{grid-template-columns:minmax(0,1.65fr) minmax(0,.85fr);margin-top:48px}
+.ctCaseGrid>.ctCaseShowcase:first-child{margin-top:0}
+.ctCaseShowcase .ctCaseMedia{height:clamp(440px,44vw,620px)}
+.ctCaseShowcase .ctCaseBody{padding:clamp(28px,4vw,66px)}
+.ctCaseShowcase+.ctCase:not(.ctCaseFeatured) .ctCaseMedia{height:300px}
+@media(max-width:850px){.ctCaseShowcase{grid-template-columns:1fr}.ctCaseShowcase .ctCaseMedia{height:clamp(300px,52vw,460px)}}
+@media(max-width:560px){.ctCaseShowcase{margin-top:36px}.ctCaseShowcase .ctCaseMedia{height:300px}.ctCaseShowcase+.ctCase:not(.ctCaseFeatured) .ctCaseMedia{height:230px}}
