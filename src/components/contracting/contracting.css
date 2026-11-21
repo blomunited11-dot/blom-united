@@ -31,3 +31,20 @@
 .ctQualityMedia>span{font-size:13px;text-align:center;padding:12px}
 .ctStandards .ctQualityCard h3{font-size:clamp(19px,1.7vw,25px);line-height:1.5;margin:10px 0 8px}
 .ctStandards .ctQualityCard p{font-size:14px;line-height:1.85;margin:0;color:var(--muted)}
+
+/* Consistent, legible explanatory copy throughout the contracting experience.
+   Keep headings and structural numbering visually distinct. */
+.contracting{--ct-description-ink:#374151}
+.contracting .ctIntro,
+.contracting .ctSectionHead>p,
+.contracting .ctProjectInfo p,
+.contracting .ctService p,
+.contracting .ctCaseBody p,
+.contracting .ctStandards p,
+.contracting .ctStandards .ctQualityCard p,
+.contracting .ctClosingInner p,
+.contracting .ctEmpty,
+.contracting .ctProjectInfo .ctSampleLabel{
+ color:var(--ct-description-ink);
+ opacity:1;
+}
