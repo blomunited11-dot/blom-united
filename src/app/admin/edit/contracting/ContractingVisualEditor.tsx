@@ -37,7 +37,7 @@ const fieldLabels:Record<string,string>={
  seeProjects:'رابط استكشاف الأعمال',contact:'نص التواصل',photo:'وصف الصورة',pending:'نص الصورة الافتراضية',
  capabilities:'عنوان نطاق الأعمال',capIntro:'مقدمة نطاق الأعمال',domainsTitle:'عنوان القطاعات المستهدفة',
  workTitle:'عنوان الأعمال',workIntro:'مقدمة الأعمال',lifecycle:'عنوان مراحل التنفيذ',
- lifecycleIntro:'مقدمة مراحل التنفيذ',integrated:'عنوان الإدارة المتكاملة',integratedIntro:'مقدمة الإدارة المتكاملة',
+ lifecycleIntro:'مقدمة مراحل التنفيذ',lifecycleMediaId:'صورة من الفكرة إلى التسليم',integrated:'عنوان الإدارة المتكاملة',integratedIntro:'مقدمة الإدارة المتكاملة',
  standards:'عنوان الجودة والسلامة',published:'عنوان المشاريع المنشورة',publishedServices:'عنوان الخدمات المنشورة',
  more:'رابط التفاصيل',return:'رابط العودة للقطاعات',end:'النص الختامي',services:'روابط الخدمات الست',serviceMediaIds:'صور الخدمات الست',qualityMediaIds:'صور الجودة والسلامة الست',domainMediaIds:'صور القطاعات الستة',
  domains:'القطاعات المستهدفة',steps:'مراحل التنفيذ',integratedItems:'عناصر الإدارة المتكاملة',
@@ -153,6 +153,7 @@ export default function ContractingVisualEditor({
  }));
  const qualityImages=Object.fromEntries(copy.qualityMediaIds.flatMap((id,index)=>{const url=visibleMediaOptions.find(item=>item.id===id)?.public_url;return url?[[String(index),url]]:[];}));
  const domainImages=Object.fromEntries(copy.domainMediaIds.flatMap((id,index)=>{const url=visibleMediaOptions.find(item=>item.id===id)?.public_url;return url?[[String(index),url]]:[];}));
+ const lifecycleImage=visibleMediaOptions.find(item=>item.id===copy.lifecycleMediaId)?.public_url||null;
  const portfolioImages=Object.fromEntries(previewCopy.projects.flatMap(project=>{
   const image=[...uploadedMedia,...mediaOptions].find(item=>item.id===project.mediaId)?.public_url;
   return image?[[project.key,image]]:[];
@@ -177,6 +178,7 @@ export default function ContractingVisualEditor({
  const editableStrings=Object.entries(copy).filter(([key,value])=>typeof value==='string'&&key!=='photo'&&key!=='pending') as [string,string][];
  function selectImage(id:string,url:string|null){
   if(imageTarget==='hero')chooseMedia(id,url);
+  else if(imageTarget==='lifecycle')updateField('lifecycleMediaId',id||null);
   else if(imageTarget.startsWith('service:'))updateServiceMedia(Number(imageTarget.slice(8)),id);
   else if(imageTarget.startsWith('domain:'))updateDomainMedia(Number(imageTarget.slice(7)),id);
   else if(imageTarget.startsWith('quality:'))updateQualityMedia(Number(imageTarget.slice(8)),id);
@@ -189,6 +191,7 @@ export default function ContractingVisualEditor({
  }
  function clearImageAssignment(target:string){
   if(target==='hero')chooseMedia('',null);
+  else if(target==='lifecycle')updateField('lifecycleMediaId',null);
   else if(target.startsWith('service:'))updateServiceMedia(Number(target.slice(8)),'');
   else if(target.startsWith('quality:'))updateQualityMedia(Number(target.slice(8)),'');
   else if(target.startsWith('domain:'))updateDomainMedia(Number(target.slice(7)),'');
@@ -226,6 +229,8 @@ export default function ContractingVisualEditor({
  }
  function inspectPageClick(event:MouseEvent<HTMLElement>){
   const target=event.target as HTMLElement;
+  const lifecycleMedia=target.closest('.ctLifecycleImage');
+  if(lifecycleMedia){event.preventDefault();setImageTarget('lifecycle');setImageSource('saved');setImagePicker(true);return;}
   const domainImage=target.closest('.ctDomainMedia');
   if(domainImage){event.preventDefault();const index=Number(domainImage.getAttribute('data-domain-index'));if(Number.isInteger(index)&&index>=0&&index<copy.domainMediaIds.length){setImageTarget('domain:'+index);setImagePicker(true);}return;}
   const qualityImage=target.closest('.ctQualityMedia');
@@ -327,7 +332,7 @@ export default function ContractingVisualEditor({
    <div style={{position:"sticky",top:0,zIndex:100,background:"#fff",padding:12,display:"flex",gap:14,flexWrap:"wrap",borderBottom:"1px solid #ddd"}}><Link href="/admin">القطاعات</Link><Link href={`/admin/edit/contracting?locale=${locale==="ar"?"en":"ar"}&page=${page}`}>{locale==="ar"?"English":"العربية"}</Link><strong>تحرير صفحة المقاولات مباشرة</strong><span>اضغط النص لتعديله أو إطار الصورة لرفع بديل</span>{operationMessage&&<span role="status" style={{color:operationMessage.includes("تم ")?"#17663b":"#a33",fontWeight:600}}>{operationMessage}</span>}<button type="button" onClick={()=>{setImageTarget("hero");setImagePicker(true)}}>اختيار صورة الواجهة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-save")?.click()}>حفظ مسودة</button><button type="button" onClick={()=>{if(window.confirm("هل تؤكد نشر مسودة المقاولات وصورها على الموقع العام؟"))document.getElementById("contracting-draft-publish")?.click()}} disabled={isDirty||!savedDraft||operationBusy}>نشر</button></div>
    {activeText&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>{fieldLabels[activeText]||activeText}</strong><textarea dir={locale==="ar"?"rtl":"ltr"} rows={5} value={String(copy[activeText as keyof typeof copy]||"")} onChange={e=>updateField(activeText,e.target.value)} maxLength={3000}/><button type="button" onClick={()=>setActiveText(null)}>إغلاق والعودة للصفحة</button></div></div>}
    {(activeList||activePageField)&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>تحرير النص المحدد</strong><textarea rows={5} dir={locale==="ar"?"rtl":"ltr"} value={activePageField&&page!=='root'?copy.pages[page][activePageField]:currentListValue()} onChange={e=>activePageField&&page!=='root'?updatePageField(page,activePageField,e.target.value):updateListValue(e.target.value)}/><button type="button" onClick={()=>{setActiveList(null);setActivePageField(null)}}>إغلاق</button></div></div>}
-   {imagePicker&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,700px)",maxHeight:"80vh",overflow:"auto",display:"grid",gap:12}}><strong>اختيار صورة للصفحة</strong>{(imageTarget==='hero'?!!selectedMediaId:imageTarget.startsWith('portfolio:')?!!copy.projects.find(project=>project.key===imageTarget.slice(10))?.mediaId:imageTarget.startsWith('service:')?!!copy.serviceMediaIds[Number(imageTarget.slice(8))]:imageTarget.startsWith('quality:')?!!copy.qualityMediaIds[Number(imageTarget.slice(8))]:imageTarget.startsWith('domain:')?!!copy.domainMediaIds[Number(imageTarget.slice(7))]:false)&&<button type="button" onClick={()=>clearImageAssignment(imageTarget)}>إزالة الصورة من هذا الموضع</button>}<div style={{display:"flex",gap:8}}><button type="button" aria-pressed={imageSource==='saved'} onClick={()=>setImageSource('saved')} style={{padding:10,border:imageSource==='saved'?"2px solid #285a78":"1px solid #ccc",borderRadius:8}}>الصور المحفوظة ({visibleMediaOptions.length})</button><button type="button" aria-pressed={imageSource==='device'} onClick={()=>setImageSource('device')} style={{padding:10,border:imageSource==='device'?"2px solid #285a78":"1px solid #ccc",borderRadius:8}}>رفع صورة من الجهاز</button></div>{imageSource==='device'?<form action={uploadImage} style={{display:"grid",gap:8}}><label>اختر صورة من جهازك (JPG أو PNG أو WebP)<input type="file" name="file" accept="image/jpeg,image/png,image/webp,image/avif" required/></label><p>سيتم تحويل الصورة إلى WebP واختيارها في الصفحة؛ الحفظ والنشر خطوتان منفصلتان.</p><button type="submit" disabled={uploading}>{uploading?'جارٍ الرفع...':'تحويل الصورة واختيارها'}</button>{uploadError&&<p role="alert">{uploadError}</p>}</form>:<div style={{display:"grid",gap:10}}>{visibleMediaOptions.length===0?<p>لا توجد صور محفوظة متاحة لهذا القطاع. اختر «رفع صورة من الجهاز».</p>:<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}}>{visibleMediaOptions.map(m=><button key={m.id} type="button" onClick={()=>selectImage(m.id,m.public_url)} style={{border:selectedMediaId===m.id?"2px solid #285a78":"1px solid #ddd",padding:6,borderRadius:8}}>{m.public_url&&<img src={m.public_url} alt={m.alt_ar||""} style={{width:"100%",height:90,objectFit:"cover"}}/>}<span style={{display:"block",fontSize:12}}>{m.alt_ar||'صورة محفوظة'}</span></button>)}</div>}</div>}<button type="button" onClick={()=>setImagePicker(false)}>إغلاق</button></div></div>}
+   {imagePicker&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,700px)",maxHeight:"80vh",overflow:"auto",display:"grid",gap:12}}><strong>اختيار صورة للصفحة</strong>{(imageTarget==='hero'?!!selectedMediaId:imageTarget==='lifecycle'?!!copy.lifecycleMediaId:imageTarget.startsWith('portfolio:')?!!copy.projects.find(project=>project.key===imageTarget.slice(10))?.mediaId:imageTarget.startsWith('service:')?!!copy.serviceMediaIds[Number(imageTarget.slice(8))]:imageTarget.startsWith('quality:')?!!copy.qualityMediaIds[Number(imageTarget.slice(8))]:imageTarget.startsWith('domain:')?!!copy.domainMediaIds[Number(imageTarget.slice(7))]:false)&&<button type="button" onClick={()=>clearImageAssignment(imageTarget)}>إزالة الصورة من هذا الموضع</button>}<div style={{display:"flex",gap:8}}><button type="button" aria-pressed={imageSource==='saved'} onClick={()=>setImageSource('saved')} style={{padding:10,border:imageSource==='saved'?"2px solid #285a78":"1px solid #ccc",borderRadius:8}}>الصور المحفوظة ({visibleMediaOptions.length})</button><button type="button" aria-pressed={imageSource==='device'} onClick={()=>setImageSource('device')} style={{padding:10,border:imageSource==='device'?"2px solid #285a78":"1px solid #ccc",borderRadius:8}}>رفع صورة من الجهاز</button></div>{imageSource==='device'?<form action={uploadImage} style={{display:"grid",gap:8}}><label>اختر صورة من جهازك (JPG أو PNG أو WebP)<input type="file" name="file" accept="image/jpeg,image/png,image/webp,image/avif" required/></label><p>سيتم تحويل الصورة إلى WebP واختيارها في الصفحة؛ الحفظ والنشر خطوتان منفصلتان.</p><button type="submit" disabled={uploading}>{uploading?'جارٍ الرفع...':'تحويل الصورة واختيارها'}</button>{uploadError&&<p role="alert">{uploadError}</p>}</form>:<div style={{display:"grid",gap:10}}>{visibleMediaOptions.length===0?<p>لا توجد صور محفوظة متاحة لهذا القطاع. اختر «رفع صورة من الجهاز».</p>:<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}}>{visibleMediaOptions.map(m=><button key={m.id} type="button" onClick={()=>selectImage(m.id,m.public_url)} style={{border:selectedMediaId===m.id?"2px solid #285a78":"1px solid #ddd",padding:6,borderRadius:8}}>{m.public_url&&<img src={m.public_url} alt={m.alt_ar||""} style={{width:"100%",height:90,objectFit:"cover"}}/>}<span style={{display:"block",fontSize:12}}>{m.alt_ar||'صورة محفوظة'}</span></button>)}</div>}</div>}<button type="button" onClick={()=>setImagePicker(false)}>إغلاق</button></div></div>}
    <section className={styles.editorPanel} aria-label="أدوات التحرير">
     <header className={styles.editorHeader}>
      <p className={styles.eyebrow}>BLOM UNITED / CONTENT STUDIO</p>
@@ -368,6 +373,18 @@ export default function ContractingVisualEditor({
       
      </fieldset>
 
+      {page==='root'&&<fieldset className={styles.projectMediaFieldset} id="lifecycle-media">
+       <legend>صورة «من الفكرة إلى التسليم»</legend>
+       <p className={styles.helpText}>صورة واحدة بانورامية للمراحل الثماني. يمكن رفع التصميم المعتمد أو اختياره من المكتبة، ثم حفظ المسودة ونشرها.</p>
+       <div className={styles.projectMediaRow}>
+        <div className={styles.projectMediaDetails}>
+         <label className={styles.projectMediaSelect}><span>الصورة المرتبطة</span><select value={copy.lifecycleMediaId||''} disabled={!!mediaError} onChange={event=>updateField('lifecycleMediaId',event.target.value||null)}><option value="">بدون صورة</option>{visibleMediaOptions.map(media=><option key={media.id} value={media.id}>{(locale==='ar'?media.alt_ar:media.alt_en)||'صورة محفوظة'}</option>)}</select></label>
+         <button type="button" onClick={()=>{setImageTarget('lifecycle');setImageSource('saved');setImagePicker(true)}}>اختيار صورة أو رفع صورة جديدة</button>
+         {copy.lifecycleMediaId&&<button type="button" onClick={()=>clearImageAssignment('lifecycle')}>إزالة الصورة</button>}
+        </div>
+        {lifecycleImage?<img className={styles.projectMediaPreview} src={lifecycleImage} alt="من الفكرة إلى التسليم"/>:<div className={styles.projectMediaNoImage}>لم تُربط الصورة بعد</div>}
+       </div>
+      </fieldset>}
       {page==='root'&&<fieldset className={styles.projectMediaFieldset} id="service-media">
        <legend>صور نطاق أعمال متكامل — مستقلة عن صورة الواجهة</legend>
        <p className={styles.helpText}>لكل خدمة صورة مستقلة. اضغط إطارها في المعاينة أو اختر صورة محفوظة أو ارفع صورة جديدة.</p>
@@ -521,7 +538,7 @@ export default function ContractingVisualEditor({
     </header>
     <div className={styles.previewViewport} onClickCapture={inspectPageClick} dir={locale==='ar'?'rtl':'ltr'}>
      {page==='root'
-      ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage} projectImages={portfolioImages} serviceImages={serviceImages} qualityImages={qualityImages} domainImages={domainImages}/>
+      ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage} projectImages={portfolioImages} serviceImages={serviceImages} qualityImages={qualityImages} domainImages={domainImages} lifecycleImage={lifecycleImage}/>
       :<ContractingInnerExperience locale={locale} page={page} copy={previewCopy} services={services} projects={projects}/>}
     </div>
    </aside>
