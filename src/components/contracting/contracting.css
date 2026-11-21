@@ -23,3 +23,11 @@
 /* With duplicate navigation removed, give the hero image more prominence without an empty gap. */
 @media(min-width:851px){.ctHero{padding:clamp(26px,3vw,48px) 0 42px}.ctHeroGrid{grid-template-columns:.82fr 1.18fr;gap:clamp(28px,4vw,65px)}.ctHeroVisual{min-height:520px}}
 @media(max-width:850px){.ctHero{padding:32px 0 38px}}
+
+/* Six quality/safety cards: image, title and description in two balanced rows. */
+.ctStandards .ctQualityCard{border-top:0;padding-top:0;min-width:0;display:flex;flex-direction:column;align-items:stretch}
+.ctQualityMedia{aspect-ratio:4/3;background:#edf1f3;overflow:hidden;display:grid;place-items:center;color:#65757d;margin-bottom:16px;position:relative}
+.ctQualityMedia img{width:100%;height:100%;object-fit:cover;display:block}
+.ctQualityMedia>span{font-size:13px;text-align:center;padding:12px}
+.ctStandards .ctQualityCard h3{font-size:clamp(19px,1.7vw,25px);line-height:1.5;margin:10px 0 8px}
+.ctStandards .ctQualityCard p{font-size:14px;line-height:1.85;margin:0;color:var(--muted)}
