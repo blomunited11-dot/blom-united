@@ -95,3 +95,12 @@
 @media(max-width:1000px){.ctJourneyStages{grid-template-columns:repeat(4,minmax(0,1fr))}.ctJourneyStage{min-height:95px}.ctJourney{grid-template-columns:minmax(0,1.4fr) minmax(240px,.8fr)}}
 @media(max-width:720px){.ctJourney{grid-template-columns:1fr}.ctJourneyScene svg{min-height:0;aspect-ratio:1100/530}.ctJourneyDetail{padding:24px;min-height:185px}.ctJourneyStages{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;gap:8px}.ctJourneyStage{flex:0 0 150px;scroll-snap-align:start;min-height:95px}.ctJourneyOverlay{bottom:12px;inset-inline-start:15px}.ctJourneyOverlay strong{font-size:16px}}
 @media(prefers-reduced-motion:reduce){.ctSceneReveal{animation:none}.ctJourneyStage,.ctJourneyActions button{transition:none}}
+
+
+/* Editorial image replaces the interactive lifecycle illustration. */
+.ctLifecycleBanner .ctLifecycleImage{position:relative;width:100%;aspect-ratio:1728/864;overflow:hidden;background:#dce3e6;border:1px solid #c7d1d5;display:grid;place-items:center}
+.ctLifecycleBanner .ctLifecycleImage img{width:100%;height:100%;object-fit:contain;display:block}
+.ctLifecycleEmpty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:30px;text-align:center;color:#314b56}
+.ctLifecycleEmpty strong{font-size:clamp(20px,3vw,36px)}
+.ctLifecycleEmpty span{font-size:14px;line-height:1.7}
+@media(max-width:680px){.ctLifecycleBanner .ctLifecycleImage{aspect-ratio:1728/864;overflow-x:auto}.ctLifecycleBanner .ctLifecycleImage img{min-width:0}}
