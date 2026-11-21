@@ -445,7 +445,8 @@ export default function ContractingVisualEditor({
       <span>{fieldLabels[key]||key} — عنصر واحد في كل سطر</span>
       <textarea name={`list:${key}`} value={(value as string[]).join('\n')} maxLength={12000} rows={Math.min(10,Math.max(3,(value as string[]).length))} required onChange={event=>updateField(key,event.target.value.split(/\r?\n/).map(item=>item.trim()).filter(Boolean))}/>
      </label>)}
-     {jsonFields.map(([key])=><label className={styles.field} key={key}>
+     <input type="hidden" name="json:serviceMediaIds" value={JSON.stringify(copy.serviceMediaIds)}/>
+     {jsonFields.filter(([key])=>key!=='serviceMediaIds').map(([key])=><label className={styles.field} key={key}>
       <span>{fieldLabels[key]||key}</span>
       <textarea name={`json:${key}`} value={jsonValues[key]||''} maxLength={30000} rows={14} required dir="ltr" aria-invalid={!!jsonErrors[key]} onChange={event=>updateJsonField(key,event.target.value)}/>
       {jsonErrors[key]&&<span className={styles.error} role="alert">{jsonErrors[key]}</span>}
