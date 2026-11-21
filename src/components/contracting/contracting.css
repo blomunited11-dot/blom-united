@@ -19,3 +19,7 @@
 .ctCapabilityPlaceholder{font-size:12px;opacity:.8}
 .ctCapability h3{margin-top:16px}
 @media(prefers-reduced-motion:reduce){.ctCapabilityMedia img{transition:none}}
+
+/* With duplicate navigation removed, give the hero image more prominence without an empty gap. */
+@media(min-width:851px){.ctHero{padding:clamp(26px,3vw,48px) 0 42px}.ctHeroGrid{grid-template-columns:.82fr 1.18fr;gap:clamp(28px,4vw,65px)}.ctHeroVisual{min-height:520px}}
+@media(max-width:850px){.ctHero{padding:32px 0 38px}}
