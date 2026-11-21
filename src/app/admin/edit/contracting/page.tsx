@@ -20,7 +20,6 @@ export default async function ContractingVisualEditorPage({searchParams}:Props){
  const locale:Locale=requestedLocale==='en'?'en':'ar';
   const selectedPage=contractingPages.find(item=>item.slug===requestedPage);
   const page:ContractingPageSlug|'root'=requestedPage==='root'?'root':selectedPage?.slug||'root';
-  if(page==='root')redirect('/admin/workspace?sector=contracting');
  let draft;
  try{
   draft=await getContractingDraft(locale);
