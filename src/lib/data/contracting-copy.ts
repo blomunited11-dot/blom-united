@@ -18,10 +18,10 @@ export type ContractingProject={
  scope:string;
  stages:string[];
 };
-export type ContractingContent=Omit<DeepWritable<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'|'qualityMediaIds'>&{projects:ContractingProject[];serviceMediaIds:(string|null)[];qualityMediaIds:(string|null)[]};
-export type ContractingCopy=Omit<DeepPartial<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'|'qualityMediaIds'>&{
+export type ContractingContent=Omit<DeepWritable<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'|'qualityMediaIds'|'domainMediaIds'>&{projects:ContractingProject[];serviceMediaIds:(string|null)[];qualityMediaIds:(string|null)[];domainMediaIds:(string|null)[]};
+export type ContractingCopy=Omit<DeepPartial<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'|'qualityMediaIds'|'domainMediaIds'>&{
  serviceMediaIds?:(string|null)[];
- qualityMediaIds?:(string|null)[];
+ qualityMediaIds?:(string|null)[];domainMediaIds?:(string|null)[];
  projects?:DeepPartial<ContractingProject>[];
  heroMediaId?:string;
 };
