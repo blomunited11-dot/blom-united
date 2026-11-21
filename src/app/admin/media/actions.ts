@@ -4,6 +4,7 @@ import {revalidatePath} from 'next/cache';
 import {randomUUID} from 'crypto';
 
 export async function uploadMedia(form:FormData){
+ try{
  const db=await serverDb();const{data:{user}}=await db.auth.getUser();if(!user)throw new Error('Unauthorized');
  const{data:member}=await db.from('admin_memberships').select('role').eq('user_id',user.id).eq('active',true).maybeSingle();
  if(member?.role!=='owner')throw new Error('Owner required');
@@ -57,4 +58,17 @@ export async function uploadMedia(form:FormData){
   if(linkError){await db.from('media_assets').delete().eq('id',asset.id);await db.storage.from('blom-media').remove([path]);throw new Error(linkError.message)}
  }
  revalidatePath('/admin/media');revalidatePath('/admin/visual');revalidatePath('/admin/projects');revalidatePath('/ar');revalidatePath('/en');
+ return {ok:true as const};
+ }catch(error){
+  const message=error instanceof Error?error.message:'Unknown media upload failure';
+  console.error('media-studio-upload-failed',message);
+  const safe=/permission|policy|row.level.security|403|unauthorized|owner required/i.test(message)?'لا توجد صلاحية كافية لحفظ الصورة في التخزين أو قاعدة البيانات.':
+   /bucket|not found|404/i.test(message)?'لم يتم العثور على حاوية التخزين أو السجل المرتبط بالصورة.':
+   /payload|413|size|too large/i.test(message)?'حجم الصورة يتجاوز الحد المسموح به للرفع.':
+   /duplicate|unique/i.test(message)?'يوجد تعارض مع صورة مسجلة سابقًا.':
+   /column|schema|relation|does not exist/i.test(message)?'بنية قاعدة البيانات لا تطابق حقول مكتبة الوسائط؛ راجع ترحيلات قاعدة البيانات.':
+   /Invalid|must be|required|Linked content|match|drafts/i.test(message)?message:
+   'تعذر حفظ الصورة. راجع سجل Cloudflare للحدث media-studio-upload-failed لمعرفة الخطأ الأصلي.';
+  return {ok:false as const,error:safe};
+ }
 }
