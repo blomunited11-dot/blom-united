@@ -40,7 +40,7 @@ export default async function ContractingVisualEditorPage({searchParams}:Props){
  const row=rows.find(item=>item.locale===locale);
  // A newly created or draft sector may not yet have a published translation.
  // The editor must still open so an owner can prepare its first publication.
- const liveCopy=row?readContractingCopy(row.body):mergeContractingCopy(locale,{},{});
+ const liveCopy=readContractingCopy(row?.body);
  const copy=mergeContractingCopy(locale,liveCopy,draft.copy);
  const mediaId=draft.found?draft.heroMediaId:liveCopy.heroMediaId||null;
  const heroImage=draft.found?draft.heroImage:row?await getContractingHeroImage(locale):null;
