@@ -24,7 +24,7 @@ export default async function Workspace({searchParams}:Props){
    <p><Link href="/admin/workspace">القطاعات</Link> / {names[selected.slug]||selected.slug}</p>
    <h2>معمارية {names[selected.slug]||selected.slug}</h2>
    {selected.slug==='contracting'?<div>
-    <p><Link href="/admin/edit/contracting">فتح محرر صفحات المقاولات — مسودات ومعاينة ونشر</Link></p>
+    <p><Link href="/admin/edit/contracting?page=root">فتح محرر صفحات المقاولات — مسودات ومعاينة ونشر</Link></p>
     <p>يتضمن المحرر البوابة الرئيسية والصفحات الداخلية الإحدى عشرة. اختر الصفحة من المحرر لتعديل محتواها ومعاينة شكلها الفعلي.</p>
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
      {contractingPages.map((page,index)=><Link key={page.slug} href={`/admin/edit/contracting?page=${page.slug}`} style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>{String(index+2).padStart(2,'0')} — {page.ar}</Link>)}
@@ -33,7 +33,7 @@ export default async function Workspace({searchParams}:Props){
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12}}>
      <Link href="/admin/projects" style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>إدارة المشاريع وحالات النشر</Link>
      <Link href="/admin/edit/contracting?page=root#project-media" style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>مسودات صور بطاقات المشاريع</Link>
-     <Link href="/admin/media" style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>مكتبة الوسائط</Link>
+     <Link href="/admin/edit/contracting?page=root" style={{border:'1px solid #e0e6ed',padding:18,borderRadius:10}}>تحرير الصور داخل الصفحة</Link>
     </div>
    </div>:<div>
     <p>هذا القطاع يعرض حاليًا البيانات المنشورة فقط. محرره لم يُبنَ بعد؛ ستظهر أدواته هنا بعد تجهيز صفحاته بدل عرض أزرار عامة لا تخص هذا القطاع.</p>
