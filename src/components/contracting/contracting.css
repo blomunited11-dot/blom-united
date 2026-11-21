@@ -136,3 +136,15 @@
  .ctCaseBody h3{margin:4px 0 5px}
  .ctCaseBody p{margin-bottom:8px;line-height:1.65}
 }
+
+/* Mobile featured portfolio: caption belongs directly to its photograph. */
+@media(max-width:560px){
+ .ctCaseGrid{row-gap:22px}
+ .ctCaseGrid .ctCaseShowcase{display:flex;flex-direction:column;gap:0;margin-top:0;background:#f5f7f8}
+ .ctCaseGrid .ctCaseShowcase .ctCaseMedia{flex:none;height:auto;aspect-ratio:16/10;min-height:0}
+ .ctCaseGrid .ctCaseShowcase .ctCaseBody{display:block;flex:none;padding:10px 12px 13px;min-height:0;margin:0}
+ .ctCaseGrid .ctCaseShowcase .ctCaseBody .ctKicker{display:block;margin:0 0 3px}
+ .ctCaseGrid .ctCaseShowcase .ctCaseBody h3{margin:0 0 3px;font-size:21px;line-height:1.45}
+ .ctCaseGrid .ctCaseShowcase .ctCaseBody p{margin:0;font-size:14px;line-height:1.65}
+ .ctCaseGrid .ctCaseShowcase+.ctCase:not(.ctCaseFeatured){margin-top:0}
+}
