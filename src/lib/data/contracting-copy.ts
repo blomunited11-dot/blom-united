@@ -18,8 +18,9 @@ export type ContractingProject={
  scope:string;
  stages:string[];
 };
-export type ContractingContent=Omit<DeepWritable<typeof contractingDefaultContent.ar>,'projects'>&{projects:ContractingProject[]};
-export type ContractingCopy=Omit<DeepPartial<typeof contractingDefaultContent.ar>,'projects'>&{
+export type ContractingContent=Omit<DeepWritable<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'>&{projects:ContractingProject[];serviceMediaIds:(string|null)[]};
+export type ContractingCopy=Omit<DeepPartial<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'>&{
+ serviceMediaIds?:(string|null)[];
  projects?:DeepPartial<ContractingProject>[];
  heroMediaId?:string;
 };
