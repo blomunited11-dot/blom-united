@@ -350,7 +350,7 @@ export default function ContractingVisualEditor({
     </div>
 
     <form action={saveDraft} className={styles.form}>
-     <input type="hidden" name="locale" value={locale}/>
+     <input type="hidden" name="locale" value={locale}/><input type="hidden" name="lifecycle_media_id" value={copy.lifecycleMediaId||""}/>
      {mediaError&&<input type="hidden" name="hero_media_id" value={selectedMediaId}/>}
      <fieldset className={styles.mediaFieldset}>
       <legend>صورة واجهة المقاولات</legend>{!!selectedMediaId&&<button type="button" onClick={()=>clearImageAssignment('hero')}>إزالة صورة الواجهة</button>}
