@@ -33,6 +33,12 @@ export function mergeContractingCopy(locale:Locale,...copies:ContractingCopy[]):
   delete content.heroMediaId;
   return {...result,...content,pages:{...result.pages,...content.pages}};
  },{});
+ // Earlier published drafts contain three legacy standards cards. They must not
+ // override the six-card section introduced later.
+ const legacyStandards=merged.standardsItems;
+ const isLegacyStandards=Array.isArray(legacyStandards)&&legacyStandards.length===3&&
+  legacyStandards.every((item,index)=>['الجودة','السلامة','الاستدامة','Quality','Safety','Sustainability'].includes(item?.name||''));
+ if(isLegacyStandards)delete merged.standardsItems;
  const projects=merged.projects?.map((project,index)=>{
   const defaultProject=base.projects.find(item=>item.key===project.key)||base.projects[index];
   return {
