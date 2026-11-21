@@ -387,6 +387,16 @@ export default function ContractingVisualEditor({
         </div>})}
        </div>
       </fieldset>}
+      {page==='root'&&<fieldset className={styles.projectMediaFieldset} id="domain-media">
+       <legend>صور القطاعات التي نخدمها — ست صور مستقلة</legend>
+       <p className={styles.helpText}>اختر صورة لكل قطاع أو اضغط صورته في معاينة الصفحة.</p>
+       <div className={styles.projectMediaGrid}>
+        {copy.domains.map((name,index)=>{const id=copy.domainMediaIds[index];const url=visibleMediaOptions.find(media=>media.id===id)?.public_url;return <div className={styles.projectMediaRow} key={index}>
+         <div className={styles.projectMediaDetails}><strong>{name}</strong><label className={styles.projectMediaSelect}><span>صورة القطاع</span><select value={id||''} disabled={!!mediaError} onChange={event=>updateDomainMedia(index,event.target.value)}><option value="">بدون صورة</option>{visibleMediaOptions.map(media=><option key={media.id} value={media.id}>{(locale==='ar'?media.alt_ar:media.alt_en)||'صورة محفوظة'}</option>)}</select></label><button type="button" onClick={()=>{setImageTarget('domain:'+index);setImagePicker(true)}}>اختيار صورة أو رفع صورة جديدة</button></div>
+         {url?<img className={styles.projectMediaPreview} src={url} alt={name}/>:<div className={styles.projectMediaNoImage}>لا توجد صورة</div>}
+        </div>})}
+       </div>
+      </fieldset>}
       {page==='root'&&<fieldset className={styles.projectMediaFieldset} id="portfolio-media">
        <legend>صور بطاقات الأعمال الثابتة</legend>
        <p className={styles.helpText}>اختر صورة لكل بطاقة ظاهرة في صفحة المقاولات. الاختيارات جزء من المسودة، ولا تظهر للزوار قبل النشر.</p>
@@ -466,8 +476,9 @@ export default function ContractingVisualEditor({
       <textarea name={`list:${key}`} value={(value as string[]).join('\n')} maxLength={12000} rows={Math.min(10,Math.max(3,(value as string[]).length))} required onChange={event=>updateField(key,event.target.value.split(/\r?\n/).map(item=>item.trim()).filter(Boolean))}/>
      </label>)}
      <input type="hidden" name="json:serviceMediaIds" value={JSON.stringify(copy.serviceMediaIds)}/>
+     <input type="hidden" name="json:domainMediaIds" value={JSON.stringify(copy.domainMediaIds)}/>
      <input type="hidden" name="json:qualityMediaIds" value={JSON.stringify(copy.qualityMediaIds)}/>
-     {jsonFields.filter(([key])=>key!=='serviceMediaIds'&&key!=='qualityMediaIds').map(([key])=><label className={styles.field} key={key}>
+     {jsonFields.filter(([key])=>key!=='serviceMediaIds'&&key!=='qualityMediaIds'&&key!=='domainMediaIds').map(([key])=><label className={styles.field} key={key}>
       <span>{fieldLabels[key]||key}</span>
       <textarea name={`json:${key}`} value={jsonValues[key]||''} maxLength={30000} rows={14} required dir="ltr" aria-invalid={!!jsonErrors[key]} onChange={event=>updateJsonField(key,event.target.value)}/>
       {jsonErrors[key]&&<span className={styles.error} role="alert">{jsonErrors[key]}</span>}
