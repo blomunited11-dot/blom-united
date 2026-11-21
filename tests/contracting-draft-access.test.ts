@@ -44,8 +44,10 @@ describe('contracting draft access',()=>{
  it('lets an owner read the locale draft row',async()=>{
   const membership=query({data:{role:'owner'},error:null});
   const draft=query({data:null,error:null});
+  const sector=query({data:{id:'sector-1'},error:null});
    const projectMedia={
     select:vi.fn().mockReturnThis(),
+    in:vi.fn().mockReturnThis(),
     limit:vi.fn().mockResolvedValue({data:[{
      project_id:'project-1',
      media_id:'media-1',
@@ -54,7 +56,7 @@ describe('contracting draft access',()=>{
    };
   const db={
    auth:{getUser:vi.fn().mockResolvedValue({data:{user:{id:'owner-1'}},error:null})},
-    from:vi.fn((table:string)=>table==='admin_memberships'?membership:table==='contracting_content_drafts'?draft:projectMedia)
+    from:vi.fn((table:string)=>table==='admin_memberships'?membership:table==='sectors'?sector:table==='contracting_content_drafts'?draft:table==='projects'?{select:vi.fn().mockReturnThis(),eq:vi.fn().mockResolvedValue({data:[{id:'project-1'}],error:null})}:projectMedia)
   };
   mocks.serverDb.mockResolvedValue(db);
 

@@ -138,13 +138,18 @@ export async function getContractingDraft(locale:Locale):Promise<ContractingDraf
  const {data:{user},error:authError}=await db.auth.getUser();
  if(authError)throw new Error(authError.message);
  if(!user)return {authorized:false,found:false,copy:{},heroMediaId:null,heroImage:null,projectMediaDrafts:{},updatedAt:null};
- const {data:membership,error:membershipError}=await db.from('admin_memberships').select('role').eq('user_id',user.id).eq('active',true).maybeSingle();
- if(membershipError)throw new Error(membershipError.message);
- if(membership?.role!=='owner')return {authorized:false,found:false,copy:{},heroMediaId:null,heroImage:null,projectMediaDrafts:{},updatedAt:null};
- const [{data:draft,error:draftError},{data:projectMedia,error:projectMediaError}]=await Promise.all([
-  db.from('contracting_content_drafts').select('content,hero_media_id,updated_at').eq('locale',locale).maybeSingle(),
-  db.from('contracting_project_media_drafts').select('project_id,media_id,media_assets(public_url)').limit(100)
- ]);
+  const {data:membership,error:membershipError}=await db.from('admin_memberships').select('role').eq('user_id',user.id).eq('active',true).maybeSingle();
+  if(membershipError)throw new Error(membershipError.message);
+  if(membership?.role!=='owner')return {authorized:false,found:false,copy:{},heroMediaId:null,heroImage:null,projectMediaDrafts:{},updatedAt:null};
+  const {data:sector,error:sectorError}=await db.from('sectors').select('id').eq('slug','contracting').maybeSingle();
+  if(sectorError)throw new Error(sectorError.message);
+  if(!sector)return {authorized:true,found:false,copy:{},heroMediaId:null,heroImage:null,projectMediaDrafts:{},updatedAt:null};
+  const {data:projectsInSector}=await db.from('projects').select('id').eq('sector_id',sector.id);
+  const projectIds=(projectsInSector||[]).map(p=>p.id);
+  const [{data:draft,error:draftError},{data:projectMedia,error:projectMediaError}]=await Promise.all([
+   db.from('contracting_content_drafts').select('content,hero_media_id,updated_at').eq('locale',locale).maybeSingle(),
+   projectIds.length?db.from('contracting_project_media_drafts').select('project_id,media_id,media_assets(public_url)').in('project_id',projectIds).limit(100):{data:[],error:null}
+  ]);
  if(draftError)throw new Error(draftError.message);
  if(projectMediaError)throw new Error(projectMediaError.message);
  const projectMediaDrafts:ContractingProjectMediaDrafts={};

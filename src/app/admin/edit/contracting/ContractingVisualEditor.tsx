@@ -259,8 +259,7 @@ export default function ContractingVisualEditor({
      <p>عدّل الحقول وشاهد أثرها مباشرة في المعاينة. الحفظ ينشئ مسودة فقط؛ النشر منفصل.</p>
     </header>
     <nav className={styles.pageNav} aria-label="صفحات المحرر">
-     <Link href={`/admin/edit/contracting?locale=${locale}&page=root`}>بوابة المقاولات</Link>
-     {contractingPages.map(item=><Link key={item.slug} href={`/admin/edit/contracting?locale=${locale}&page=${item.slug}`}>{copy.pages[item.slug].title}</Link>)}
+      {contractingPages.map(item=><Link key={item.slug} href={`/admin/edit/contracting?locale=${locale}&page=${item.slug}`}>{copy.pages[item.slug].title}</Link>)}
     </nav>
     <div className={styles.utilityLinks}>
      <Link href={`/admin/edit/contracting?locale=ar&page=${page}`}>العربية</Link>
