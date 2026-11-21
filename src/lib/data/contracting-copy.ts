@@ -37,11 +37,8 @@ export function mergeContractingCopy(locale:Locale,...copies:ContractingCopy[]):
  // override the six-card section introduced later.
  const legacyStandards=merged.standardsItems;
  const isLegacyStandards=Array.isArray(legacyStandards)&&legacyStandards.length===3&&
-  legacyStandards.every((item,index)=>['الجودة','السلامة','الاستدامة','Quality','Safety','Sustainability'].includes(item?.name||''));
- if(isLegacyStandards){
-  delete merged.standardsItems;
-  if(merged.standards=== 'الجودة والسلامة والاستدامة'||merged.standards==='Quality, safety and sustainability')delete merged.standards;
- }
+  legacyStandards.every(item=>['الجودة','السلامة','الاستدامة','Quality','Safety','Sustainability'].includes(item?.name||''));
+ const resolvedStandards=isLegacyStandards?{standardsItems:base.standardsItems,...((merged.standards==='الجودة والسلامة والاستدامة'||merged.standards==='Quality, safety and sustainability')?{standards:base.standards}:{})}:{};
  const projects=merged.projects?.map((project,index)=>{
   const defaultProject=base.projects.find(item=>item.key===project.key)||base.projects[index];
   return {
@@ -51,5 +48,5 @@ export function mergeContractingCopy(locale:Locale,...copies:ContractingCopy[]):
    mediaId:project.mediaId===undefined?defaultProject?.mediaId??null:project.mediaId
   };
  });
- return {...base,...merged,...(projects?{projects}:{}),pages:{...base.pages,...merged.pages}} as ContractingContent;
+ return {...base,...merged,...resolvedStandards,...(projects?{projects}:{}),pages:{...base.pages,...merged.pages}} as ContractingContent;
 }
