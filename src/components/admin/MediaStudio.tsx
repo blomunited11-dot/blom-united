@@ -21,7 +21,8 @@ export function MediaStudio({sectors,projects,services}:{sectors:Sector[];projec
    if(blob.size>10*1024*1024)throw new Error('الصورة بعد التحويل أكبر من 10 ميجابايت. قلل الجودة أو العرض.');
    const processed=new File([blob],file.name.replace(/\.[^.]+$/,'')+'.webp',{type:'image/webp'});
    const data=new FormData();for(const [key,value] of form.entries())if(key!=='file')data.append(key,value);data.set('file',processed);data.set('width',String(width));data.set('height',String(height));data.set('display_ratio',ratio);data.set('display_fit',fit);data.set('display_position',position);
-   await uploadMedia(data);
+   const result=await uploadMedia(data);
+   if(!result.ok){setError(result.error);return;}
    setSize(`${(file.size/1048576).toFixed(2)} → ${(blob.size/1048576).toFixed(2)} MB · ${width}×${height}`);
    setNotice('تم حفظ الصورة بصيغة WebP وربطها بالمحتوى المختار عند تحديده.');setFile(null);if(preview)URL.revokeObjectURL(preview);setPreview('');if(input.current)input.current.value='';
   }catch(e){setError(e instanceof Error?e.message:'فشلت معالجة الصورة')}finally{setBusy(false)}
