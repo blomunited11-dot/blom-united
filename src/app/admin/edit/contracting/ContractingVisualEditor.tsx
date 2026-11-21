@@ -39,7 +39,7 @@ const fieldLabels:Record<string,string>={
  workTitle:'عنوان الأعمال',workIntro:'مقدمة الأعمال',lifecycle:'عنوان مراحل التنفيذ',
  lifecycleIntro:'مقدمة مراحل التنفيذ',integrated:'عنوان الإدارة المتكاملة',integratedIntro:'مقدمة الإدارة المتكاملة',
  standards:'عنوان الجودة والسلامة',published:'عنوان المشاريع المنشورة',publishedServices:'عنوان الخدمات المنشورة',
- more:'رابط التفاصيل',return:'رابط العودة للقطاعات',end:'النص الختامي',services:'روابط الخدمات الست',
+ more:'رابط التفاصيل',return:'رابط العودة للقطاعات',end:'النص الختامي',services:'روابط الخدمات الست',serviceMediaIds:'صور الخدمات الست',
  domains:'القطاعات المستهدفة',steps:'مراحل التنفيذ',integratedItems:'عناصر الإدارة المتكاملة',
  projects:'بطاقات الأعمال (JSON)',standardsItems:'عناصر الجودة والسلامة (JSON)'
 };
@@ -147,11 +147,19 @@ export default function ContractingVisualEditor({
  }
 
  const previewCopy=mergeContractingCopy(locale,copy);
+ const serviceImages=Object.fromEntries(copy.serviceMediaIds.flatMap((id,index)=>{
+  const url=visibleMediaOptions.find(item=>item.id===id)?.public_url;
+  return url?[[String(index),url]]:[];
+ }));
  const portfolioImages=Object.fromEntries(previewCopy.projects.flatMap(project=>{
   const image=[...uploadedMedia,...mediaOptions].find(item=>item.id===project.mediaId)?.public_url;
   return image?[[project.key,image]]:[];
  }));
 
+ function updateServiceMedia(index:number,mediaId:string){
+  setCopy(current=>({...current,serviceMediaIds:current.serviceMediaIds.map((id,i)=>i===index?(mediaId||null):id)}));
+  setIsDirty(true);
+ }
  function updatePortfolioMedia(projectKey:string,mediaId:string){
   const nextProjects=copy.projects.map(project=>project.key===projectKey
    ?{...project,mediaId:mediaId||null}
@@ -165,6 +173,7 @@ export default function ContractingVisualEditor({
  const editableStrings=Object.entries(copy).filter(([key,value])=>typeof value==='string'&&key!=='photo'&&key!=='pending') as [string,string][];
  function selectImage(id:string,url:string|null){
   if(imageTarget==='hero')chooseMedia(id,url);
+  else if(imageTarget.startsWith('service:'))updateServiceMedia(Number(imageTarget.slice(8)),id);
   else if(imageTarget.startsWith('portfolio:'))updatePortfolioMedia(imageTarget.slice(10),id);
   else if(imageTarget.startsWith('project:')){
    setProjectMediaSelections(current=>({...current,[imageTarget.slice(8)]:id}));
@@ -206,10 +215,14 @@ export default function ContractingVisualEditor({
    return;
   }
   if(target.closest('button,input,select,textarea'))return;
-  const media=target.closest('.ctHeroVisual,.ctCaseMedia');
+  const media=target.closest('.ctHeroVisual,.ctCaseMedia,.ctCapabilityMedia');
   if(media){
    if(media.classList.contains('ctHeroVisual'))setImageTarget('hero');
-   else{
+   else if(media.classList.contains('ctCapabilityMedia')){
+    const index=Number(media.getAttribute('data-capability-index'));
+    if(!Number.isInteger(index)||index<0||index>=copy.serviceMediaIds.length)return;
+    setImageTarget('service:'+index);
+   }else{
     const card=media.closest('.ctCase');
     const cards=Array.from(card?.parentElement?.children||[]);
     const index=card?cards.indexOf(card):-1;
@@ -325,6 +338,28 @@ export default function ContractingVisualEditor({
       
      </fieldset>
 
+      {page==='root'&&<fieldset className={styles.projectMediaFieldset} id="service-media">
+       <legend>صور نطاق أعمال متكامل — مستقلة عن صورة الواجهة</legend>
+       <p className={styles.helpText}>لكل خدمة صورة مستقلة. اضغط إطارها في المعاينة أو اختر صورة محفوظة أو ارفع صورة جديدة.</p>
+       <div className={styles.projectMediaGrid}>
+        {copy.services.map((service,index)=>{
+         const id=copy.serviceMediaIds[index];
+         const url=visibleMediaOptions.find(item=>item.id===id)?.public_url;
+         return <div className={styles.projectMediaRow} key={index}>
+          <div className={styles.projectMediaDetails}><strong>{service}</strong>
+           <label className={styles.projectMediaSelect}><span>صورة هذه الخدمة فقط</span>
+            <select value={id||''} disabled={!!mediaError} onChange={event=>updateServiceMedia(index,event.target.value)}>
+             <option value="">بدون صورة</option>
+             {visibleMediaOptions.map(item=><option key={item.id} value={item.id}>{(locale==='ar'?item.alt_ar:item.alt_en)||'صورة محفوظة'}</option>)}
+            </select>
+           </label>
+           <button type="button" onClick={()=>{setImageTarget('service:'+index);setImagePicker(true)}}>اختيار صورة أو رفع صورة جديدة</button>
+          </div>
+          {url?<img className={styles.projectMediaPreview} src={url} alt={service}/>:<div className={styles.projectMediaNoImage}>لا توجد صورة</div>}
+         </div>;
+        })}
+       </div>
+      </fieldset>}
       {page==='root'&&<fieldset className={styles.projectMediaFieldset} id="portfolio-media">
        <legend>صور بطاقات الأعمال الثابتة</legend>
        <p className={styles.helpText}>اختر صورة لكل بطاقة ظاهرة في صفحة المقاولات. الاختيارات جزء من المسودة، ولا تظهر للزوار قبل النشر.</p>
@@ -432,7 +467,7 @@ export default function ContractingVisualEditor({
     </header>
     <div className={styles.previewViewport} onClick={inspectPageClick} dir={locale==='ar'?'rtl':'ltr'}>
      {page==='root'
-      ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage} projectImages={portfolioImages}/>
+      ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage} projectImages={portfolioImages} serviceImages={serviceImages}/>
       :<ContractingInnerExperience locale={locale} page={page} copy={previewCopy} services={services} projects={projects}/>}
     </div>
    </aside>
