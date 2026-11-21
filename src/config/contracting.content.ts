@@ -20,6 +20,7 @@ export const contractingDefaultContent={
   capabilities:'نطاق أعمال متكامل',capIntro:'من الإنشاء إلى التشغيل، تجمع بلوم التخصصات اللازمة لتنسيق العمل وتحقيق نتائج قابلة للقياس.',
   serviceMediaIds:[null,null,null,null,null,null],
    services:['المقاولات العامة وإدارة التنفيذ','الإنشاءات والهياكل الخرسانية','أعمال التشغيل والصيانة','الأعمال المعمارية والتشطيبات','الأعمال الكهروميكانيكية','البنية التحتية والموقع العام'],
+  domainMediaIds:[null,null,null,null,null,null],
   domainsTitle:'القطاعات التي نخدمها',domains:['القطاع الحكومي والمرافق','الرعاية الصحية والعيادات','التعليم والإسكان الجامعي','الضيافة والفنادق','التجاري والمكاتب الإدارية','السكني والتطوير العقاري'],
   workTitle:'أعمال تحكي التجربة',workIntro:'نماذج من الأعمال الواردة في الملف التعريفي. تظهر هنا مواضع الصور إلى حين اعتماد المواد الأصلية ونشرها.',
   projects:[
@@ -61,6 +62,7 @@ export const contractingDefaultContent={
   capabilities:'Integrated capabilities',capIntro:'From construction through operation, we coordinate the disciplines required to deliver measurable results.',
   serviceMediaIds:[null,null,null,null,null,null],
    services:['General contracting & construction management','Structural and concrete works','Operation and maintenance works','Architectural works and finishing','MEP systems and services','Infrastructure and external works'],
+  domainMediaIds:[null,null,null,null,null,null],
   domainsTitle:'Sectors we serve',domains:['Government and public facilities','Healthcare and clinics','Education and student housing','Hospitality and hotels','Retail and corporate offices','Residential and real estate'],
   workTitle:'Work that speaks for itself',workIntro:'Examples documented in the company profile. Image spaces remain until original project photography is approved.',
   projects:[
