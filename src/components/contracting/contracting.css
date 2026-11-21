@@ -165,3 +165,29 @@
 /* Keep card spacing without visible divider rules. */
 .ctDomains .ctDomainCard,.ctCapabilities .ctCapability,.ctStandards .ctQualityCard{border-top:0;border-bottom:0}
 @media(max-width:560px){.ctDomains .ctDomainCard,.ctCapabilities .ctCapability,.ctStandards .ctQualityCard{border-top:0;border-bottom:0}}
+
+/* Unified image-caption rhythm across the entire contracting sector. */
+.contracting .ctCapabilities,.contracting .ctStandards,.contracting .ctDomains{align-items:start;column-gap:18px;row-gap:24px}
+.contracting .ctCapability,.contracting .ctQualityCard,.contracting .ctDomainCard{display:flex;flex-direction:column;gap:0;min-height:0;margin:0;padding:0;border:0;align-self:start}
+.contracting .ctCapabilityMedia,.contracting .ctQualityMedia,.contracting .ctDomainMedia{order:0;width:100%;margin:0 0 8px;border:0}
+.contracting .ctCapability>span,.contracting .ctQualityCard>span,.contracting .ctDomainCard>span{order:1;display:block;margin:0 0 3px;line-height:1.35}
+.contracting .ctCapability h3,.contracting .ctQualityCard h3,.contracting .ctDomainCard h3{order:2;margin:0;line-height:1.45}
+.contracting .ctQualityCard p{order:3;margin:4px 0 0;line-height:1.65}
+.contracting .ctCaseGrid{row-gap:26px}
+.contracting .ctCaseBody{border:0;padding:11px 0 12px}
+.contracting .ctCaseBody h3{margin:3px 0 4px}
+.contracting .ctCaseBody p{margin:0 0 8px;line-height:1.65}
+.contracting .ctCaseShowcase{margin-top:0}
+.contracting .ctCaseShowcase .ctCaseBody{padding:clamp(16px,2vw,28px);justify-content:center}
+.contracting .ctCaseShowcase .ctCaseBody h3{margin:4px 0}
+.contracting .ctCaseShowcase .ctCaseBody p{margin:0;line-height:1.65}
+@media(max-width:850px){.contracting .ctCaseShowcase .ctCaseBody{padding:12px 14px 16px}}
+@media(max-width:560px){
+ .contracting .ctCapabilities,.contracting .ctStandards,.contracting .ctDomains{row-gap:24px}
+ .contracting .ctCapability,.contracting .ctQualityCard,.contracting .ctDomainCard{margin:0;padding:0;border:0}
+ .contracting .ctCapabilityMedia,.contracting .ctQualityMedia,.contracting .ctDomainMedia{margin:0 0 7px}
+ .contracting .ctCapability h3,.contracting .ctQualityCard h3,.contracting .ctDomainCard h3{margin:0;font-size:20px}
+ .contracting .ctCaseShowcase{margin:0}
+ .contracting .ctCaseShowcase .ctCaseBody{padding:10px 12px 14px}
+ .contracting .ctCase:not(.ctCaseFeatured) .ctCaseBody{padding:9px 0 12px}
+}
