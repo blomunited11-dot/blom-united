@@ -68,3 +68,30 @@
 .ctCaseShowcase+.ctCase:not(.ctCaseFeatured) .ctCaseMedia{height:300px}
 @media(max-width:850px){.ctCaseShowcase{grid-template-columns:1fr}.ctCaseShowcase .ctCaseMedia{height:clamp(300px,52vw,460px)}}
 @media(max-width:560px){.ctCaseShowcase{margin-top:36px}.ctCaseShowcase .ctCaseMedia{height:300px}.ctCaseShowcase+.ctCase:not(.ctCaseFeatured) .ctCaseMedia{height:230px}}
+
+
+/* Interactive eight-stage journey — large architectural illustration, compact stage rail. */
+.ctLifecycleSection{background:#f0f2f1}
+.ctJourney{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(270px,.65fr);background:#fff;min-height:480px;border:1px solid #d7dddc;overflow:hidden}
+.ctJourneyScene{position:relative;min-width:0;overflow:hidden;background:#d7e1e4;display:flex;align-items:stretch}
+.ctJourneyScene svg{width:100%;height:100%;min-height:440px;display:block}
+.ctSceneReveal{animation:ctReveal .45s ease both}
+@keyframes ctReveal{from{opacity:.3;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.ctJourneyOverlay{position:absolute;inset-inline-start:25px;bottom:22px;display:flex;flex-direction:column;gap:7px;color:#18323d;text-shadow:0 1px 12px #ffffffcc}
+.ctJourneyOverlay span{font-size:12px;letter-spacing:.2em;font-variant-numeric:tabular-nums}
+.ctJourneyOverlay strong{font-size:clamp(18px,2vw,29px);font-weight:650;line-height:1.4}
+.ctJourneyDetail{padding:clamp(25px,3.3vw,52px);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:15px}
+.ctJourneyDetail h3{font-size:clamp(22px,2vw,32px);line-height:1.5;margin:0}
+.ctJourneyDetail p{font-size:15px;line-height:2;color:#42515a;margin:0}
+.ctJourneyActions{display:flex;gap:9px;margin-top:26px}
+.ctJourneyActions button{width:46px;height:46px;border:1px solid #b6c4c7;background:#fff;color:#1c3a45;font-size:28px;cursor:pointer;transition:background .2s,color .2s}
+.ctJourneyActions button:hover,.ctJourneyActions button:focus-visible{background:#1b3946;color:#fff}
+.ctJourneyStages{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin-top:18px}
+.ctJourneyStage{border:1px solid #d4dddf;background:#fff;min-width:0;min-height:116px;display:flex;flex-direction:column;align-items:flex-start;text-align:start;gap:12px;padding:14px 10px;cursor:pointer;color:#263a42;transition:background .2s,border-color .2s,color .2s}
+.ctJourneyStage:hover,.ctJourneyStage:focus-visible{border-color:#577481}
+.ctJourneyStage.isActive{background:#1d3b47;color:#fff;border-color:#1d3b47}
+.ctJourneyStageNumber{font-size:19px;font-weight:650;direction:ltr;font-variant-numeric:tabular-nums}
+.ctJourneyStageText{font-size:clamp(11px,.9vw,13px);line-height:1.6;font-weight:550}
+@media(max-width:1000px){.ctJourneyStages{grid-template-columns:repeat(4,minmax(0,1fr))}.ctJourneyStage{min-height:95px}.ctJourney{grid-template-columns:minmax(0,1.4fr) minmax(240px,.8fr)}}
+@media(max-width:720px){.ctJourney{grid-template-columns:1fr}.ctJourneyScene svg{min-height:0;aspect-ratio:1100/530}.ctJourneyDetail{padding:24px;min-height:185px}.ctJourneyStages{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;gap:8px}.ctJourneyStage{flex:0 0 150px;scroll-snap-align:start;min-height:95px}.ctJourneyOverlay{bottom:12px;inset-inline-start:15px}.ctJourneyOverlay strong{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.ctSceneReveal{animation:none}.ctJourneyStage,.ctJourneyActions button{transition:none}}
