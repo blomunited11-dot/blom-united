@@ -208,6 +208,13 @@ export default function ContractingVisualEditor({
  }
  function inspectPageClick(event:MouseEvent<HTMLElement>){
   const target=event.target as HTMLElement;
+  const capabilityImage=target.closest('.ctCapabilityMedia');
+  if(capabilityImage){
+   event.preventDefault();
+   const index=Number(capabilityImage.getAttribute('data-capability-index'));
+   if(Number.isInteger(index)&&index>=0&&index<copy.serviceMediaIds.length){setImageTarget('service:'+index);setImagePicker(true);}
+   return;
+  }
   const anchor=target.closest('a[href]') as HTMLAnchorElement|null;
   if(anchor){
    const match=anchor.getAttribute('href')?.match(/^\/(?:ar|en)\/sectors\/contracting\/([^/?#]+)$/);
