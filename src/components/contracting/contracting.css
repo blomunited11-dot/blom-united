@@ -148,3 +148,16 @@
  .ctCaseGrid .ctCaseShowcase .ctCaseBody p{margin:0;font-size:14px;line-height:1.65}
  .ctCaseGrid .ctCaseShowcase+.ctCase:not(.ctCaseFeatured){margin-top:0}
 }
+
+/* Domain cards: photograph and its label form one unit on desktop and mobile. */
+.ctDomains{column-gap:18px;row-gap:26px;align-items:start}
+.ctDomains .ctDomainCard{display:flex;flex-direction:column;gap:0;min-height:0;margin:0;padding:0 0 12px;border:0;border-bottom:1px solid var(--ct-line)}
+.ctDomains .ctDomainCard .ctDomainMedia{order:0;margin:0 0 7px;width:100%;aspect-ratio:4/3}
+.ctDomains .ctDomainCard>span{order:1;margin:0 0 2px;line-height:1.3}
+.ctDomains .ctDomainCard h3{order:2;margin:0;font-size:clamp(18px,1.7vw,22px);line-height:1.45}
+@media(max-width:560px){
+ .ctDomains{row-gap:22px}
+ .ctDomains .ctDomainCard{margin:0;padding:0 0 14px}
+ .ctDomains .ctDomainCard:last-child{padding-bottom:0;border-bottom:0}
+ .ctDomains .ctDomainCard .ctDomainMedia{margin-bottom:7px}
+}
