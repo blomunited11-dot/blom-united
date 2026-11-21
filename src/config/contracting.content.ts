@@ -35,8 +35,9 @@ export const contractingDefaultContent={
   steps:['الفكرة ودراسة الجدوى','التصميم والتراخيص','أعمال الموقع والحفر','الأساسات والخرسانة','المباني والأعمال المعمارية','الكهروميكانيك والتمديدات','التشطيبات النهائية','التشغيل والتسليم والضمان'],
   integrated:'إدارة متكاملة للمشروع',integratedIntro:'فريق واحد ونقطة تحكم واحدة، مع تنسيق الأعمال والقرارات والتسليم.',
   integratedItems:['إدارة النطاق والبرنامج الزمني','المشتريات والتوريد والموردين','إدارة المقاولين المتخصصين','تقارير تقدم واضحة وقرارات أسرع','تسليم منظم مع توثيق وتشغيل'],
-  standards:'الجودة والسلامة والاستدامة',
-  standardsItems:[{name:'الجودة',text:'إجراءات للفحص والاعتماد والمتابعة، وتوثيق مستمر يقلل المخاطر.'},{name:'السلامة',text:'استباق المخاطر، والتدريب المستمر، ومسؤولية مشتركة في كل موقع.'},{name:'الاستدامة',text:'تقليل الهدر، ورفع كفاءة الموارد، واختيار واعٍ للمواد والأساليب.'}],
+  qualityMediaIds:[null,null,null,null,null,null],
+  standards:'الجودة والسلامة',
+  standardsItems:[{name:'السلامة أولًا.. في كل خطوة',text:'بيئة عمل آمنة تبدأ من التخطيط وتستمر حتى التسليم، وفق إجراءات وقائية واضحة.'},{name:'جودة تُبنى عليها الثقة',text:'رقابة دقيقة على المواد والتنفيذ والتشطيبات لضمان نتائج تلبي متطلبات المشروع.'},{name:'لا مساومة على التفاصيل',text:'فحص الأعمال في مراحلها المختلفة، ومعالجة الملاحظات قبل الانتقال إلى المرحلة التالية.'},{name:'الوقاية ثقافة.. وليست إجراءً',text:'تعزيز الوعي بالمخاطر والالتزام بتعليمات السلامة بين فرق العمل والمقاولين.'},{name:'رقابة تسبق التحديات',text:'متابعة استباقية لمؤشرات الجودة والسلامة، لتقليل المخاطر والتأخير وإعادة العمل.'},{name:'إتقان يستمر بعد التسليم',text:'مراجعة نهائية وتوثيق منظم للأعمال لضمان جاهزية المشروع واستدامة جودته.'}],
   published:'المشاريع المنشورة',publishedServices:'الخدمات المنشورة',more:'عرض التفاصيل',return:'العودة إلى قطاعات المجموعة',end:'من أول خط على الورق إلى آخر تفصيل في الموقع.'
  },
  en:{
@@ -75,8 +76,9 @@ export const contractingDefaultContent={
   steps:['Brief and feasibility','Design and permits','Site setup and excavation','Foundations and concrete','Blockwork and architecture','MEP installation and testing','Final finishes','Commissioning, handover and warranty'],
   integrated:'Integrated project delivery',integratedIntro:'One team and one point of control, from coordination to handover.',
   integratedItems:['Scope and schedule management','Procurement and vendor coordination','Specialist contractor management','Clear progress reporting and faster decisions','Structured handover and documentation'],
-  standards:'Quality, safety and sustainability',
-  standardsItems:[{name:'Quality',text:'Inspection, approval and follow-up procedures supported by continuous documentation.'},{name:'Safety',text:'Proactive risk management, training and shared responsibility on every site.'},{name:'Sustainability',text:'Less waste, efficient resource use and considered material choices.'}],
+  qualityMediaIds:[null,null,null,null,null,null],
+  standards:'Quality and safety',
+  standardsItems:[{name:'Safety first, at every step',text:'A safer workplace from planning to handover.'},{name:'Quality that earns trust',text:'Careful oversight of materials, construction and finishes.'},{name:'No detail overlooked',text:'Stage-by-stage inspection and timely resolution of issues.'},{name:'Prevention is a culture',text:'Risk awareness and consistent safety practices.'},{name:'Oversight ahead of challenges',text:'Proactive quality and safety monitoring.'},{name:'Excellence beyond handover',text:'Final review and organized documentation for lasting quality.'}],
   published:'Published projects',publishedServices:'Published services',more:'View details',return:'Back to group sectors',end:'From the first line on paper to the last detail on site.'
  }
 } as const;
