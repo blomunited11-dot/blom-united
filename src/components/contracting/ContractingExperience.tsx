@@ -5,6 +5,7 @@ import type {Entry} from '@/lib/data/site';
 import {mergeContractingCopy,type ContractingCopy} from '@/lib/data/contracting-copy';
 import {contractingDefaultContent} from '@/config/contracting.content';
 import './contracting.css';
+import ContractingLifecycle from './ContractingLifecycle';
 
 export default function ContractingExperience({locale,services,projects,copy={},heroImage=null,projectImages={},serviceImages={},qualityImages={},domainImages={},editorControls=null}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy;heroImage?:string|null;projectImages?:Record<string,string>;serviceImages?:Record<string,string>;qualityImages?:Record<string,string>;domainImages?:Record<string,string>;editorControls?:ReactNode}){
  const t=mergeContractingCopy(locale,copy);
@@ -37,7 +38,7 @@ export default function ContractingExperience({locale,services,projects,copy={},
     {!imageOnly&&<div className="ctCaseBody">{p.category&&<span className="ctKicker">{p.category}</span>}<h3>{p.href?<Link href={p.href}>{p.name}</Link>:p.name}</h3>{p.scope&&<p>{p.scope}</p>}{!showcase&&p.stages.length>0&&<div className="ctStageTags">{p.stages.map(stage=><span key={stage}>{stage}</span>)}</div>}</div>}
    </article>;
   })}</div></section>
-  <section className="ctBand" id="ct-process"><div className="ctWrap"><div className="ctSectionHead"><div><span className="ctKicker">05 / LIFECYCLE</span><h2>{t.lifecycle}</h2></div><p>{t.lifecycleIntro}</p></div><div className="ctLifecycle">{t.steps.map((s,i)=><div key={s}><span>{String(i+1).padStart(2,'0')}</span><h3>{s}</h3></div>)}</div></div></section>
+  <ContractingLifecycle locale={locale} title={t.lifecycle} intro={t.lifecycleIntro} steps={t.steps}/>
   <section className="ctSection ctWrap"><div className="ctSectionHead"><div><span className="ctKicker">06 / DELIVERY</span><h2>{t.integrated}</h2></div><p>{t.integratedIntro}</p></div><div className="ctDelivery">{t.integratedItems.map((item,i)=><div key={item}><span>{String(i+1).padStart(2,'0')}</span><p>{item}</p></div>)}</div></section>
   <section className="ctClosing"><div className="ctWrap ctClosingInner"><p>{t.end}</p><div className="ctClosingLinks"><Link href={`/${locale}/contact`}>{t.contact}</Link><Link href={`/${locale}/sectors`}>{t.return}</Link></div></div></section>
  </main>
