@@ -18,10 +18,10 @@ export type ContractingProject={
  scope:string;
  stages:string[];
 };
-export type ContractingContent=Omit<DeepWritable<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'|'qualityMediaIds'|'domainMediaIds'>&{projects:ContractingProject[];serviceMediaIds:(string|null)[];qualityMediaIds:(string|null)[];domainMediaIds:(string|null)[]};
-export type ContractingCopy=Omit<DeepPartial<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'|'qualityMediaIds'|'domainMediaIds'>&{
+export type ContractingContent=Omit<DeepWritable<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'|'qualityMediaIds'|'domainMediaIds'|'lifecycleMediaId'|'integratedMediaId'>&{projects:ContractingProject[];serviceMediaIds:(string|null)[];qualityMediaIds:(string|null)[];domainMediaIds:(string|null)[];lifecycleMediaId:string|null;integratedMediaId:string|null};
+export type ContractingCopy=Omit<DeepPartial<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'|'qualityMediaIds'|'domainMediaIds'|'lifecycleMediaId'|'integratedMediaId'>&{
  serviceMediaIds?:(string|null)[];
- qualityMediaIds?:(string|null)[];domainMediaIds?:(string|null)[];
+ qualityMediaIds?:(string|null)[];domainMediaIds?:(string|null)[];lifecycleMediaId?:string|null;integratedMediaId?:string|null;
  projects?:DeepPartial<ContractingProject>[];
  heroMediaId?:string;
 };
