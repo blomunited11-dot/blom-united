@@ -6,7 +6,7 @@ import {mergeContractingCopy,type ContractingCopy} from '@/lib/data/contracting-
 import {contractingDefaultContent} from '@/config/contracting.content';
 import './contracting.css';
 
-export default function ContractingExperience({locale,services,projects,copy={},heroImage=null,projectImages={},serviceImages={},qualityImages={},domainImages={},lifecycleImage=null,editorControls=null}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy;heroImage?:string|null;projectImages?:Record<string,string>;serviceImages?:Record<string,string>;qualityImages?:Record<string,string>;domainImages?:Record<string,string>;lifecycleImage?:string|null;editorControls?:ReactNode}){
+export default function ContractingExperience({locale,services,projects,copy={},heroImage=null,projectImages={},serviceImages={},qualityImages={},domainImages={},lifecycleImage=null,integratedImage=null,editorControls=null}:{locale:Locale;services:Entry[];projects:Entry[];copy?:ContractingCopy;heroImage?:string|null;projectImages?:Record<string,string>;serviceImages?:Record<string,string>;qualityImages?:Record<string,string>;domainImages?:Record<string,string>;lifecycleImage?:string|null;integratedImage?:string|null;editorControls?:ReactNode}){
  const t=mergeContractingCopy(locale,copy);
  // The editorial portfolio is managed by the contracting content editor.
  // Published project entities must not replace its three-image showcases.
@@ -38,7 +38,7 @@ export default function ContractingExperience({locale,services,projects,copy={},
    </article>;
   })}</div></section>
   <section className="ctBand ctLifecycleBanner" id="ct-process"><div className="ctWrap"><div className="ctSectionHead"><div><span className="ctKicker">05 / LIFECYCLE</span><h2>{t.lifecycle}</h2></div><p>{t.lifecycleIntro}</p></div><div className="ctLifecycleImage" data-lifecycle-media="true">{lifecycleImage?<img src={lifecycleImage} alt={t.lifecycle} loading="lazy"/>:<div className="ctLifecycleEmpty"><strong>{t.lifecycle}</strong><span>{locale==='ar'?'اختر صورة المراحل الثماني من لوحة إدارة المقاولات':'Select the eight-stage banner in the contracting editor'}</span></div>}</div></div></section>
-  <section className="ctSection ctWrap"><div className="ctSectionHead"><div><span className="ctKicker">06 / DELIVERY</span><h2>{t.integrated}</h2></div><p>{t.integratedIntro}</p></div><div className="ctDelivery">{t.integratedItems.map((item,i)=><div key={item}><span>{String(i+1).padStart(2,'0')}</span><p>{item}</p></div>)}</div></section>
+  <section className="ctSection ctWrap" id="ct-integrated"><div className="ctSectionHead"><div><span className="ctKicker">06 / DELIVERY</span><h2>{t.integrated}</h2></div><p>{t.integratedIntro}</p></div><div className="ctIntegratedImage" data-integrated-media="true">{integratedImage?<img src={integratedImage} alt={t.integrated} loading="lazy"/>:<div className="ctIntegratedEmpty">{locale==='ar'?'اختر صورة الإدارة المتكاملة من لوحة التحرير':'Choose the integrated delivery image in the editor'}</div>}</div><div className="ctDelivery">{t.integratedItems.map((item,i)=><div key={item}><span>{String(i+1).padStart(2,'0')}</span><p>{item}</p></div>)}</div></section>
   <section className="ctClosing"><div className="ctWrap ctClosingInner"><p>{t.end}</p><div className="ctClosingLinks"><Link href={`/${locale}/contact`}>{t.contact}</Link><Link href={`/${locale}/sectors`}>{t.return}</Link></div></div></section>
  </main>
 }
