@@ -39,7 +39,7 @@ const fieldLabels:Record<string,string>={
  workTitle:'عنوان الأعمال',workIntro:'مقدمة الأعمال',lifecycle:'عنوان مراحل التنفيذ',
  lifecycleIntro:'مقدمة مراحل التنفيذ',integrated:'عنوان الإدارة المتكاملة',integratedIntro:'مقدمة الإدارة المتكاملة',
  standards:'عنوان الجودة والسلامة',published:'عنوان المشاريع المنشورة',publishedServices:'عنوان الخدمات المنشورة',
- more:'رابط التفاصيل',return:'رابط العودة للقطاعات',end:'النص الختامي',services:'روابط الخدمات الست',serviceMediaIds:'صور الخدمات الست',
+ more:'رابط التفاصيل',return:'رابط العودة للقطاعات',end:'النص الختامي',services:'روابط الخدمات الست',serviceMediaIds:'صور الخدمات الست',qualityMediaIds:'صور الجودة والسلامة الست',
  domains:'القطاعات المستهدفة',steps:'مراحل التنفيذ',integratedItems:'عناصر الإدارة المتكاملة',
  projects:'بطاقات الأعمال (JSON)',standardsItems:'عناصر الجودة والسلامة (JSON)'
 };
@@ -151,6 +151,7 @@ export default function ContractingVisualEditor({
   const url=visibleMediaOptions.find(item=>item.id===id)?.public_url;
   return url?[[String(index),url]]:[];
  }));
+ const qualityImages=Object.fromEntries(copy.qualityMediaIds.flatMap((id,index)=>{const url=visibleMediaOptions.find(item=>item.id===id)?.public_url;return url?[[String(index),url]]:[];}));
  const portfolioImages=Object.fromEntries(previewCopy.projects.flatMap(project=>{
   const image=[...uploadedMedia,...mediaOptions].find(item=>item.id===project.mediaId)?.public_url;
   return image?[[project.key,image]]:[];
@@ -160,6 +161,7 @@ export default function ContractingVisualEditor({
   setCopy(current=>({...current,serviceMediaIds:current.serviceMediaIds.map((id,i)=>i===index?(mediaId||null):id)}));
   setIsDirty(true);
  }
+ function updateQualityMedia(index:number,mediaId:string){setCopy(current=>({...current,qualityMediaIds:current.qualityMediaIds.map((id,i)=>i===index?(mediaId||null):id)}));setIsDirty(true);}
  function updatePortfolioMedia(projectKey:string,mediaId:string){
   const nextProjects=copy.projects.map(project=>project.key===projectKey
    ?{...project,mediaId:mediaId||null}
@@ -174,6 +176,7 @@ export default function ContractingVisualEditor({
  function selectImage(id:string,url:string|null){
   if(imageTarget==='hero')chooseMedia(id,url);
   else if(imageTarget.startsWith('service:'))updateServiceMedia(Number(imageTarget.slice(8)),id);
+  else if(imageTarget.startsWith('quality:'))updateQualityMedia(Number(imageTarget.slice(8)),id);
   else if(imageTarget.startsWith('portfolio:'))updatePortfolioMedia(imageTarget.slice(10),id);
   else if(imageTarget.startsWith('project:')){
    setProjectMediaSelections(current=>({...current,[imageTarget.slice(8)]:id}));
@@ -208,6 +211,8 @@ export default function ContractingVisualEditor({
  }
  function inspectPageClick(event:MouseEvent<HTMLElement>){
   const target=event.target as HTMLElement;
+  const qualityImage=target.closest('.ctQualityMedia');
+  if(qualityImage){event.preventDefault();const index=Number(qualityImage.getAttribute('data-quality-index'));if(Number.isInteger(index)&&index>=0&&index<copy.qualityMediaIds.length){setImageTarget('quality:'+index);setImagePicker(true);}return;}
   const capabilityImage=target.closest('.ctCapabilityMedia');
   if(capabilityImage){
    event.preventDefault();
@@ -367,6 +372,16 @@ export default function ContractingVisualEditor({
         })}
        </div>
       </fieldset>}
+      {page==='root'&&<fieldset className={styles.projectMediaFieldset} id="quality-media">
+       <legend>صور الجودة والسلامة — ست صور مستقلة</legend>
+       <p className={styles.helpText}>اختر صورة مستقلة لكل عنوان، أو اضغط إطار الصورة في معاينة الصفحة.</p>
+       <div className={styles.projectMediaGrid}>
+        {copy.standardsItems.map((item,index)=>{const id=copy.qualityMediaIds[index];const url=visibleMediaOptions.find(media=>media.id===id)?.public_url;return <div className={styles.projectMediaRow} key={index}>
+         <div className={styles.projectMediaDetails}><strong>{item.name}</strong><label className={styles.projectMediaSelect}><span>صورة هذا العنوان</span><select value={id||''} disabled={!!mediaError} onChange={event=>updateQualityMedia(index,event.target.value)}><option value="">بدون صورة</option>{visibleMediaOptions.map(media=><option key={media.id} value={media.id}>{(locale==='ar'?media.alt_ar:media.alt_en)||'صورة محفوظة'}</option>)}</select></label><button type="button" onClick={()=>{setImageTarget('quality:'+index);setImagePicker(true)}}>اختيار صورة أو رفع صورة جديدة</button></div>
+         {url?<img className={styles.projectMediaPreview} src={url} alt={item.name}/>:<div className={styles.projectMediaNoImage}>لا توجد صورة</div>}
+        </div>})}
+       </div>
+      </fieldset>}
       {page==='root'&&<fieldset className={styles.projectMediaFieldset} id="portfolio-media">
        <legend>صور بطاقات الأعمال الثابتة</legend>
        <p className={styles.helpText}>اختر صورة لكل بطاقة ظاهرة في صفحة المقاولات. الاختيارات جزء من المسودة، ولا تظهر للزوار قبل النشر.</p>
@@ -446,7 +461,8 @@ export default function ContractingVisualEditor({
       <textarea name={`list:${key}`} value={(value as string[]).join('\n')} maxLength={12000} rows={Math.min(10,Math.max(3,(value as string[]).length))} required onChange={event=>updateField(key,event.target.value.split(/\r?\n/).map(item=>item.trim()).filter(Boolean))}/>
      </label>)}
      <input type="hidden" name="json:serviceMediaIds" value={JSON.stringify(copy.serviceMediaIds)}/>
-     {jsonFields.filter(([key])=>key!=='serviceMediaIds').map(([key])=><label className={styles.field} key={key}>
+     <input type="hidden" name="json:qualityMediaIds" value={JSON.stringify(copy.qualityMediaIds)}/>
+     {jsonFields.filter(([key])=>key!=='serviceMediaIds'&&key!=='qualityMediaIds').map(([key])=><label className={styles.field} key={key}>
       <span>{fieldLabels[key]||key}</span>
       <textarea name={`json:${key}`} value={jsonValues[key]||''} maxLength={30000} rows={14} required dir="ltr" aria-invalid={!!jsonErrors[key]} onChange={event=>updateJsonField(key,event.target.value)}/>
       {jsonErrors[key]&&<span className={styles.error} role="alert">{jsonErrors[key]}</span>}
@@ -475,7 +491,7 @@ export default function ContractingVisualEditor({
     </header>
     <div className={styles.previewViewport} onClickCapture={inspectPageClick} dir={locale==='ar'?'rtl':'ltr'}>
      {page==='root'
-      ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage} projectImages={portfolioImages} serviceImages={serviceImages}/>
+      ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage} projectImages={portfolioImages} serviceImages={serviceImages} qualityImages={qualityImages}/>
       :<ContractingInnerExperience locale={locale} page={page} copy={previewCopy} services={services} projects={projects}/>}
     </div>
    </aside>
