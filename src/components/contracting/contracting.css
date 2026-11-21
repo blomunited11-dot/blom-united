@@ -104,3 +104,9 @@
 .ctLifecycleEmpty strong{font-size:clamp(20px,3vw,36px)}
 .ctLifecycleEmpty span{font-size:14px;line-height:1.7}
 @media(max-width:680px){.ctLifecycleBanner .ctLifecycleImage{aspect-ratio:1728/864;overflow-x:auto}.ctLifecycleBanner .ctLifecycleImage img{min-width:0}}
+
+/* Integrated delivery editorial banner: keep the full artwork visible. */
+.ctIntegratedImage{width:100%;aspect-ratio:1728/864;background:#142b3a;display:grid;place-items:center;overflow:hidden;margin-block:20px 28px;border:1px solid #c7d1d5}
+.ctIntegratedImage img{display:block;width:100%;height:100%;object-fit:contain}
+.ctIntegratedEmpty{color:#e7edf0;text-align:center;padding:30px;line-height:1.8}
+@media(max-width:700px){.ctIntegratedImage{aspect-ratio:1728/864}}
