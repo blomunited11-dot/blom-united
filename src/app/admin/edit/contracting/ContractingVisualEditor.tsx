@@ -158,7 +158,8 @@ export default function ContractingVisualEditor({
   setUploading(true);setUploadError('');
   try{
    const result=await uploadContractingEditorImage(form);
-   const item:MediaOption={id:result.id,public_url:result.public_url,alt_ar:result.alt_ar,alt_en:result.alt_en};
+   if(!result.ok){setUploadError(result.error);return;}
+   const item:MediaOption={id:result.asset.id,public_url:result.asset.public_url,alt_ar:result.asset.alt_ar,alt_en:result.asset.alt_en};
    setUploadedMedia(current=>[item,...current]);
    selectImage(item.id,item.public_url);
   }catch(error){setUploadError(error instanceof Error?error.message:'تعذر رفع الصورة')}
