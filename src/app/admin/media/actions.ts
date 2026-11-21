@@ -36,12 +36,12 @@ export async function uploadMedia(form:FormData){
  const width=Number(form.get('width')),height=Number(form.get('height'));
  if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width>20000||height>20000)throw new Error('Invalid dimensions');
  const altAr=String(form.get('alt_ar')||'').trim(),altEn=String(form.get('alt_en')||'').trim();
- if(!altAr||!altEn||altAr.length>300||altEn.length>300)throw new Error('Alternative text required in both languages');
+ if(altAr.length>300||altEn.length>300)throw new Error('Alternative text must be under 300 characters');
  const path='uploads/'+randomUUID()+'.webp';
  const{error:storageError}=await db.storage.from('blom-media').upload(path,file,{contentType:'image/webp',upsert:false});
  if(storageError)throw new Error(storageError.message);
  const{data:url}=db.storage.from('blom-media').getPublicUrl(path);
- const{data:asset,error:insertError}=await db.from('media_assets').insert({storage_path:path,public_url:url.publicUrl,alt_ar:altAr,alt_en:altEn,sector_id:sectorId||null,width_px:width,height_px:height,display_ratio:ratio,display_fit:fit,display_position:position}).select('id').single();
+ const{data:asset,error:insertError}=await db.from('media_assets').insert({storage_path:path,public_url:url.publicUrl,alt_ar:altAr||null,alt_en:altEn||null,sector_id:sectorId||null,width_px:width,height_px:height,display_ratio:ratio,display_fit:fit,display_position:position}).select('id').single();
  if(insertError||!asset){await db.storage.from('blom-media').remove([path]);throw new Error(insertError?.message||'Media save failed')}
  if(entityId){
   const requestedSlot=String(form.get('slot')??'');
