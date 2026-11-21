@@ -3,7 +3,7 @@ export const contractingDefaultContent={
   title:'المقاولات والتطوير العقاري',label:'قطاع المقاولات / BLOM UNITED',
   lead:'نحوّل التخطيط الدقيق إلى تنفيذ منضبط.',
   intro:'بلوم المتحدة شركة مقاولات متكاملة تُحوّل التخطيط الدقيق إلى تنفيذ منضبط. نُدير المشروع كوحدة واحدة: نطاق واضح، جدول محكوم، وجودة تُقاس بالتفاصيل.',
-  seeProjects:'استكشف الأعمال',contact:'تواصل معنا',photo:'موضع الصورة المعتمدة',pending:'تُضاف الصورة الأصلية عبر مكتبة الوسائط',
+  seeProjects:'استكشف الأعمال',contact:'تواصل معنا',photo:'صورة المشروع',pending:'الصورة غير متاحة حاليًا',
   pages:{
    'general-contracting':{title:'المقاولات العامة وإدارة التنفيذ',description:'إدارة نطاق العمل والبرنامج الزمني والتنسيق بين فرق التنفيذ والموردين.'},
    'structural-concrete':{title:'الإنشاءات والهياكل الخرسانية',description:'أعمال الموقع والأساسات والهياكل الخرسانية ومتابعة مراحل الإنشاء.'},
@@ -11,7 +11,7 @@ export const contractingDefaultContent={
    'architectural-finishing':{title:'الأعمال المعمارية والتشطيبات',description:'الأعمال المعمارية والتشطيبات الداخلية والخارجية ومتابعة الجودة.'},
    'mep-systems':{title:'الأعمال الكهروميكانيكية',description:'تنسيق وتركيب واختبار أنظمة الكهرباء والميكانيكا والتمديدات.'},
    infrastructure:{title:'البنية التحتية والموقع العام',description:'تجهيز المواقع والأعمال الترابية والطرق والمواقف والأعمال الخارجية.'},
-   projects:{title:'المشاريع والأعمال',description:'نماذج من الأعمال الواردة في الملف التعريفي. تظهر هنا مواضع الصور إلى حين اعتماد المواد الأصلية ونشرها.'},
+   projects:{title:'المشاريع والأعمال',description:'نماذج من مشاريع وأعمال بلوم المتحدة.'},
    'project-lifecycle':{title:'دورة حياة المشروع',description:'ثماني مراحل مترابطة كما يعرضها الملف التعريفي، لكل مرحلة مسؤولية ومخرجات واضحة.'},
    'quality-safety':{title:'الجودة والسلامة والاستدامة',description:'إجراءات واضحة للجودة والسلامة والاستدامة في جميع مراحل المشروع.'},
    'integrated-delivery':{title:'الحلول والإدارة المتكاملة',description:'فريق واحد ونقطة تحكم واحدة، مع تنسيق الأعمال والقرارات والتسليم.'},
@@ -22,7 +22,7 @@ export const contractingDefaultContent={
    services:['المقاولات العامة وإدارة التنفيذ','الإنشاءات والهياكل الخرسانية','أعمال التشغيل والصيانة','الأعمال المعمارية والتشطيبات','الأعمال الكهروميكانيكية','البنية التحتية والموقع العام'],
   domainMediaIds:[null,null,null,null,null,null],
   domainsTitle:'القطاعات التي نخدمها',domains:['المباني والمرافق','الرعاية الصحية والعيادات','التعليم والإسكان الجامعي','الضيافة والفنادق','التجاري والمكاتب الإدارية','السكني والتطوير العقاري'],
-  workTitle:'أعمال تحكي التجربة',workIntro:'نماذج من الأعمال الواردة في الملف التعريفي. تظهر هنا مواضع الصور إلى حين اعتماد المواد الأصلية ونشرها.',
+  workTitle:'أعمال تحكي التجربة',workIntro:'نماذج من مشاريع وأعمال بلوم المتحدة.',
   projects:[
    {key:'taiba-medical-complex-before',mediaId:null,name:'مجمع طيبة الطبي',category:'الرعاية الصحية',scope:'إحلال وتجديد المبنى، مع أعمال الواجهات والتشطيبات والتجهيز للتشغيل.',stages:['قبل التنفيذ']},
    {key:'taiba-medical-complex-during',mediaId:null,name:'مجمع طيبة الطبي',category:'الرعاية الصحية',scope:'مراحل أعمال الإحلال والتجديد والتشطيبات.',stages:['أثناء التنفيذ']},
@@ -50,7 +50,7 @@ export const contractingDefaultContent={
   title:'Contracting & Real Estate Development',label:'CONTRACTING / BLOM UNITED',
   lead:'Precise planning. Disciplined execution.',
   intro:'BLOM UNITED is an integrated contracting company turning precise planning into disciplined execution. One scope, one schedule, one standard.',
-  seeProjects:'Explore our work',contact:'Contact us',photo:'Approved image placeholder',pending:'Original imagery to be added through the media library',
+  seeProjects:'Explore our work',contact:'Contact us',photo:'Project image',pending:'Image currently unavailable',
   pages:{
    'general-contracting':{title:'General contracting & construction management',description:'Scope, schedule, delivery teams and vendor coordination.'},
    'structural-concrete':{title:'Structural and concrete works',description:'Site works, foundations, concrete structures and construction stages.'},
@@ -58,7 +58,7 @@ export const contractingDefaultContent={
    'architectural-finishing':{title:'Architectural works and finishing',description:'Architectural works, interior and exterior finishes, and quality follow-up.'},
    'mep-systems':{title:'MEP systems and services',description:'Coordination, installation and testing of mechanical, electrical and plumbing systems.'},
    infrastructure:{title:'Infrastructure and external works',description:'Site preparation, earthworks, roads, parking and external works.'},
-   projects:{title:'Projects & portfolio',description:'Examples documented in the company profile. Image spaces remain until original project photography is approved.'},
+   projects:{title:'Projects & portfolio',description:'Selected projects and work by BLOM UNITED.'},
    'project-lifecycle':{title:'Project lifecycle',description:'Eight connected stages from the company profile, with clear ownership and deliverables.'},
    'quality-safety':{title:'Quality, safety & sustainability',description:'Clear quality, safety and sustainability practices throughout each project.'},
    'integrated-delivery':{title:'Integrated delivery',description:'One team and one point of control, from coordination to handover.'},
@@ -69,7 +69,7 @@ export const contractingDefaultContent={
    services:['General contracting & construction management','Structural and concrete works','Operation and maintenance works','Architectural works and finishing','MEP systems and services','Infrastructure and external works'],
   domainMediaIds:[null,null,null,null,null,null],
   domainsTitle:'Sectors we serve',domains:['Government and public facilities','Healthcare and clinics','Education and student housing','Hospitality and hotels','Retail and corporate offices','Residential and real estate'],
-  workTitle:'Work that speaks for itself',workIntro:'Examples documented in the company profile. Image spaces remain until original project photography is approved.',
+  workTitle:'Work that speaks for itself',workIntro:'Selected projects and work by BLOM UNITED.',
   projects:[
    {key:'taiba-medical-complex-before',mediaId:null,name:'Taiba Medical Complex',category:'Healthcare',scope:'Building renovation, facade and finishing works, and preparation for operation.',stages:['Before execution']},
    {key:'taiba-medical-complex-during',mediaId:null,name:'Taiba Medical Complex',category:'Healthcare',scope:'Renovation and finishing works in progress.',stages:['During execution']},
