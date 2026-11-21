@@ -39,6 +39,9 @@ export function mergeContractingCopy(locale:Locale,...copies:ContractingCopy[]):
  const isLegacyStandards=Array.isArray(legacyStandards)&&legacyStandards.length===3&&
   legacyStandards.every(item=>['الجودة','السلامة','الاستدامة','Quality','Safety','Sustainability'].includes(item?.name||''));
  const resolvedStandards=isLegacyStandards?{standardsItems:base.standardsItems,...((merged.standards==='الجودة والسلامة والاستدامة'||merged.standards==='Quality, safety and sustainability')?{standards:base.standards}:{})}:{};
+ // Preserve published custom sector labels while migrating the previous first label.
+ // Existing drafts and translations can otherwise override the updated default.
+ const resolvedDomains=merged.domains?.map((domain,index)=>index===0&&domain==='القطاع الحكومي والمرافق'?'المباني والمرافق':domain);
  const projects=merged.projects?.map((project,index)=>{
   const defaultProject=base.projects.find(item=>item.key===project.key)||base.projects[index];
   return {
@@ -48,5 +51,5 @@ export function mergeContractingCopy(locale:Locale,...copies:ContractingCopy[]):
    mediaId:project.mediaId===undefined?defaultProject?.mediaId??null:project.mediaId
   };
  });
- return {...base,...merged,...resolvedStandards,...(projects?{projects}:{}),pages:{...base.pages,...merged.pages}} as ContractingContent;
+ return {...base,...merged,...resolvedStandards,...(resolvedDomains?{domains:resolvedDomains}:{}),...(projects?{projects}:{}),pages:{...base.pages,...merged.pages}} as ContractingContent;
 }
