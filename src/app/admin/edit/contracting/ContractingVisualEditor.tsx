@@ -39,7 +39,7 @@ const fieldLabels:Record<string,string>={
  workTitle:'عنوان الأعمال',workIntro:'مقدمة الأعمال',lifecycle:'عنوان مراحل التنفيذ',
  lifecycleIntro:'مقدمة مراحل التنفيذ',integrated:'عنوان الإدارة المتكاملة',integratedIntro:'مقدمة الإدارة المتكاملة',
  standards:'عنوان الجودة والسلامة',published:'عنوان المشاريع المنشورة',publishedServices:'عنوان الخدمات المنشورة',
- more:'رابط التفاصيل',return:'رابط العودة للقطاعات',end:'النص الختامي',services:'روابط الخدمات الست',serviceMediaIds:'صور الخدمات الست',qualityMediaIds:'صور الجودة والسلامة الست',
+ more:'رابط التفاصيل',return:'رابط العودة للقطاعات',end:'النص الختامي',services:'روابط الخدمات الست',serviceMediaIds:'صور الخدمات الست',qualityMediaIds:'صور الجودة والسلامة الست',domainMediaIds:'صور القطاعات الستة',
  domains:'القطاعات المستهدفة',steps:'مراحل التنفيذ',integratedItems:'عناصر الإدارة المتكاملة',
  projects:'بطاقات الأعمال (JSON)',standardsItems:'عناصر الجودة والسلامة (JSON)'
 };
@@ -152,6 +152,7 @@ export default function ContractingVisualEditor({
   return url?[[String(index),url]]:[];
  }));
  const qualityImages=Object.fromEntries(copy.qualityMediaIds.flatMap((id,index)=>{const url=visibleMediaOptions.find(item=>item.id===id)?.public_url;return url?[[String(index),url]]:[];}));
+ const domainImages=Object.fromEntries(copy.domainMediaIds.flatMap((id,index)=>{const url=visibleMediaOptions.find(item=>item.id===id)?.public_url;return url?[[String(index),url]]:[];}));
  const portfolioImages=Object.fromEntries(previewCopy.projects.flatMap(project=>{
   const image=[...uploadedMedia,...mediaOptions].find(item=>item.id===project.mediaId)?.public_url;
   return image?[[project.key,image]]:[];
@@ -161,6 +162,7 @@ export default function ContractingVisualEditor({
   setCopy(current=>({...current,serviceMediaIds:current.serviceMediaIds.map((id,i)=>i===index?(mediaId||null):id)}));
   setIsDirty(true);
  }
+ function updateDomainMedia(index:number,mediaId:string){setCopy(current=>({...current,domainMediaIds:current.domainMediaIds.map((id,i)=>i===index?(mediaId||null):id)}));setIsDirty(true);}
  function updateQualityMedia(index:number,mediaId:string){setCopy(current=>({...current,qualityMediaIds:current.qualityMediaIds.map((id,i)=>i===index?(mediaId||null):id)}));setIsDirty(true);}
  function updatePortfolioMedia(projectKey:string,mediaId:string){
   const nextProjects=copy.projects.map(project=>project.key===projectKey
@@ -176,6 +178,7 @@ export default function ContractingVisualEditor({
  function selectImage(id:string,url:string|null){
   if(imageTarget==='hero')chooseMedia(id,url);
   else if(imageTarget.startsWith('service:'))updateServiceMedia(Number(imageTarget.slice(8)),id);
+  else if(imageTarget.startsWith('domain:'))updateDomainMedia(Number(imageTarget.slice(7)),id);
   else if(imageTarget.startsWith('quality:'))updateQualityMedia(Number(imageTarget.slice(8)),id);
   else if(imageTarget.startsWith('portfolio:'))updatePortfolioMedia(imageTarget.slice(10),id);
   else if(imageTarget.startsWith('project:')){
@@ -211,6 +214,8 @@ export default function ContractingVisualEditor({
  }
  function inspectPageClick(event:MouseEvent<HTMLElement>){
   const target=event.target as HTMLElement;
+  const domainImage=target.closest('.ctDomainMedia');
+  if(domainImage){event.preventDefault();const index=Number(domainImage.getAttribute('data-domain-index'));if(Number.isInteger(index)&&index>=0&&index<copy.domainMediaIds.length){setImageTarget('domain:'+index);setImagePicker(true);}return;}
   const qualityImage=target.closest('.ctQualityMedia');
   if(qualityImage){event.preventDefault();const index=Number(qualityImage.getAttribute('data-quality-index'));if(Number.isInteger(index)&&index>=0&&index<copy.qualityMediaIds.length){setImageTarget('quality:'+index);setImagePicker(true);}return;}
   const capabilityImage=target.closest('.ctCapabilityMedia');
@@ -491,7 +496,7 @@ export default function ContractingVisualEditor({
     </header>
     <div className={styles.previewViewport} onClickCapture={inspectPageClick} dir={locale==='ar'?'rtl':'ltr'}>
      {page==='root'
-      ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage} projectImages={portfolioImages} serviceImages={serviceImages} qualityImages={qualityImages}/>
+      ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage} projectImages={portfolioImages} serviceImages={serviceImages} qualityImages={qualityImages} domainImages={domainImages}/>
       :<ContractingInnerExperience locale={locale} page={page} copy={previewCopy} services={services} projects={projects}/>}
     </div>
    </aside>
