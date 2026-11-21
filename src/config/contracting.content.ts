@@ -37,7 +37,7 @@ export const contractingDefaultContent={
    {key:'al-jouf-emirate-headquarters',mediaId:null,name:'مقر إمارة منطقة الجوف',category:'المرافق الحكومية',scope:'أعمال الواجهات والقواطع والممرات والمواقف والتشطيبات.',stages:['قبل التنفيذ','أثناء التنفيذ','بعد الإنجاز']},
    {key:'residential-duplex-projects',mediaId:null,name:'مشاريع الفلل والدوبلكسات',category:'المشاريع السكنية',scope:'أعمال الموقع والأساسات والهياكل والعزل والتشطيبات.',stages:['أعمال الأساسات','الهيكل والتشطيب','الواجهات']}
   ],
-  lifecycle:'من الفكرة إلى التسليم',lifecycleIntro:'ثماني مراحل مترابطة كما يعرضها الملف التعريفي، لكل مرحلة مسؤولية ومخرجات واضحة.',lifecycleMediaId:null,
+  lifecycle:'من الفكرة إلى التسليم',lifecycleIntro:'ثماني مراحل مترابطة كما يعرضها الملف التعريفي، لكل مرحلة مسؤولية ومخرجات واضحة.',lifecycleMediaId:null,integratedMediaId:null,
   steps:['الفكرة ودراسة الجدوى','التصميم والتراخيص','أعمال الموقع والحفر','الأساسات والخرسانة','المباني والأعمال المعمارية','الكهروميكانيك والتمديدات','التشطيبات النهائية','التشغيل والتسليم والضمان'],
   integrated:'إدارة متكاملة للمشروع',integratedIntro:'فريق واحد ونقطة تحكم واحدة، مع تنسيق الأعمال والقرارات والتسليم.',
   integratedItems:['إدارة النطاق والبرنامج الزمني','المشتريات والتوريد والموردين','إدارة المقاولين المتخصصين','تقارير تقدم واضحة وقرارات أسرع','تسليم منظم مع توثيق وتشغيل'],
@@ -84,7 +84,7 @@ export const contractingDefaultContent={
    {key:'al-jouf-emirate-headquarters',mediaId:null,name:'Al-Jouf Emirate Headquarters',category:'Government',scope:'Facades, partitions, hardscape, parking and finishes.',stages:['Before','During','After']},
    {key:'residential-duplex-projects',mediaId:null,name:'Residential Duplex Projects',category:'Residential',scope:'Site works, foundations, concrete structure, waterproofing and finishes.',stages:['Foundations','Structure and finishes','Facades']}
   ],
-  lifecycle:'From brief to handover',lifecycleIntro:'Eight connected stages from the company profile, with clear ownership and deliverables.',lifecycleMediaId:null,
+  lifecycle:'From brief to handover',lifecycleIntro:'Eight connected stages from the company profile, with clear ownership and deliverables.',lifecycleMediaId:null,integratedMediaId:null,
   steps:['Brief and feasibility','Design and permits','Site setup and excavation','Foundations and concrete','Blockwork and architecture','MEP installation and testing','Final finishes','Commissioning, handover and warranty'],
   integrated:'Integrated project delivery',integratedIntro:'One team and one point of control, from coordination to handover.',
   integratedItems:['Scope and schedule management','Procurement and vendor coordination','Specialist contractor management','Clear progress reporting and faster decisions','Structured handover and documentation'],
