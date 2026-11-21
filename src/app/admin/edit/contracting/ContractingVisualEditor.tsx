@@ -157,7 +157,21 @@ export default function ContractingVisualEditor({
  async function uploadImage(form:FormData){
   setUploading(true);setUploadError('');
   try{
-   const result=await uploadContractingEditorImage(form);
+   const source=form.get('file');
+   if(!(source instanceof File))throw new Error('اختر صورة من جهازك');
+   const bitmap=await createImageBitmap(source).catch(()=>{throw new Error('تعذر قراءة الصورة؛ اختر JPG أو PNG أو WebP مدعومة');});
+   const scale=Math.min(1,1920/bitmap.width,2400/bitmap.height);
+   const width=Math.max(1,Math.round(bitmap.width*scale));
+   const height=Math.max(1,Math.round(bitmap.height*scale));
+   const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+   const context=canvas.getContext('2d');
+   if(!context){bitmap.close();throw new Error('تعذر تشغيل معالج الصور');}
+   context.drawImage(bitmap,0,0,width,height);bitmap.close();
+   const blob=await new Promise<Blob>((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error('فشل تحويل الصورة')),'image/webp',0.82));
+   if(blob.type!=='image/webp'||blob.size>10*1024*1024)throw new Error('تعذر إنشاء WebP بحجم أقل من 10 ميجابايت');
+   const uploadForm=new FormData();
+   uploadForm.set('file',new File([blob],source.name.replace(/\\.[^.]+$/,'')+'.webp',{type:'image/webp'}));
+   const result=await uploadContractingEditorImage(uploadForm);
    if(!result.ok){setUploadError(result.error);return;}
    const item:MediaOption={id:result.asset.id,public_url:result.asset.public_url,alt_ar:result.asset.alt_ar,alt_en:result.asset.alt_en};
    setUploadedMedia(current=>[item,...current]);
@@ -252,7 +266,7 @@ export default function ContractingVisualEditor({
    <div style={{position:"sticky",top:0,zIndex:100,background:"#fff",padding:12,display:"flex",gap:14,flexWrap:"wrap",borderBottom:"1px solid #ddd"}}><Link href="/admin">القطاعات</Link><Link href={`/admin/edit/contracting?locale=${locale==="ar"?"en":"ar"}&page=${page}`}>{locale==="ar"?"English":"العربية"}</Link><strong>تحرير صفحة المقاولات مباشرة</strong><span>اضغط النص لتعديله أو الصورة لاختيار بديل</span><button type="button" onClick={()=>{setImageTarget("hero");setImagePicker(true)}}>اختيار صورة الواجهة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-save")?.click()}>حفظ مسودة</button><button type="button" onClick={()=>{if(window.confirm("هل تؤكد نشر مسودة المقاولات وصورها على الموقع العام؟"))document.getElementById("contracting-draft-publish")?.click()}} disabled={isDirty||!draftFound}>نشر</button></div>
    {activeText&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>{fieldLabels[activeText]||activeText}</strong><textarea dir={locale==="ar"?"rtl":"ltr"} rows={5} value={String(copy[activeText as keyof typeof copy]||"")} onChange={e=>updateField(activeText,e.target.value)} maxLength={3000}/><button type="button" onClick={()=>setActiveText(null)}>إغلاق والعودة للصفحة</button></div></div>}
    {(activeList||activePageField)&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>تحرير النص المحدد</strong><textarea rows={5} dir={locale==="ar"?"rtl":"ltr"} value={activePageField&&page!=='root'?copy.pages[page][activePageField]:currentListValue()} onChange={e=>activePageField&&page!=='root'?updatePageField(page,activePageField,e.target.value):updateListValue(e.target.value)}/><button type="button" onClick={()=>{setActiveList(null);setActivePageField(null)}}>إغلاق</button></div></div>}
-   {imagePicker&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,700px)",maxHeight:"80vh",overflow:"auto",display:"grid",gap:12}}><strong>صورة الواجهة — مكتبة الوسائط</strong><form action={uploadImage} style={{display:"grid",gap:8}}><label>صورة من جهازك بصيغة WebP (حتى 10 MB)<input type="file" name="file" accept="image/webp" required/></label><p>يُستخدم النص الموجود بجانب الصورة في الصفحة؛ لا حاجة لإدخال وصف بديل عند الرفع.</p><button type="submit" disabled={uploading}>{uploading?'جارٍ الرفع...':'رفع الصورة واختيارها'}</button>{uploadError&&<p role="alert">{uploadError}</p>}</form><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}}>{visibleMediaOptions.map(m=><button key={m.id} type="button" onClick={()=>selectImage(m.id,m.public_url)}>{m.public_url&&<img src={m.public_url} alt={m.alt_ar||""} style={{width:"100%",height:90,objectFit:"cover"}}/>}</button>)}</div><button type="button" onClick={()=>setImagePicker(false)}>إغلاق</button></div></div>}
+   {imagePicker&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,700px)",maxHeight:"80vh",overflow:"auto",display:"grid",gap:12}}><strong>استبدال الصورة في الصفحة</strong><form action={uploadImage} style={{display:"grid",gap:8}}><label>اختر صورة من جهازك (JPG أو PNG أو WebP)<input type="file" name="file" accept="image/jpeg,image/png,image/webp,image/avif" required/></label><p>يُستخدم النص الموجود بجانب الصورة في الصفحة؛ لا حاجة لإدخال وصف بديل عند الرفع.</p><button type="submit" disabled={uploading}>{uploading?'جارٍ الرفع...':'تحويل الصورة واختيارها'}</button>{uploadError&&<p role="alert">{uploadError}</p>}</form><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}}>{visibleMediaOptions.map(m=><button key={m.id} type="button" onClick={()=>selectImage(m.id,m.public_url)}>{m.public_url&&<img src={m.public_url} alt={m.alt_ar||""} style={{width:"100%",height:90,objectFit:"cover"}}/>}</button>)}</div><button type="button" onClick={()=>setImagePicker(false)}>إغلاق</button></div></div>}
    <section className={styles.editorPanel} aria-label="أدوات التحرير">
     <header className={styles.editorHeader}>
      <p className={styles.eyebrow}>BLOM UNITED / CONTENT STUDIO</p>
@@ -288,9 +302,9 @@ export default function ContractingVisualEditor({
          <span>{(locale==='ar'?item.alt_ar:item.alt_en)||'صورة من المكتبة'}</span>
         </label>)}
        </div>
-       {mediaOptions.length===0&&<p className={styles.helpText}>لا توجد صور متاحة بعد. أضف صورة من <Link href="/admin/media">مكتبة الوسائط</Link> ثم عد إلى المحرر.</p>}
+       {mediaOptions.length===0&&<p className={styles.helpText}>لا توجد صور متاحة بعد. أضف صورة من نافذة اختيار الصورة في المحرر ثم عد إلى المحرر.</p>}
       </>}
-      <Link href="/admin/media">فتح مكتبة الوسائط</Link>
+      
      </fieldset>
 
       {page==='root'&&<fieldset className={styles.projectMediaFieldset} id="portfolio-media">
@@ -326,7 +340,7 @@ export default function ContractingVisualEditor({
        <legend>صور سجلات المشاريع المنشورة</legend>
        <p className={styles.helpText}>هذه الصور تخص سجلات المشاريع المنشورة في قاعدة البيانات، وتُحفظ كمسودات حتى نشر مسودة المقاولات.</p>
        {projects.length===0?<p className={styles.helpText}>لا توجد مشاريع منشورة في قطاع المقاولات لربط صورها.</p>:<>
-        {mediaOptions.length===0&&<p className={styles.helpText}>لا توجد صور متاحة. أضف الصور أولًا من <Link href="/admin/media">مكتبة الوسائط</Link>.</p>}
+        {mediaOptions.length===0&&<p className={styles.helpText}>لا توجد صور متاحة. أضف الصور أولًا من نافذة اختيار الصورة في المحرر.</p>}
         <div className={styles.projectMediaGrid}>
          {projects.map(project=>{
           const selection=projectMediaSelections[project.id]||'';
