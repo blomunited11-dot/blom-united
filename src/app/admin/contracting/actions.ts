@@ -50,6 +50,10 @@ function buildDraftContent(form:FormData,locale:'ar'|'en'){
    try{parsed=JSON.parse(formText(form,`json:${key}`));}
    catch{throw new Error(`Invalid JSON list: ${key}`);}
    content[key]=parsed;
+  }else if(key==='integratedMediaId'){
+   const id=formText(form,'integrated_media_id');
+   if(id&&!/^[0-9a-f-]{36}$/i.test(id))throw new Error('Invalid integrated media');
+   content.integratedMediaId=id||null;
   }else if(key==='lifecycleMediaId'){
    const id=formText(form,'lifecycle_media_id');
    if(id&&!/^[0-9a-f-]{36}$/i.test(id))throw new Error('Invalid lifecycle media');
