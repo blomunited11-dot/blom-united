@@ -19,7 +19,7 @@ export type ContractingProject={
  stages:string[];
 };
 export type ContractingContent=Omit<DeepWritable<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'|'qualityMediaIds'>&{projects:ContractingProject[];serviceMediaIds:(string|null)[];qualityMediaIds:(string|null)[]};
-export type ContractingCopy=Omit<DeepPartial<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'>&{
+export type ContractingCopy=Omit<DeepPartial<typeof contractingDefaultContent.ar>,'projects'|'serviceMediaIds'|'qualityMediaIds'>&{
  serviceMediaIds?:(string|null)[];
  qualityMediaIds?:(string|null)[];
  projects?:DeepPartial<ContractingProject>[];
