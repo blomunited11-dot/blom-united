@@ -187,6 +187,18 @@ export default function ContractingVisualEditor({
   }
   setImagePicker(false);
  }
+ function clearImageAssignment(target:string){
+  if(target==='hero')chooseMedia('',null);
+  else if(target.startsWith('service:'))updateServiceMedia(Number(target.slice(8)),'');
+  else if(target.startsWith('quality:'))updateQualityMedia(Number(target.slice(8)),'');
+  else if(target.startsWith('domain:'))updateDomainMedia(Number(target.slice(7)),'');
+  else if(target.startsWith('portfolio:'))updatePortfolioMedia(target.slice(10),'');
+  else if(target.startsWith('project:')){
+   setProjectMediaSelections(current=>({...current,[target.slice(8)]:''}));
+   setIsDirty(true);
+  }
+  setImagePicker(false);
+ }
  async function uploadImage(form:FormData){
   setUploading(true);setUploadError('');
   try{
@@ -315,7 +327,7 @@ export default function ContractingVisualEditor({
    <div style={{position:"sticky",top:0,zIndex:100,background:"#fff",padding:12,display:"flex",gap:14,flexWrap:"wrap",borderBottom:"1px solid #ddd"}}><Link href="/admin">القطاعات</Link><Link href={`/admin/edit/contracting?locale=${locale==="ar"?"en":"ar"}&page=${page}`}>{locale==="ar"?"English":"العربية"}</Link><strong>تحرير صفحة المقاولات مباشرة</strong><span>اضغط النص لتعديله أو إطار الصورة لرفع بديل</span>{operationMessage&&<span role="status" style={{color:operationMessage.includes("تم ")?"#17663b":"#a33",fontWeight:600}}>{operationMessage}</span>}<button type="button" onClick={()=>{setImageTarget("hero");setImagePicker(true)}}>اختيار صورة الواجهة</button><button type="button" onClick={()=>document.getElementById("contracting-draft-save")?.click()}>حفظ مسودة</button><button type="button" onClick={()=>{if(window.confirm("هل تؤكد نشر مسودة المقاولات وصورها على الموقع العام؟"))document.getElementById("contracting-draft-publish")?.click()}} disabled={isDirty||!savedDraft||operationBusy}>نشر</button></div>
    {activeText&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>{fieldLabels[activeText]||activeText}</strong><textarea dir={locale==="ar"?"rtl":"ltr"} rows={5} value={String(copy[activeText as keyof typeof copy]||"")} onChange={e=>updateField(activeText,e.target.value)} maxLength={3000}/><button type="button" onClick={()=>setActiveText(null)}>إغلاق والعودة للصفحة</button></div></div>}
    {(activeList||activePageField)&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,650px)",display:"grid",gap:12}}><strong>تحرير النص المحدد</strong><textarea rows={5} dir={locale==="ar"?"rtl":"ltr"} value={activePageField&&page!=='root'?copy.pages[page][activePageField]:currentListValue()} onChange={e=>activePageField&&page!=='root'?updatePageField(page,activePageField,e.target.value):updateListValue(e.target.value)}/><button type="button" onClick={()=>{setActiveList(null);setActivePageField(null)}}>إغلاق</button></div></div>}
-   {imagePicker&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,700px)",maxHeight:"80vh",overflow:"auto",display:"grid",gap:12}}><strong>اختيار صورة للصفحة</strong><div style={{display:"flex",gap:8}}><button type="button" aria-pressed={imageSource==='saved'} onClick={()=>setImageSource('saved')} style={{padding:10,border:imageSource==='saved'?"2px solid #285a78":"1px solid #ccc",borderRadius:8}}>الصور المحفوظة ({visibleMediaOptions.length})</button><button type="button" aria-pressed={imageSource==='device'} onClick={()=>setImageSource('device')} style={{padding:10,border:imageSource==='device'?"2px solid #285a78":"1px solid #ccc",borderRadius:8}}>رفع صورة من الجهاز</button></div>{imageSource==='device'?<form action={uploadImage} style={{display:"grid",gap:8}}><label>اختر صورة من جهازك (JPG أو PNG أو WebP)<input type="file" name="file" accept="image/jpeg,image/png,image/webp,image/avif" required/></label><p>سيتم تحويل الصورة إلى WebP واختيارها في الصفحة؛ الحفظ والنشر خطوتان منفصلتان.</p><button type="submit" disabled={uploading}>{uploading?'جارٍ الرفع...':'تحويل الصورة واختيارها'}</button>{uploadError&&<p role="alert">{uploadError}</p>}</form>:<div style={{display:"grid",gap:10}}>{visibleMediaOptions.length===0?<p>لا توجد صور محفوظة متاحة لهذا القطاع. اختر «رفع صورة من الجهاز».</p>:<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}}>{visibleMediaOptions.map(m=><button key={m.id} type="button" onClick={()=>selectImage(m.id,m.public_url)} style={{border:selectedMediaId===m.id?"2px solid #285a78":"1px solid #ddd",padding:6,borderRadius:8}}>{m.public_url&&<img src={m.public_url} alt={m.alt_ar||""} style={{width:"100%",height:90,objectFit:"cover"}}/>}<span style={{display:"block",fontSize:12}}>{m.alt_ar||'صورة محفوظة'}</span></button>)}</div>}</div>}<button type="button" onClick={()=>setImagePicker(false)}>إغلاق</button></div></div>}
+   {imagePicker&&<div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:300,background:"#0009",display:"grid",placeItems:"center"}}><div style={{background:"white",color:"#111",padding:24,borderRadius:12,width:"min(92vw,700px)",maxHeight:"80vh",overflow:"auto",display:"grid",gap:12}}><strong>اختيار صورة للصفحة</strong>{(imageTarget==='hero'?!!selectedMediaId:imageTarget.startsWith('portfolio:')?!!copy.projects.find(project=>project.key===imageTarget.slice(10))?.mediaId:imageTarget.startsWith('service:')?!!copy.serviceMediaIds[Number(imageTarget.slice(8))]:imageTarget.startsWith('quality:')?!!copy.qualityMediaIds[Number(imageTarget.slice(8))]:imageTarget.startsWith('domain:')?!!copy.domainMediaIds[Number(imageTarget.slice(7))]:false)&&<button type="button" onClick={()=>clearImageAssignment(imageTarget)}>إزالة الصورة من هذا الموضع</button>}<div style={{display:"flex",gap:8}}><button type="button" aria-pressed={imageSource==='saved'} onClick={()=>setImageSource('saved')} style={{padding:10,border:imageSource==='saved'?"2px solid #285a78":"1px solid #ccc",borderRadius:8}}>الصور المحفوظة ({visibleMediaOptions.length})</button><button type="button" aria-pressed={imageSource==='device'} onClick={()=>setImageSource('device')} style={{padding:10,border:imageSource==='device'?"2px solid #285a78":"1px solid #ccc",borderRadius:8}}>رفع صورة من الجهاز</button></div>{imageSource==='device'?<form action={uploadImage} style={{display:"grid",gap:8}}><label>اختر صورة من جهازك (JPG أو PNG أو WebP)<input type="file" name="file" accept="image/jpeg,image/png,image/webp,image/avif" required/></label><p>سيتم تحويل الصورة إلى WebP واختيارها في الصفحة؛ الحفظ والنشر خطوتان منفصلتان.</p><button type="submit" disabled={uploading}>{uploading?'جارٍ الرفع...':'تحويل الصورة واختيارها'}</button>{uploadError&&<p role="alert">{uploadError}</p>}</form>:<div style={{display:"grid",gap:10}}>{visibleMediaOptions.length===0?<p>لا توجد صور محفوظة متاحة لهذا القطاع. اختر «رفع صورة من الجهاز».</p>:<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}}>{visibleMediaOptions.map(m=><button key={m.id} type="button" onClick={()=>selectImage(m.id,m.public_url)} style={{border:selectedMediaId===m.id?"2px solid #285a78":"1px solid #ddd",padding:6,borderRadius:8}}>{m.public_url&&<img src={m.public_url} alt={m.alt_ar||""} style={{width:"100%",height:90,objectFit:"cover"}}/>}<span style={{display:"block",fontSize:12}}>{m.alt_ar||'صورة محفوظة'}</span></button>)}</div>}</div>}<button type="button" onClick={()=>setImagePicker(false)}>إغلاق</button></div></div>}
    <section className={styles.editorPanel} aria-label="أدوات التحرير">
     <header className={styles.editorHeader}>
      <p className={styles.eyebrow}>BLOM UNITED / CONTENT STUDIO</p>
@@ -336,7 +348,7 @@ export default function ContractingVisualEditor({
      <input type="hidden" name="locale" value={locale}/>
      {mediaError&&<input type="hidden" name="hero_media_id" value={selectedMediaId}/>}
      <fieldset className={styles.mediaFieldset}>
-      <legend>صورة واجهة المقاولات</legend>
+      <legend>صورة واجهة المقاولات</legend>{!!selectedMediaId&&<button type="button" onClick={()=>clearImageAssignment('hero')}>إزالة صورة الواجهة</button>}
       <p className={styles.helpText}>اضغط إطار رفع الصورة لاختيار صورة من جهازك أو من الصور المحفوظة؛ ثم احفظ المسودة وانشرها.</p>
       {mediaError?<p className={styles.error} role="alert">تعذر تحميل مكتبة الوسائط: {mediaError}</p>:<>
        <div className={styles.mediaGrid}>
@@ -371,7 +383,7 @@ export default function ContractingVisualEditor({
              {visibleMediaOptions.map(item=><option key={item.id} value={item.id}>{(locale==='ar'?item.alt_ar:item.alt_en)||'صورة محفوظة'}</option>)}
             </select>
            </label>
-           <button type="button" onClick={()=>{setImageTarget('service:'+index);setImagePicker(true)}}>اختيار صورة أو رفع صورة جديدة</button>
+           <button type="button" onClick={()=>{setImageTarget('service:'+index);setImagePicker(true)}}>اختيار صورة أو رفع صورة جديدة</button>{id&&<button type="button" onClick={()=>clearImageAssignment('service:'+index)}>إزالة الصورة</button>}
           </div>
           {url?<img className={styles.projectMediaPreview} src={url} alt={service}/>:<div className={styles.projectMediaNoImage}>لا توجد صورة</div>}
          </div>;
@@ -383,7 +395,7 @@ export default function ContractingVisualEditor({
        <p className={styles.helpText}>اختر صورة مستقلة لكل عنوان، أو اضغط إطار الصورة في معاينة الصفحة.</p>
        <div className={styles.projectMediaGrid}>
         {copy.standardsItems.map((item,index)=>{const id=copy.qualityMediaIds[index];const url=visibleMediaOptions.find(media=>media.id===id)?.public_url;return <div className={styles.projectMediaRow} key={index}>
-         <div className={styles.projectMediaDetails}><strong>{item.name}</strong><label className={styles.projectMediaSelect}><span>صورة هذا العنوان</span><select value={id||''} disabled={!!mediaError} onChange={event=>updateQualityMedia(index,event.target.value)}><option value="">بدون صورة</option>{visibleMediaOptions.map(media=><option key={media.id} value={media.id}>{(locale==='ar'?media.alt_ar:media.alt_en)||'صورة محفوظة'}</option>)}</select></label><button type="button" onClick={()=>{setImageTarget('quality:'+index);setImagePicker(true)}}>اختيار صورة أو رفع صورة جديدة</button></div>
+         <div className={styles.projectMediaDetails}><strong>{item.name}</strong><label className={styles.projectMediaSelect}><span>صورة هذا العنوان</span><select value={id||''} disabled={!!mediaError} onChange={event=>updateQualityMedia(index,event.target.value)}><option value="">بدون صورة</option>{visibleMediaOptions.map(media=><option key={media.id} value={media.id}>{(locale==='ar'?media.alt_ar:media.alt_en)||'صورة محفوظة'}</option>)}</select></label><button type="button" onClick={()=>{setImageTarget('quality:'+index);setImagePicker(true)}}>اختيار صورة أو رفع صورة جديدة</button>{id&&<button type="button" onClick={()=>clearImageAssignment('quality:'+index)}>إزالة الصورة</button>}</div>
          {url?<img className={styles.projectMediaPreview} src={url} alt={item.name}/>:<div className={styles.projectMediaNoImage}>لا توجد صورة</div>}
         </div>})}
        </div>
@@ -393,7 +405,7 @@ export default function ContractingVisualEditor({
        <p className={styles.helpText}>اختر صورة لكل قطاع أو اضغط صورته في معاينة الصفحة.</p>
        <div className={styles.projectMediaGrid}>
         {copy.domains.map((name,index)=>{const id=copy.domainMediaIds[index];const url=visibleMediaOptions.find(media=>media.id===id)?.public_url;return <div className={styles.projectMediaRow} key={index}>
-         <div className={styles.projectMediaDetails}><strong>{name}</strong><label className={styles.projectMediaSelect}><span>صورة القطاع</span><select value={id||''} disabled={!!mediaError} onChange={event=>updateDomainMedia(index,event.target.value)}><option value="">بدون صورة</option>{visibleMediaOptions.map(media=><option key={media.id} value={media.id}>{(locale==='ar'?media.alt_ar:media.alt_en)||'صورة محفوظة'}</option>)}</select></label><button type="button" onClick={()=>{setImageTarget('domain:'+index);setImagePicker(true)}}>اختيار صورة أو رفع صورة جديدة</button></div>
+         <div className={styles.projectMediaDetails}><strong>{name}</strong><label className={styles.projectMediaSelect}><span>صورة القطاع</span><select value={id||''} disabled={!!mediaError} onChange={event=>updateDomainMedia(index,event.target.value)}><option value="">بدون صورة</option>{visibleMediaOptions.map(media=><option key={media.id} value={media.id}>{(locale==='ar'?media.alt_ar:media.alt_en)||'صورة محفوظة'}</option>)}</select></label><button type="button" onClick={()=>{setImageTarget('domain:'+index);setImagePicker(true)}}>اختيار صورة أو رفع صورة جديدة</button>{id&&<button type="button" onClick={()=>clearImageAssignment('domain:'+index)}>إزالة الصورة</button>}</div>
          {url?<img className={styles.projectMediaPreview} src={url} alt={name}/>:<div className={styles.projectMediaNoImage}>لا توجد صورة</div>}
         </div>})}
        </div>
@@ -415,12 +427,12 @@ export default function ContractingVisualEditor({
              onChange={event=>updatePortfolioMedia(project.key,event.target.value)}
             >
              <option value="">بدون صورة</option>
-             {mediaOptions.map((item,index)=><option key={item.id} value={item.id}>
+             {visibleMediaOptions.map((item,index)=><option key={item.id} value={item.id}>
               {(locale==='ar'?item.alt_ar:item.alt_en)||`صورة من المكتبة ${index+1}`}
              </option>)}
             </select>
            </label>
-           <button type="button" onClick={()=>{setImageTarget('portfolio:'+project.key);setImageSource('saved');setImagePicker(true);}}>اختيار صورة أو رفع صورة جديدة</button>
+           <button type="button" onClick={()=>{setImageTarget('portfolio:'+project.key);setImageSource('saved');setImagePicker(true);}}>اختيار صورة أو رفع صورة جديدة</button>{project.mediaId&&<button type="button" onClick={()=>clearImageAssignment('portfolio:'+project.key)}>إزالة الصورة</button>}
           </div>
           {previewUrl?<img className={styles.projectMediaPreview} src={previewUrl} alt={`معاينة صورة ${project.name}`}/>:<div className={styles.projectMediaNoImage}>لا توجد صورة</div>}
          </div>;
