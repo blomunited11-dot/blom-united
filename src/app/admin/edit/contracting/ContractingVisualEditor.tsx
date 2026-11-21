@@ -472,7 +472,7 @@ export default function ContractingVisualEditor({
      <div><p className={styles.eyebrow}>LIVE PREVIEW</p><h2>معاينة الموقع</h2></div>
      <span>لا تظهر للزوار قبل النشر</span>
     </header>
-    <div className={styles.previewViewport} onClick={inspectPageClick} dir={locale==='ar'?'rtl':'ltr'}>
+    <div className={styles.previewViewport} onClickCapture={inspectPageClick} dir={locale==='ar'?'rtl':'ltr'}>
      {page==='root'
       ?<ContractingExperience locale={locale} services={services} projects={previewProjects} copy={previewCopy} heroImage={heroImage} projectImages={portfolioImages} serviceImages={serviceImages}/>
       :<ContractingInnerExperience locale={locale} page={page} copy={previewCopy} services={services} projects={projects}/>}
