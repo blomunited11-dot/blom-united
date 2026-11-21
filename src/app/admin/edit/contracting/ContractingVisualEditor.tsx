@@ -243,8 +243,9 @@ export default function ContractingVisualEditor({
     const card=media.closest('.ctCase');
     const cards=Array.from(card?.parentElement?.children||[]);
     const index=card?cards.indexOf(card):-1;
-    if(projects.length>0){const item=projects[index];if(!item)return;setImageTarget('project:'+item.id)}
-    else{const item=copy.projects[index];if(!item)return;setImageTarget('portfolio:'+item.key)}
+    const item=previewCopy.projects[index];
+    if(!item)return;
+    setImageTarget('portfolio:'+item.key);
    }
    setImagePicker(true);return;
   }
@@ -402,7 +403,7 @@ export default function ContractingVisualEditor({
        <p className={styles.helpText}>اختر صورة لكل بطاقة ظاهرة في صفحة المقاولات. الاختيارات جزء من المسودة، ولا تظهر للزوار قبل النشر.</p>
        <div className={styles.projectMediaGrid}>
         {copy.projects.map(project=>{
-         const previewUrl=mediaOptions.find(item=>item.id===project.mediaId)?.public_url||null;
+         const previewUrl=visibleMediaOptions.find(item=>item.id===project.mediaId)?.public_url||null;
          return <div className={styles.projectMediaRow} key={project.key}>
           <div className={styles.projectMediaDetails}>
            <strong>{project.name}</strong>
@@ -419,6 +420,7 @@ export default function ContractingVisualEditor({
              </option>)}
             </select>
            </label>
+           <button type="button" onClick={()=>{setImageTarget('portfolio:'+project.key);setImageSource('saved');setImagePicker(true);}}>اختيار صورة أو رفع صورة جديدة</button>
           </div>
           {previewUrl?<img className={styles.projectMediaPreview} src={previewUrl} alt={`معاينة صورة ${project.name}`}/>:<div className={styles.projectMediaNoImage}>لا توجد صورة</div>}
          </div>;
