@@ -10,6 +10,7 @@ import {
  readContractingCopy
 } from '@/lib/data/contracting';
 import {published} from '@/lib/data/site';
+import {contractingDefaultContent} from '@/config/contracting.content';
 import type {Locale} from '@/lib/i18n/dictionary';
 
 export const dynamic='force-dynamic';
@@ -38,12 +39,12 @@ export default async function ContractingVisualEditorPage({searchParams}:Props){
  ]);
  if(copyError||!rows)return <p role="alert">تعذر تحميل المحتوى المنشور.</p>;
  const row=rows.find(item=>item.locale===locale);
- if(!row)return <p role="alert">الترجمة المطلوبة غير موجودة.</p>;
-
- const liveCopy=readContractingCopy(row.body);
+ // A newly created or draft sector may not yet have a published translation.
+ // The editor must still open so an owner can prepare its first publication.
+ const liveCopy=row?readContractingCopy(row.body):contractingDefaultContent[locale];
  const copy=mergeContractingCopy(locale,liveCopy,draft.copy);
  const mediaId=draft.found?draft.heroMediaId:liveCopy.heroMediaId||null;
- const heroImage=draft.found?draft.heroImage:await getContractingHeroImage(locale);
+ const heroImage=draft.found?draft.heroImage:row?await getContractingHeroImage(locale):null;
  const mediaOptions=(media||[]).filter(item=>item.public_url&&(!item.sector_id||item.sector_id===sector.id));
  const portfolioImages=await getContractingPortfolioImages(copy.projects);
  for(const project of copy.projects){
