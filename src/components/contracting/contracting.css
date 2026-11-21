@@ -161,3 +161,7 @@
  .ctDomains .ctDomainCard:last-child{padding-bottom:0;border-bottom:0}
  .ctDomains .ctDomainCard .ctDomainMedia{margin-bottom:7px}
 }
+
+/* Keep card spacing without visible divider rules. */
+.ctDomains .ctDomainCard,.ctCapabilities .ctCapability,.ctStandards .ctQualityCard{border-top:0;border-bottom:0}
+@media(max-width:560px){.ctDomains .ctDomainCard,.ctCapabilities .ctCapability,.ctStandards .ctQualityCard{border-top:0;border-bottom:0}}
