@@ -199,3 +199,13 @@
 .contracting #ct-services .ctCapabilityMedia{background:#e3eaf2;border:0;overflow:hidden}
 .contracting #ct-services .ctCapabilityMedia img{display:block}
 @media(max-width:560px){.contracting #ct-services{padding-inline:14px;border-radius:0}}
+
+/* Featured portfolio editorial treatment: deliberate typography and balanced image/text. */
+.contracting .ctCaseGrid .ctCaseShowcase{background:#f0f4f8;align-items:stretch}
+.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;padding:clamp(24px,3.2vw,52px);min-width:0}
+.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody>.ctKicker{display:block;direction:rtl;text-align:start;letter-spacing:0;opacity:1;color:#466b95;font-size:clamp(13px,1vw,16px);font-weight:650;line-height:1.6;margin:0 0 9px}
+.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody h3{color:#153d78;font-size:clamp(26px,2.3vw,37px);font-weight:650;line-height:1.35;margin:0 0 12px}
+.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody p{color:#334b63;font-size:clamp(15px,1.05vw,17px);line-height:1.8;margin:0;max-width:44ch}
+@media(min-width:851px){.contracting .ctCaseGrid .ctCaseShowcase{grid-template-columns:minmax(0,1.55fr) minmax(330px,.85fr)}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseMedia{min-height:440px}}
+@media(max-width:850px){.contracting .ctCaseGrid .ctCaseShowcase{grid-template-columns:1fr}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody{padding:18px 20px 22px}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody>.ctKicker{margin-bottom:5px}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody h3{font-size:clamp(23px,4vw,30px);margin-bottom:6px}}
+@media(max-width:560px){.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody{padding:13px 14px 17px}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody>.ctKicker{font-size:13px;margin-bottom:4px}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody h3{font-size:23px;margin-bottom:5px}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody p{font-size:14px;line-height:1.65}}
