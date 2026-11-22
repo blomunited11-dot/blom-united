@@ -209,3 +209,21 @@
 @media(min-width:851px){.contracting .ctCaseGrid .ctCaseShowcase{grid-template-columns:minmax(0,1.55fr) minmax(330px,.85fr)}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseMedia{min-height:440px}}
 @media(max-width:850px){.contracting .ctCaseGrid .ctCaseShowcase{grid-template-columns:1fr}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody{padding:18px 20px 22px}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody>.ctKicker{margin-bottom:5px}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody h3{font-size:clamp(23px,4vw,30px);margin-bottom:6px}}
 @media(max-width:560px){.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody{padding:13px 14px 17px}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody>.ctKicker{font-size:13px;margin-bottom:4px}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody h3{font-size:23px;margin-bottom:5px}.contracting .ctCaseGrid .ctCaseShowcase .ctCaseBody p{font-size:14px;line-height:1.65}}
+
+/* Localized, editable five-stage overlay for the text-free integrated delivery artwork. */
+.contracting .ctIntegratedImage{position:relative;isolation:isolate;display:block;aspect-ratio:1016/572;overflow:hidden;margin-block:20px 28px;background:#dce5eb;border:0}
+.contracting .ctIntegratedImage>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.contracting .ctIntegratedStages{position:absolute;inset-inline:4.8%;bottom:5.8%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1.1%;direction:rtl;align-items:stretch;z-index:1}
+.contracting .ctIntegratedStage{position:relative;min-width:0;min-height:clamp(65px,8vw,114px);padding:clamp(13px,1.6vw,22px) 6px 9px;display:flex;align-items:center;justify-content:center;text-align:center;background:rgba(18,48,85,.9);color:#fff;border:1px solid rgba(255,255,255,.65)}
+.contracting .ctIntegratedStage:nth-child(even){background:rgba(51,91,121,.91)}
+.contracting .ctIntegratedStageNumber{position:absolute;top:-19px;left:50%;transform:translateX(-50%);background:#426783;color:#fff;font-size:clamp(16px,2vw,27px);font-weight:750;line-height:1;padding:7px 9px;direction:ltr;font-variant-numeric:tabular-nums}
+.contracting .ctIntegratedStageLabel{font-size:clamp(11px,1.22vw,17px);line-height:1.5;font-weight:650;overflow-wrap:anywhere}
+@media(max-width:700px){
+ .contracting .ctIntegratedImage{aspect-ratio:auto;overflow:visible;background:transparent}
+ .contracting .ctIntegratedImage>img{position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1016/572;object-fit:cover}
+ .contracting .ctIntegratedStages{position:relative;inset:auto;bottom:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 10px;padding:25px 0 0}
+ .contracting .ctIntegratedStage{min-height:85px;padding:19px 10px 12px}
+ .contracting .ctIntegratedStage:last-child:nth-child(odd){grid-column:1/-1}
+ .contracting .ctIntegratedStageNumber{font-size:18px;top:-15px;padding:5px 8px}
+ .contracting .ctIntegratedStageLabel{font-size:14px}
+}
