@@ -191,3 +191,11 @@
  .contracting .ctCaseShowcase .ctCaseBody{padding:10px 12px 14px}
  .contracting .ctCase:not(.ctCaseFeatured) .ctCaseBody{padding:9px 0 12px}
 }
+
+/* BLOM corporate palette: quiet blue-grey backdrop for the capabilities gallery. */
+.contracting #ct-services{position:relative;isolation:isolate;padding-inline:clamp(18px,2.5vw,36px);background:linear-gradient(145deg,#f0f4f8 0%,#f5f7fa 55%,#edf2f7 100%);border-radius:4px}
+.contracting #ct-services .ctSectionHead h2,.contracting #ct-services .ctCapability h3{color:#153d78}
+.contracting #ct-services .ctCapability>span{color:#627b98;opacity:1}
+.contracting #ct-services .ctCapabilityMedia{background:#e3eaf2;border:0;overflow:hidden}
+.contracting #ct-services .ctCapabilityMedia img{display:block}
+@media(max-width:560px){.contracting #ct-services{padding-inline:14px;border-radius:0}}
