@@ -21,12 +21,25 @@ export default async function Sector({params,searchParams}:{params:Promise<{loca
   ]);
   const previewProjects=preview?withContractingProjectMediaDrafts(projects,preview.projectMediaDrafts):projects;
   const mergedCopy=mergeContractingCopy(l,copy);
-  const images=await getContractingPortfolioImages([{key:'integrated-banner',mediaId:mergedCopy.integratedMediaId},{key:'lifecycle-banner',mediaId:mergedCopy.lifecycleMediaId},...mergedCopy.projects,...mergedCopy.serviceMediaIds.map((mediaId,index)=>({key:`service-${index}`,mediaId})),...mergedCopy.qualityMediaIds.map((mediaId,index)=>({key:`quality-${index}`,mediaId})),...mergedCopy.domainMediaIds.map((mediaId,index)=>({key:`domain-${index}`,mediaId}))]);
+  // Media is shared between languages: English copy can be translated independently
+  // without requiring editors to upload or select every image a second time.
+  const arabicMediaCopy=l==='en'?mergeContractingCopy('ar',await getContractingCopy('ar')):null;
+  const arabicProjects=new Map(arabicMediaCopy?.projects.map(project=>[project.key,project.mediaId])||[]);
+  const mediaSelections=[
+   {key:'integrated-banner',mediaId:mergedCopy.integratedMediaId||arabicMediaCopy?.integratedMediaId},
+   {key:'lifecycle-banner',mediaId:mergedCopy.lifecycleMediaId||arabicMediaCopy?.lifecycleMediaId},
+   ...mergedCopy.projects.map(project=>({...project,mediaId:project.mediaId||arabicProjects.get(project.key)||null})),
+   ...mergedCopy.serviceMediaIds.map((mediaId,index)=>({key:`service-${index}`,mediaId:mediaId||arabicMediaCopy?.serviceMediaIds[index]||null})),
+   ...mergedCopy.qualityMediaIds.map((mediaId,index)=>({key:`quality-${index}`,mediaId:mediaId||arabicMediaCopy?.qualityMediaIds[index]||null})),
+   ...mergedCopy.domainMediaIds.map((mediaId,index)=>({key:`domain-${index}`,mediaId:mediaId||arabicMediaCopy?.domainMediaIds[index]||null}))
+  ];
+  const images=await getContractingPortfolioImages(mediaSelections);
   const serviceImages=Object.fromEntries(mergedCopy.serviceMediaIds.flatMap((_,index)=>images[`service-${index}`]?[[String(index),images[`service-${index}`]]]:[]));
   const qualityImages=Object.fromEntries(mergedCopy.qualityMediaIds.flatMap((_,index)=>images[`quality-${index}`]?[[String(index),images[`quality-${index}`]]]:[]));
   const domainImages=Object.fromEntries(mergedCopy.domainMediaIds.flatMap((_,index)=>images[`domain-${index}`]?[[String(index),images[`domain-${index}`]]]:[]));
   const projectImages=images;
-  return <ContractingExperience locale={l} services={services} projects={previewProjects} copy={mergedCopy} heroImage={heroImage} projectImages={projectImages} serviceImages={serviceImages} qualityImages={qualityImages} domainImages={domainImages} lifecycleImage={images['lifecycle-banner']||null} integratedImage={images['integrated-banner']||null}/>;
+  const sharedHeroImage=heroImage||(l==='en'?await getContractingHeroImage('ar'):null);
+  return <ContractingExperience locale={l} services={services} projects={previewProjects} copy={mergedCopy} heroImage={sharedHeroImage} projectImages={projectImages} serviceImages={serviceImages} qualityImages={qualityImages} domainImages={domainImages} lifecycleImage={images['lifecycle-banner']||null} integratedImage={images['integrated-banner']||null}/>;
  }
  return <main className="container page"><h1>{sector?.title||s[l]}</h1><p>{sector?.summary||dict[l].noContent}</p><h2>{l==='ar'?'الخدمات':'Services'}</h2><div className="cards">{services.map(x=><Link className="card cardBody" key={x.id} href={`/${l}/sectors/${slug}/services/${x.slug}`}>{x.title}</Link>)}</div><h2>{dict[l].projects}</h2><div className="cards">{projects.map(x=><Link className="card cardBody" key={x.id} href={`/${l}/projects/${x.slug}`}>{x.title}</Link>)}</div></main>;
 }
