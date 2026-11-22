@@ -219,13 +219,14 @@
 .contracting .ctIntegratedStageNumber{position:absolute;top:-19px;left:50%;transform:translateX(-50%);background:#426783;color:#fff;font-size:clamp(16px,2vw,27px);font-weight:750;line-height:1;padding:7px 9px;direction:ltr;font-variant-numeric:tabular-nums}
 .contracting .ctIntegratedStageLabel{font-size:clamp(11px,1.22vw,17px);line-height:1.5;font-weight:650;overflow-wrap:anywhere}
 @media(max-width:700px){
- .contracting .ctIntegratedImage{aspect-ratio:auto;overflow:visible;background:transparent}
- .contracting .ctIntegratedImage>img{position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1016/572;object-fit:cover}
- .contracting .ctIntegratedStages{position:relative;inset:auto;bottom:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 10px;padding:25px 0 0}
- .contracting .ctIntegratedStage{min-height:85px;padding:19px 10px 12px}
- .contracting .ctIntegratedStage:last-child:nth-child(odd){grid-column:1/-1}
- .contracting .ctIntegratedStageNumber{font-size:18px;top:-15px;padding:5px 8px}
- .contracting .ctIntegratedStageLabel{font-size:14px}
+ /* Keep the five editable captions aligned with the five blue tabs in the artwork. */
+ .contracting .ctIntegratedImage{aspect-ratio:1016/572;overflow:hidden;background:#dce5eb}
+ .contracting .ctIntegratedImage>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+ .contracting .ctIntegratedStages{position:absolute;inset-inline:4.8%;bottom:5.8%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1.1%;padding:0}
+ .contracting .ctIntegratedStage{min-height:0;aspect-ratio:1.5;padding:5px 2px 3px}
+ .contracting .ctIntegratedStage:last-child:nth-child(odd){grid-column:auto}
+ .contracting .ctIntegratedStageNumber{font-size:clamp(7px,1.7vw,12px);top:-10px;padding:2px 3px}
+ .contracting .ctIntegratedStageLabel{font-size:clamp(6px,1.5vw,11px);line-height:1.2}
 }
 
 /* Eight editable lifecycle captions aligned with the blank blue tabs in the artwork. */
