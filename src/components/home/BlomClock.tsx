@@ -20,7 +20,7 @@ export default function BlomClock(){
  const seconds=time?.second||0;
  const minutes=(time?.minute||0)+seconds/60;
  const hours=((time?.hour||0)%12)+minutes/60;
- return <svg className="blomClockOverlay" viewBox="0 0 100 100" aria-hidden="true" focusable="false" style={{position:'absolute',left:'35.2%',top:'31.7%',width:'5.2%',height:'5.2%',overflow:'visible',pointerEvents:'none'}}>
+ return <svg className="blomClockOverlay" viewBox="0 0 100 100" aria-hidden="true" focusable="false" style={{position:'absolute',left:'35.55%',top:'31.15%',width:'5.5%',height:'5.5%',overflow:'visible',pointerEvents:'none'}}>
   <circle cx="50" cy="50" r="48" fill="#087340" stroke="#d9b968" strokeWidth="4"/>
   {Array.from({length:12},(_,i)=><line key={i} x1="50" y1="10" x2="50" y2="19" stroke="#fff9d9" strokeWidth="3" transform={`rotate(${i*30} 50 50)`}/>)}
   <g transform={`rotate(${hours*30} 50 50)`}><path d="M50 50 L50 30" fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round"/></g>
