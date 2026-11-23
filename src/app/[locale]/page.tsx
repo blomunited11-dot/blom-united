@@ -11,8 +11,6 @@ export default async function Home({params}:{params:Promise<{locale:string}>}){
     <div className="blomOpeningArtwork" role="img" aria-label={locale==='ar'?'رمز بلوم المتحدة مع مشهد مدينة سعودية':'BLOM UNITED symbol with Saudi cityscape'}>
      <div className="blomClockArtwork" style={{position:'relative',width:'min(100%, calc((100svh - 120px) * 745 / 771))',maxWidth:'100%',flex:'none'}}>
       <img className="blomOpeningImage" src="/brand/hero-city-b.webp" alt="" width={745} height={771} fetchPriority="high" style={{width:'100%',height:'auto',maxHeight:'none',display:'block'}} />
-      {/* Conceal the baked-in clock face while leaving the original image and live clock unchanged. */}
-      <span aria-hidden="true" style={{position:'absolute',left:'36.1%',top:'30.7%',width:'4.1%',height:'7.5%',borderRadius:'48% 48% 44% 44%',background:'linear-gradient(90deg,#667b8d 0%,#8193a1 24%,#9ba9b3 48%,#7d90a0 75%,#60778b 100%)',pointerEvents:'none'}} />
       {/* Overlay follows the image's intrinsic coordinates at every viewport width. */}
 <BlomClock />
      </div>
