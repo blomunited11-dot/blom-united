@@ -234,6 +234,16 @@
 .contracting .ctLifecycleBanner .ctLifecycleImage>img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
 /* The uploaded 1820x830 artwork places its eight empty blue caption tabs at ~45%-56% of the image height. */
 .contracting .ctLifecycleStageLabels{position:absolute;top:45%;left:2.7%;right:2.7%;height:11%;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:1.35%;direction:ltr;z-index:1}
+/* New artwork: visual slots run left-to-right as 08, 07, 05, 04, 03, 06, 02, 01.
+   Keep the underlying steps in their logical 01..08 order for the editor and mobile. */
+.contracting .ctLifecycleStageLabel:nth-child(1){grid-column:8}
+.contracting .ctLifecycleStageLabel:nth-child(2){grid-column:7}
+.contracting .ctLifecycleStageLabel:nth-child(3){grid-column:5}
+.contracting .ctLifecycleStageLabel:nth-child(4){grid-column:4}
+.contracting .ctLifecycleStageLabel:nth-child(5){grid-column:3}
+.contracting .ctLifecycleStageLabel:nth-child(6){grid-column:6}
+.contracting .ctLifecycleStageLabel:nth-child(7){grid-column:2}
+.contracting .ctLifecycleStageLabel:nth-child(8){grid-column:1}
 .contracting .ctLifecycleStageLabel{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;direction:rtl;padding:2px 5px;line-height:1.2;overflow:hidden}
 .contracting .ctLifecycleStageIndex{display:block;flex:none;font-size:clamp(11px,1.05vw,16px);font-weight:750;line-height:1.15;direction:ltr;opacity:1}
 .contracting .ctLifecycleStageTitle{display:block;max-width:100%;font-size:clamp(9px,.9vw,14px);font-weight:650;line-height:1.2;overflow-wrap:break-word;opacity:1}
@@ -242,6 +252,7 @@
  .contracting .ctLifecycleBanner .ctLifecycleImage>img{position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1820/830;object-fit:contain}
  .contracting .ctLifecycleStageLabels{position:relative;top:auto;left:auto;right:auto;height:auto;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px;direction:rtl}
  .contracting .ctLifecycleStageLabel{background:#143d73;min-height:72px;padding:10px 12px;border-radius:3px}
+ .contracting .ctLifecycleStageLabel:nth-child(n){grid-column:auto}
  .contracting .ctLifecycleStageIndex{font-size:15px;margin-bottom:4px}
  .contracting .ctLifecycleStageTitle{font-size:14px;line-height:1.45}
 }
